@@ -19,7 +19,7 @@
   };
   let collections = [], selected = null;
 
-  // --- NEUES KRONK SYSTEM ---
+  // --- KRONK CHARAKTER & FREISCHALT-SYSTEM ---
   const kronkLevel = [
     { id: 'kronk', name: 'Standard Kronk', pointsNeeded: 0 },
     { id: 'kronk_silber', name: 'Silberner Kronk', pointsNeeded: 1000 },
@@ -44,16 +44,33 @@
     localStorage.setItem('kronk_aktiv', aktiverKronk);
   }
 
+  function aktualisiereKronkMenue() {
+    const select = $("kronk-select");
+    if (!select) return;
+    select.replaceChildren();
+    kronkLevel.forEach(char => {
+      if (freigeschalteteKronks.includes(char.id)) {
+        select.add(new Option(char.name, char.id));
+      }
+    });
+    select.value = aktiverKronk;
+  }
+
   function pruefeFreischaltungen() {
+    let neuFreigeschaltet = false;
     kronkLevel.forEach(char => {
       if (gesamtPunkte >= char.pointsNeeded && !freigeschalteteKronks.includes(char.id)) {
         freigeschalteteKronks.push(char.id);
-        speichereSpielstand();
+        neuFreigeschaltet = true;
         alert(`🎉 Glückwunsch! Du hast insgesamt ${gesamtPunkte} Punkte erreicht und den "${char.name}" freigeschaltet!`);
       }
     });
+    if (neuFreigeschaltet) {
+      speichereSpielstand();
+      aktualisiereKronkMenue();
+    }
   }
-  // --------------------------
+  // -------------------------------------------
 
   function collectionTitle(c) {
     return `${c.fach} · Klasse ${c.klasse} · ${c.thema}${c.beispiel ? " (Beispiel)" : ""}`;
@@ -88,11 +105,12 @@
   }
   function chooseTopic() {
     resetRound(); mode = "ready";
-    showPanel("Hoch hinaus mit Kronk!", "Kronk springt von allein. Halte links oder rechts gedrückt und lande mit seinen Füßen auf einer richtigen Antwort. Falsche Plattformen brechen weg!", "Los geht’s!", true);
+    showPanel("Hoch hinaus mit Kronk!", "Kronk springt von allein. Halte links oder rechts gedrückt und lande mit seinen Füßen auf der richtigen Antwort. Falsche Plattformen brechen weg!", "Los geht’s!", true);
     $("selection").hidden = false; $("choose-topic").hidden = true;
     $("question").textContent = "Bereit für den nächsten Sprung?";
     $("progress").textContent = "Mit Kronk nach oben";
     $("status").textContent = "Wähle ein Thema und starte das Spiel.";
+    aktualisiereKronkMenue();
     updateSelected(); $("subject").focus({preventScroll:true});
   }
   function loadCollection(entry) {
@@ -335,23 +353,38 @@
   window.addEventListener("keyup", e => keys.delete(e.key));
   window.addEventListener("blur", () => { clearInput(); if (mode === "playing") pause(); });
   document.addEventListener("visibilitychange", () => { if (document.hidden && mode === "playing") pause(); });
+  
+  // Event-Listener für das neue Charakter-Menü
+  $("kronk-select").addEventListener("change", async (e) => {
+    aktiverKronk = e.target.value;
+    speichereSpielstand();
+    await Promise.all(["normal", "jubel", "sprung"].map(name => new Promise((resolve) => {
+      const img = new Image(); 
+      img.onload = () => { images[name] = img; resolve(); };
+      img.src = `assets/${aktiverKronk}-${name}.png`;
+    })));
+  });
+
   $("subject").addEventListener("change", updateGrades);
   $("grade").addEventListener("change", updateTopics);
   $("topic").addEventListener("change", updateSelected);
   $("choose-topic").addEventListener("click", chooseTopic);
   $("pause").addEventListener("click", pause);
   $("start").addEventListener("click", () => mode === "paused" ? pause() : start());
+
   if (typeof ResizeObserver !== "undefined") {
     new ResizeObserver(entries => {
       const height = entries[0].target.getBoundingClientRect().height + 12;
       document.querySelector(".stage").style.setProperty("--question-height", `${height}px`);
     }).observe(document.querySelector(".question"));
   }
+
   async function init() {
     try {
       await loadCollections();
       $("start").disabled = true;
       ladeSpielstand();
+      aktualisiereKronkMenue();
       await Promise.all(["normal", "jubel", "sprung"].map(name => new Promise((resolve, reject) => {
         const img = new Image(); img.onload = () => { images[name] = img; resolve(); };
         img.onerror = () => reject(Error(`Kronk-Bild fehlt: assets/${aktiverKronk}-${name}.png`)); 
