@@ -56,13 +56,33 @@
     select.value = aktiverKronk;
   }
 
+  const unlockQueue = [];
+  function showNextUnlock() {
+    if (!unlockQueue.length || $("unlock-dialog").open) return;
+    const char = unlockQueue.shift();
+    clearInput();
+    $("unlock-title").textContent = char.name;
+    $("unlock-image").src = `assets/${char.id}-jubel.png`;
+    $("unlock-image").alt = char.name;
+    $("unlock-description").textContent = `Stark gemacht! Du hast ${gesamtPunkte.toLocaleString("de-DE")} Gesamtpunkte gesammelt und einen neuen Kronk freigeschaltet.`;
+    $("unlock-continue").textContent = unlockQueue.length ? "Nächsten Kronk ansehen" : mode === "playing" ? "Weiterspielen" : "Weiter";
+    $("unlock-dialog").showModal();
+  }
+  function closeUnlock() {
+    $("unlock-dialog").close();
+    clearInput(); accumulator = 0; last = 0;
+    if (unlockQueue.length) showNextUnlock();
+    else (mode === "playing" ? canvas : $("start")).focus({preventScroll:true});
+  }
+  $("unlock-continue").addEventListener("click", closeUnlock);
+  $("unlock-dialog").addEventListener("cancel", e => { e.preventDefault(); closeUnlock(); });
   function pruefeFreischaltungen() {
     let neuFreigeschaltet = false;
     kronkLevel.forEach(char => {
       if (gesamtPunkte >= char.pointsNeeded && !freigeschalteteKronks.includes(char.id)) {
         freigeschalteteKronks.push(char.id);
         neuFreigeschaltet = true;
-        alert(`🎉 Glückwunsch! Du hast insgesamt ${gesamtPunkte} Punkte erreicht und den "${char.name}" freigeschaltet!`);
+        unlockQueue.push(char);
       }
     });
     if (neuFreigeschaltet) {
@@ -201,6 +221,7 @@
     $("pause").disabled = false; $("pause").textContent = "Pause"; setQuestion(); canvas.focus({preventScroll:true});
   }
   function pause() {
+    if ($("unlock-dialog").open) return;
     if (mode === "playing") {
       mode = "paused"; $("pause").textContent = "Weiter";
       showPanel("Kurze Pause", "Kronk wartet auf dich. Dein Spielstand bleibt erhalten.", "Weiterspielen");
@@ -214,7 +235,7 @@
     $("status").textContent = won ? "Alle Aufgaben geschafft!" : "Lies die Lösung und versuche es noch einmal.";
   }
   function step(dt) {
-    if (mode !== "playing") return;
+    if (mode !== "playing" || $("unlock-dialog").open) return;
     const left = keys.has("ArrowLeft") || [...pointers.values()].includes(-1);
     const right = keys.has("ArrowRight") || [...pointers.values()].includes(1);
     const direction = Number(right) - Number(left);
@@ -335,8 +356,8 @@
   }
   function frame(time) {
     const dt = Math.min((time - last) / 1000 || 0, .05); last = time;
-    if (mode === "playing") { accumulator += dt; while (accumulator >= 1 / 120) { step(1 / 120); accumulator -= 1 / 120; } } else accumulator = 0;
-    draw(); requestAnimationFrame(frame);
+    if (mode === "playing" && !$("unlock-dialog").open) { accumulator += dt; while (accumulator >= 1 / 120) { step(1 / 120); accumulator -= 1 / 120; } } else accumulator = 0;
+    showNextUnlock(); draw(); requestAnimationFrame(frame);
   }
   for (const [id, direction] of [["left", -1], ["right", 1]]) {
     const button = $(id);
@@ -346,7 +367,7 @@
     button.addEventListener("contextmenu", e => e.preventDefault());
   }
   window.addEventListener("keydown", e => {
-    if (e.target.tagName === "SELECT") return;
+    if ($("unlock-dialog").open || e.target.tagName === "SELECT") return;
     if (["ArrowLeft", "ArrowRight"].includes(e.key)) { e.preventDefault(); if (mode === "playing") keys.add(e.key); }
     if (e.key.toLowerCase() === "p" && !e.repeat) pause();
   });

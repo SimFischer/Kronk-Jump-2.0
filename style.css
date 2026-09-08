@@ -59,3 +59,17 @@ button:focus-visible,select:focus-visible,canvas:focus-visible { outline:3px sol
 .controls button { box-shadow:0 3px 0 #cc7900; }
 @media(hover:hover) { .primary:hover:not(:disabled),header button:hover:not(:disabled) { background:#1e3060; } .secondary:hover { background:#dce4f2; } .controls button:hover { background:#ffad33; } }
 @media(max-width:430px) { header { padding:10px 12px; gap:8px; } .school-name { font-size:9px; letter-spacing:1px; } h1 { font-size:22px; } header button { padding:10px 12px; } .meta { font-size:12px; } }
+
+/* Freischaltungen als modale Karte; die Runde wartet auf die Bestätigung. */
+.unlock-card { width:min(420px,calc(100% - 32px)); max-height:calc(100dvh - 32px); overflow:auto; padding:28px; border:1px solid #d6deeb; border-top:6px solid #ff9900; border-radius:24px; background:#fff; color:#293f77; text-align:center; box-shadow:0 24px 80px #172b5940; }
+.unlock-card::backdrop { background:#172b598c; backdrop-filter:blur(5px); }
+.unlock-card[open] { animation:unlock-appear .3s ease-out; }
+.unlock-badge { display:inline-block; margin:0 0 18px; padding:8px 12px; border-radius:999px; background:#fff0d8; color:#855000; font-size:12px; font-weight:800; letter-spacing:1px; }
+.unlock-portrait { display:grid; place-items:center; width:200px; height:200px; margin:0 auto 18px; border:2px solid #ffcc80; border-radius:50%; background:radial-gradient(circle,#fff 15%,#fff0d8 70%); }
+.unlock-portrait img { display:block; width:180px; height:180px; object-fit:contain; }
+.unlock-card h2 { font-size:28px; }
+.unlock-card p { line-height:1.5; }
+.unlock-hint { color:#52617b; font-size:14px; margin-bottom:22px; }
+@keyframes unlock-appear { from { opacity:0; transform:translateY(12px) scale(.96); } to { opacity:1; transform:none; } }
+@media(max-height:650px) { .unlock-card { padding:18px; } .unlock-portrait { width:120px; height:120px; margin-bottom:10px; } .unlock-portrait img { width:110px; height:110px; } .unlock-badge { margin-bottom:10px; } }
+@media(prefers-reduced-motion:reduce) { .unlock-card[open] { animation:none; } }
