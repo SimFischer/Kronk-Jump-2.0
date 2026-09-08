@@ -275,7 +275,7 @@
     const lines = textLines(text, maxWidth);
     const height = Math.max(46, lines.length * 23 + 16);
     ctx.fillStyle = "#ffffff"; ctx.fillRect(x - maxWidth / 2 - 8, y, maxWidth + 16, height);
-    ctx.fillStyle = "#102743";
+    ctx.fillStyle = "#293f77";
     lines.forEach((s, i) => ctx.fillText(s, x, y + 29 + i * 23));
   }
   function drawRow(r, old = false) {
@@ -283,7 +283,7 @@
     if (y < -200 || y > H + 100) return;
     ctx.globalAlpha = old ? .22 : 1;
     for (const p of r.platforms) {
-      ctx.fillStyle = p.broken ? "#e94232" : "#102743";
+      ctx.fillStyle = p.broken ? "#e94232" : "#293f77";
       if (p.broken) {
         ctx.save(); ctx.translate(p.x + p.width / 2, y + 15); ctx.rotate(.2); ctx.fillRect(-p.width / 2, 0, p.width * .45, 10); ctx.rotate(-.4); ctx.fillRect(0, 0, p.width * .45, 10); ctx.restore();
       } else { ctx.fillRect(p.x, y, p.width, 10); }
@@ -306,11 +306,11 @@
   function drawNearbyQuestion(question) {
     if (!question) return;
     const { lines, y, height } = question;
-    ctx.fillStyle = "#fff5ce";
+    ctx.fillStyle = "#fff6e8";
     ctx.fillRect(20, y, W - 40, height);
-    ctx.strokeStyle = "#102743"; ctx.lineWidth = 2;
+    ctx.strokeStyle = "#293f77"; ctx.lineWidth = 2;
     ctx.strokeRect(20, y, W - 40, height);
-    ctx.fillStyle = "#102743"; ctx.textAlign = "center";
+    ctx.fillStyle = "#293f77"; ctx.textAlign = "center";
     ctx.font = "700 24px system-ui";
     lines.forEach((line, i) => ctx.fillText(line, W / 2, y + 33 + i * 30));
   }
@@ -319,8 +319,8 @@
     const height = nearby ? Math.max(H, Math.ceil(nearby.y + nearby.height + 20)) : H;
     if (canvas.height !== height) canvas.height = height;
     ctx.clearRect(0, 0, W, height);
-    ctx.fillStyle = "#d8f0fb"; ctx.fillRect(0, 0, W, height);
-    ctx.strokeStyle = "#bddfeF"; ctx.lineWidth = 1;
+    ctx.fillStyle = "#f0f4fa"; ctx.fillRect(0, 0, W, height);
+    ctx.strokeStyle = "#dce4f0"; ctx.lineWidth = 1;
     for (let y = ((-camera * .3) % 60) - 60; y < height; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
     if (!player) return;
     oldRows.forEach(r => drawRow(r, true)); drawRow(row);
