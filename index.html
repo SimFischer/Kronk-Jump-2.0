@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102743">
+  <meta name="description" content="Mit Kronk von Antwort zu Antwort springen. Ein Lernspiel mit austauschbaren Aufgaben.">
+  <title>Kronk springt!</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="aufgaben.js?v=32246f8"></script>
+  <script defer src="spiel.js?v=8c2dd6a"></script>
+</head>
+<body>
+<main class="game">
+  <header><h1>KRONK <span>springt!</span></h1><button id="pause" disabled>Pause</button></header>
+  <div class="meta"><span id="set-title">Wähle deine Aufgabensammlung</span><span id="score">0 Punkte</span></div>
+  <div class="stage">
+    <section class="question" aria-label="Aktuelle Aufgabe" aria-live="polite"><span id="progress">Mit Kronk nach oben</span><h2 id="question">Bereit für den nächsten Sprung?</h2></section>
+    <div class="playfield"><canvas id="canvas" width="600" height="540" tabindex="0" aria-label="Spielfeld. Steuere Kronk mit den Pfeiltasten oder den beiden Richtungstasten auf die richtige Antwortplattform."></canvas></div>
+    <p id="status" role="status">Wähle ein Thema und starte das Spiel.</p>
+    <div id="overlay" class="overlay">
+      <div class="card">
+        <img src="assets/kronk-normal.png" alt="Kronk, das Schulmaskottchen" width="110" height="100">
+        <h2 id="panel-title">Hoch hinaus mit Kronk!</h2>
+        <p id="panel-text">Kronk springt von allein. Halte links oder rechts gedrückt und lande mit seinen Füßen auf der richtigen Antwort. Falsche Plattformen brechen weg!</p>
+        <div id="selection">
+          <label>Fach <select id="subject" disabled></select></label>
+          <label>Klassenstufe <select id="grade" disabled></select></label>
+          <label>Thema <select id="topic" disabled></select></label>
+          <p id="collection-info"></p><p id="load-errors" role="alert" hidden></p>
+        </div>
+        <label id="time-label">Denkpause pro Sprung <select id="thinking"><option value="0">0 Sekunden – ohne Denkpause</option><option value="1">1 Sekunde</option><option value="2" selected>2 Sekunden</option><option value="4">4 Sekunden</option><option value="6">6 Sekunden</option><option value="8">8 Sekunden</option><option value="10">10 Sekunden</option></select></label>
+        <button id="start" class="primary" disabled>Sammlungen werden geladen …</button>
+        <button id="choose-topic" class="secondary" hidden>Zur Themenauswahl</button>
+      </div>
+    </div>
+  </div>
+  <nav class="controls" aria-label="Spielsteuerung"><button id="left" aria-label="Kronk nach links bewegen">◀ <span>Links halten</span></button><button id="right" aria-label="Kronk nach rechts bewegen"><span>Rechts halten</span> ▶</button></nav>
+  <footer>Touch: Richtung halten · Tastatur: ← → · P: Pause</footer>
+</main>
+</body>
+</html>
