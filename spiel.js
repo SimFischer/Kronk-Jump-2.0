@@ -18,6 +18,43 @@
     return a;
   };
   let collections = [], selected = null;
+
+  // --- NEUES KRONK SYSTEM ---
+  const kronkLevel = [
+    { id: 'kronk', name: 'Standard Kronk', pointsNeeded: 0 },
+    { id: 'kronk_silber', name: 'Silberner Kronk', pointsNeeded: 1000 },
+    { id: 'kronk_gold', name: 'Goldener Kronk', pointsNeeded: 2500 }
+  ];
+  let gesamtPunkte = 0;
+  let freigeschalteteKronks = ['kronk'];
+  let aktiverKronk = 'kronk';
+
+  function ladeSpielstand() {
+    const pts = localStorage.getItem('kronk_gesamtpunkte');
+    if (pts) gesamtPunkte = parseInt(pts);
+    const chars = localStorage.getItem('kronk_freigeschaltet');
+    if (chars) freigeschalteteKronks = JSON.parse(chars);
+    const aktiv = localStorage.getItem('kronk_aktiv');
+    if (aktiv) aktiverKronk = aktiv;
+  }
+
+  function speichereSpielstand() {
+    localStorage.setItem('kronk_gesamtpunkte', gesamtPunkte);
+    localStorage.setItem('kronk_freigeschaltet', JSON.stringify(freigeschalteteKronks));
+    localStorage.setItem('kronk_aktiv', aktiverKronk);
+  }
+
+  function pruefeFreischaltungen() {
+    kronkLevel.forEach(char => {
+      if (gesamtPunkte >= char.pointsNeeded && !freigeschalteteKronks.includes(char.id)) {
+        freigeschalteteKronks.push(char.id);
+        speichereSpielstand();
+        alert(`🎉 Glückwunsch! Du hast insgesamt ${gesamtPunkte} Punkte erreicht und den "${char.name}" freigeschaltet!`);
+      }
+    });
+  }
+  // --------------------------
+
   function collectionTitle(c) {
     return `${c.fach} · Klasse ${c.klasse} · ${c.thema}${c.beispiel ? " (Beispiel)" : ""}`;
   }
@@ -46,7 +83,7 @@
   function resetRound() {
     questions = []; index = 0; score = 0; camera = 0; oldRows = []; row = null; player = null;
     hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0; last = 0; facing = 1;
-    clearInput(); $("score").textContent = "0 Punkte";
+    clearInput(); $("score").textContent = `0 Punkte (Gesamt: ${gesamtPunkte})`;
     $("pause").disabled = true; $("pause").textContent = "Pause";
   }
   function chooseTopic() {
@@ -129,7 +166,7 @@
   }
   function setQuestion() {
     $("question").textContent = row.q.frage;
-    $("score").textContent = `${score} Punkte`;
+    $("score").textContent = `${score} Punkte (Gesamt: ${gesamtPunkte})`;
     $("progress").textContent = `Aufgabe ${index + 1} von ${questions.length}`;
     $("status").textContent = "Füße auf eine richtige Plattform!";
   }
@@ -174,23 +211,24 @@
       player.vy += GRAVITY * dt;
       if (!apexUsed && player.vy >= 0) {
         apexUsed = true;
-        // Bei 0 Sekunden die natürliche Fallgeschwindigkeit unverändert lassen.
         if (thinking > 0) { hold = thinking; player.vy = 0; }
       }
       player.y += player.vy * dt;
     }
     celebration = Math.max(0, celebration - dt);
     if (!failText && player.vy > 0 && previousY <= row.y && player.y >= row.y) {
-      // Nur die schmale Fußposition zählt, nicht Kronks langer Schnabel.
       const hit = row.platforms.find(p => !p.broken && player.x >= p.x && player.x <= p.x + p.width);
       if (hit) {
         if (hit.richtig) {
-          score += 100; $("score").textContent = `${score} Punkte`;
+          score += 100;
+          gesamtPunkte += 100;
+          pruefeFreischaltungen();
+          speichereSpielstand();
+          $("score").textContent = `${score} Punkte (Gesamt: ${gesamtPunkte})`;
           player.y = row.y; player.vy = -JUMP; hold = 0; apexUsed = false; celebration = .5;
           oldRows.push(row); oldRows = oldRows.slice(-1); index++;
           if (index === questions.length) { finish(true); return; }
           row = makeRow(row.y - GAP);
-          // Kamera nur mit der Aufgabe wechseln: Die aktive Reihe bleibt auf Höhe 300.
           camera = row.y - 300; setQuestion();
         } else {
           hit.broken = true; failText = `„${hit.text}“ war hier nicht richtig.`;
@@ -201,7 +239,6 @@
     if (player.y - camera > H + 110) finish(false);
   }
   function textLines(text, maxWidth) {
-    // Zeichenweises Umbrechen funktioniert auch bei langen deutschen Wörtern.
     const lines = []; let line = "";
     for (const word of text.split(/\s+/)) {
       let next = line ? line + " " + word : word;
@@ -218,7 +255,6 @@
   }
   function wrapped(text, x, y, maxWidth) {
     const lines = textLines(text, maxWidth);
-    // Plattformetikett wächst nach unten; Text wird weder gekürzt noch überlagert.
     const height = Math.max(46, lines.length * 23 + 16);
     ctx.fillStyle = "#ffffff"; ctx.fillRect(x - maxWidth / 2 - 8, y, maxWidth + 16, height);
     ctx.fillStyle = "#102743";
@@ -261,7 +297,6 @@
     lines.forEach((line, i) => ctx.fillText(line, W / 2, y + 33 + i * 30));
   }
   function draw() {
-    // Dieselbe Frage wie oben, direkt unter der längsten Antwort.
     const nearby = nearbyQuestion();
     const height = nearby ? Math.max(H, Math.ceil(nearby.y + nearby.height + 20)) : H;
     if (canvas.height !== height) canvas.height = height;
@@ -276,7 +311,6 @@
       const height = 95, width = height * img.naturalWidth / img.naturalHeight;
       ctx.save(); ctx.translate(player.x, player.y - camera); ctx.scale(facing, 1);
       ctx.drawImage(img, -width / 2, -height, width, height); ctx.restore();
-      // Kleiner Fußmarker macht die Landeposition eindeutig.
       ctx.fillStyle = "#e94232"; ctx.fillRect(player.x - 7, player.y - camera - 3, 14, 3);
     }
     drawNearbyQuestion(nearby);
@@ -307,7 +341,6 @@
   $("choose-topic").addEventListener("click", chooseTopic);
   $("pause").addEventListener("click", pause);
   $("start").addEventListener("click", () => mode === "paused" ? pause() : start());
-  // Reserve genug Platz für beliebig mehrzeilige Fragen, auch nach einer Drehung.
   if (typeof ResizeObserver !== "undefined") {
     new ResizeObserver(entries => {
       const height = entries[0].target.getBoundingClientRect().height + 12;
@@ -318,9 +351,11 @@
     try {
       await loadCollections();
       $("start").disabled = true;
+      ladeSpielstand();
       await Promise.all(["normal", "jubel", "sprung"].map(name => new Promise((resolve, reject) => {
         const img = new Image(); img.onload = () => { images[name] = img; resolve(); };
-        img.onerror = () => reject(Error(`Kronk-Bild fehlt: assets/kronk-${name}.png`)); img.src = `assets/kronk-${name}.png`;
+        img.onerror = () => reject(Error(`Kronk-Bild fehlt: assets/${aktiverKronk}-${name}.png`)); 
+        img.src = `assets/${aktiverKronk}-${name}.png`;
       })));
       chooseTopic();
     } catch (e) { mode = "error"; showPanel("Dateien prüfen", e.message, "Bitte Dateien korrigieren"); $("start").disabled = true; }
