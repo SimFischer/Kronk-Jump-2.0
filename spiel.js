@@ -3,7 +3,21 @@
 (() => {
   const $ = id => document.getElementById(id);
   const canvas = $("canvas"), ctx = canvas.getContext("2d");
-  const W = 600, H = 540, GAP = 165, GRAVITY = 600, JUMP = 620, SPEED = 400;
+  const W = 600, H = 540, GAP = 165, GRAVITY = 600, JUMP = 620, SPEED = 480;
+  let canvasDpr = 0, renderHeight = H;
+  // Physik in unveränderten Spieleinheiten; Zeichenauflösung in echten Displaypixeln.
+  function resizeCanvas() {
+    const bounds = document.querySelector(".playfield").getBoundingClientRect();
+    const displayWidth = Math.min(bounds.width, bounds.height * W / renderHeight);
+    if (displayWidth <= 0) return;
+    canvasDpr = window.devicePixelRatio || 1;
+    const width = Math.max(1, Math.round(displayWidth * canvasDpr));
+    const height = Math.max(1, Math.round(displayWidth * renderHeight / W * canvasDpr));
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width; canvas.height = height;
+    }
+    ctx.setTransform(canvas.width / W, 0, 0, canvas.height / renderHeight, 0, 0);
+  }
   const images = {};
   let mode = "loading", questions = [], index = 0, score = 0, camera = 0;
   let row, oldRows = [], player, last = 0, accumulator = 0, hold = 0, apexUsed = false, thinking = 2;
@@ -118,6 +132,7 @@
     $("collection-info").textContent = selected ? `${selected.data.fragen.length} Aufgaben${selected.beispiel ? " · Kleine Beispielsammlung zum Ausprobieren" : ""}` : "";
   }
   function resetRound() {
+    renderHeight = H;
     questions = []; index = 0; score = 0; camera = 0; oldRows = []; row = null; player = null;
     hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0; last = 0; facing = 1;
     clearInput(); $("score").textContent = `0 Punkte (Gesamt: ${gesamtPunkte})`;
@@ -188,7 +203,7 @@
   function makeRow(y) {
     const q = questions[index];
     const answers = shuffle(q.antworten);
-    const gap = 14, margin = 20, width = (W - margin * 2 - gap * (answers.length - 1)) / answers.length;
+    const gap = 10, margin = 12, width = (W - margin * 2 - gap * (answers.length - 1)) / answers.length;
     return { y, q, platforms: answers.map((a, i) => ({...a, x: margin + i * (width + gap), width, broken: false})) };
   }
   function clearInput() {
@@ -207,6 +222,11 @@
     $("score").textContent = `${score} Punkte (Gesamt: ${gesamtPunkte})`;
     $("progress").textContent = `Aufgabe ${index + 1} von ${questions.length}`;
     $("status").textContent = "Füße auf eine richtige Plattform!";
+    // Auch lange Antworten bleiben vollständig sichtbar; die Frage ist echter HTML-Text darunter.
+    ctx.font = "600 22px system-ui";
+    const answerHeight = Math.max(...row.platforms.map(p => Math.max(52, textLines(p.text, p.width - 16).length * 26 + 18)));
+    renderHeight = Math.max(H, row.y - camera + 16 + answerHeight + 20);
+    resizeCanvas();
   }
   function start() {
     if (!selected || !["ready", "won", "lost"].includes(mode)) return;
@@ -294,10 +314,10 @@
   }
   function wrapped(text, x, y, maxWidth) {
     const lines = textLines(text, maxWidth);
-    const height = Math.max(46, lines.length * 23 + 16);
+    const height = Math.max(52, lines.length * 26 + 18);
     ctx.fillStyle = "#ffffff"; ctx.fillRect(x - maxWidth / 2 - 8, y, maxWidth + 16, height);
     ctx.fillStyle = "#293f77";
-    lines.forEach((s, i) => ctx.fillText(s, x, y + 29 + i * 23));
+    lines.forEach((s, i) => ctx.fillText(s, x, y + 32 + i * 26));
   }
   function drawRow(r, old = false) {
     const y = r.y - camera;
@@ -307,38 +327,15 @@
       ctx.fillStyle = p.broken ? "#e94232" : "#293f77";
       if (p.broken) {
         ctx.save(); ctx.translate(p.x + p.width / 2, y + 15); ctx.rotate(.2); ctx.fillRect(-p.width / 2, 0, p.width * .45, 10); ctx.rotate(-.4); ctx.fillRect(0, 0, p.width * .45, 10); ctx.restore();
-      } else { ctx.fillRect(p.x, y, p.width, 10); }
-      ctx.textAlign = "center"; ctx.font = "600 20px system-ui";
-      if (!old) wrapped(p.text, p.x + p.width / 2, y + 12, p.width - 16);
+      } else { ctx.fillRect(p.x, y, p.width, 14); }
+      ctx.textAlign = "center"; ctx.font = "600 22px system-ui";
+      if (!old) wrapped(p.text, p.x + p.width / 2, y + 16, p.width - 16);
     }
     ctx.globalAlpha = 1;
   }
-  function nearbyQuestion() {
-    if (!row || !player) return null;
-    if (row.nearby) return row.nearby;
-    ctx.font = "600 20px system-ui";
-    const answerHeight = Math.max(...row.platforms.map(p =>
-      Math.max(46, textLines(p.text, p.width - 16).length * 23 + 16)));
-    ctx.font = "700 24px system-ui";
-    const lines = textLines(row.q.frage, W - 72);
-    return row.nearby = { lines, y: row.y - camera + 12 + answerHeight + 14,
-      height: lines.length * 30 + 24 };
-  }
-  function drawNearbyQuestion(question) {
-    if (!question) return;
-    const { lines, y, height } = question;
-    ctx.fillStyle = "#fff6e8";
-    ctx.fillRect(20, y, W - 40, height);
-    ctx.strokeStyle = "#293f77"; ctx.lineWidth = 2;
-    ctx.strokeRect(20, y, W - 40, height);
-    ctx.fillStyle = "#293f77"; ctx.textAlign = "center";
-    ctx.font = "700 24px system-ui";
-    lines.forEach((line, i) => ctx.fillText(line, W / 2, y + 33 + i * 30));
-  }
   function draw() {
-    const nearby = nearbyQuestion();
-    const height = nearby ? Math.max(H, Math.ceil(nearby.y + nearby.height + 20)) : H;
-    if (canvas.height !== height) canvas.height = height;
+    if (canvasDpr !== (window.devicePixelRatio || 1)) resizeCanvas();
+    const height = renderHeight;
     ctx.clearRect(0, 0, W, height);
     ctx.fillStyle = "#f0f4fa"; ctx.fillRect(0, 0, W, height);
     ctx.strokeStyle = "#dce4f0"; ctx.lineWidth = 1;
@@ -352,7 +349,6 @@
       ctx.drawImage(img, -width / 2, -height, width, height); ctx.restore();
       ctx.fillStyle = "#e94232"; ctx.fillRect(player.x - 7, player.y - camera - 3, 14, 3);
     }
-    drawNearbyQuestion(nearby);
   }
   function frame(time) {
     const dt = Math.min((time - last) / 1000 || 0, .05); last = time;
@@ -398,7 +394,9 @@
       const height = entries[0].target.getBoundingClientRect().height + 12;
       document.querySelector(".stage").style.setProperty("--question-height", `${height}px`);
     }).observe(document.querySelector(".question"));
+    new ResizeObserver(resizeCanvas).observe(document.querySelector(".playfield"));
   }
+  window.addEventListener("resize", resizeCanvas);
 
   async function init() {
     try {
@@ -413,7 +411,7 @@
       })));
       chooseTopic();
     } catch (e) { mode = "error"; showPanel("Dateien prüfen", e.message, "Bitte Dateien korrigieren"); $("start").disabled = true; }
-    requestAnimationFrame(frame);
+    resizeCanvas(); requestAnimationFrame(frame);
   }
   init();
 })();

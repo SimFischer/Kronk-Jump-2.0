@@ -2,19 +2,19 @@
 
 Ein Lern-Jump-Spiel mit dem Schulmaskottchen Kronk. Reines HTML, CSS und JavaScript: kein Build-Schritt, Backend, Benutzerkonto, Tracking oder externe Schriftarten. Die drei Originalbilder in `assets/` werden unverändert verwendet.
 
-**Spielen:** https://simfischer.github.io/Kronk-Jump/
+**Spielen:** https://simfischer.github.io/Kronk-Jump-2.0/
 
 ## Spielen und auswählen
 
 1. Fach, Klassenstufe und Thema auswählen. Die nachfolgenden Felder passen sich automatisch an. Es erscheinen nur Sammlungen, deren Dateien erfolgreich geladen und geprüft wurden.
-2. Denkpause wählen: **0, 1, 2, 4 oder 6 Sekunden**, Standard **2 Sekunden**. Bei 0 Sekunden fällt Kronk am Scheitel ohne Halt weiter; es erscheint kein Denkpausen-Countdown.
+2. Denkpause wählen: **0, 1, 2, 4, 6, 8 oder 10 Sekunden**, Standard **2 Sekunden**. Bei 0 Sekunden fällt Kronk am Scheitel ohne Halt weiter; es erscheint kein Denkpausen-Countdown.
 3. Kronk springt automatisch. Links oder rechts gedrückt halten, alternativ die Pfeiltasten benutzen. Die seitliche Steuerung bleibt auch in der Denkpause aktiv. Der rote Fußmarker muss auf einer richtigen Plattform landen. Bei mehreren richtigen Antworten genügt eine beliebige richtige Plattform.
 4. Jede richtige Landung gibt 100 Punkte und den nächsten Sprung. Falsche Plattformen brechen. Nach einem Fehler erscheinen alle richtigen Antworten und die Erklärung, falls vorhanden.
 5. Mit **Noch einmal spielen** dieselbe Sammlung neu beginnen. **Zur Themenauswahl** setzt die Runde zurück und öffnet die Auswahl. Das ist auch über die Pause möglich.
 
 Pause über den Knopf oder **P**. Beim Verlassen des Browserfensters bzw. Wechseln des Tabs pausiert das Spiel automatisch. Über **Weiterspielen** fortsetzen. Neustart und Themenauswahl löschen Punkte, Fortschritt, Plattformen, Eingaben und Denkpause der alten Runde.
 
-Die Frage steht in einer festen, kontrastreichen Box im Spielfeld oberhalb der Sprungzone. Sie bewegt sich nicht mit Kronk. Frage und Plattformen wechseln gemeinsam. Sehr lange Fragen vergrößern den benötigten Platz; auf kleinen Displays kann die Seite dann scrollen, ohne den Text abzuschneiden.
+Die Frage steht in einer festen, kontrastreichen Box unterhalb des Spielfelds, direkt über der Steuerung. Sie wird nur einmal als scharfer HTML-Text angezeigt und bewegt sich nicht mit Kronk. Das Spielfeld nutzt die tatsächliche Display-Pixeldichte und passt sich bei Größenwechseln und Drehung proportional an. Plattformen und Antwortschrift sind größer. Frage und Plattformen wechseln gemeinsam. Sehr lange Fragen vergrößern den benötigten Platz; auf kleinen Displays kann die Seite dann scrollen, ohne den Text abzuschneiden.
 
 ## Vorhandene Sammlungen
 
@@ -90,13 +90,13 @@ Eine fehlende, ungültige oder falsch registrierte Sammlung erscheint mit Datein
 - `assets/`: unveränderte Originalbilder (Normal, Jubel, Sprung).
 - `tests/spiel.test.cjs`: automatisierte Entwicklungstests mit Node.js, optional ausführbar über `node tests/spiel.test.cjs`. Zum Spielen wird Node.js nicht benötigt.
 
-GitHub Pages verwendet weiterhin die vorhandene Konfiguration. Alle Spielpfade sind relativ und funktionieren unter der Projektadresse `/Kronk-Jump/`. Auf dem Computer lässt sich `index.html` auch direkt öffnen; auf dem iPad den veröffentlichten Weblink verwenden, optional über Safari zum Home-Bildschirm hinzufügen. Kein Offline-/Service-Worker-Modus.
+GitHub Pages verwendet weiterhin die vorhandene Konfiguration. Alle Spielpfade sind relativ und funktionieren unter der Projektadresse `/Kronk-Jump-2.0/`. Auf dem Computer lässt sich `index.html` auch direkt öffnen; auf dem iPad den veröffentlichten Weblink verwenden, optional über Safari zum Home-Bildschirm hinzufügen. Kein Offline-/Service-Worker-Modus.
 
-Die Physik rechnet mit festen Schritten von 1/120 Sekunde. `GAP = 165`, `GRAVITY = 600`, `JUMP = 620`, `SPEED = 400`. Die Flugzeit bis zur nächsthöheren Plattform beträgt ohne Denkpause etwa 1,75 Sekunden. Für die gesamte steuerbare Breite von 544 Einheiten werden 1,36 Sekunden benötigt; damit sind alle Plattformen auch von den Rändern erreichbar. Die Kamera wechselt nur mit der Aufgabe und hält die aktive Plattformreihe auf fester Bildschirmhöhe.
+Die Physik rechnet mit festen Schritten von 1/120 Sekunde. `GAP = 165`, `GRAVITY = 600`, `JUMP = 620`, `SPEED = 480`. Die Flugzeit bis zur nächsthöheren Plattform beträgt ohne Denkpause etwa 1,75 Sekunden. Für die gesamte steuerbare Breite von 544 Einheiten werden rund 1,13 Sekunden benötigt; damit sind alle Plattformen auch von den Rändern erreichbar. Die Kamera wechselt nur mit der Aufgabe und hält die aktive Plattformreihe auf fester Bildschirmhöhe.
 
 ## Prüfungen und Grenzen
 
-Automatisiert geprüft: abhängige Auswahl und Inhalte, alle fünf Denkzeiten, 18 Querwechsel zwischen beiden Randpositionen und jeder Plattformmitte bei 2–4 Antworten ohne Denkpause, Tastatur- und Pointer-Ereignisse, Denkpause mit seitlicher Steuerung, manuelle und automatische Pause, richtige/falsche/verfehlte Landungen, Sieg, Neustart, Themenrückkehr sowie fehlende/fehlerhafte Aufgabendateien.
+Automatisiert geprüft: abhängige Auswahl und Inhalte, alle sieben Denkzeiten, 18 Querwechsel zwischen beiden Randpositionen und jeder Plattformmitte bei 2–4 Antworten ohne Denkpause, Tastatur- und Pointer-Ereignisse, Denkpause mit seitlicher Steuerung, manuelle und automatische Pause, richtige/falsche/verfehlte Landungen, Sieg, Neustart, Themenrückkehr sowie fehlende/fehlerhafte Aufgabendateien.
 
 Zusätzlich im Chrome-Browser mit iPad-ähnlichen Ansichten (768 × 1024 und 1024 × 768) geprüft. Das ersetzt keinen Praxistest auf einem echten iPad mit Safari und echten Mehrfinger-Touchgesten. Kein gespeicherter Lernstand oder Bestenliste; das Canvas-Spiel bietet keine vollständig gleichwertige Screenreader-Spielweise.
 
