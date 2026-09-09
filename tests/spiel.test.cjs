@@ -68,17 +68,17 @@ module.exports = (async () => {
   for (const seconds of [0,2]) {
     t.fixture([allCorrect,allCorrect,allCorrect]); get('thinking').value=String(seconds); t.start();
     for (let jump=0;jump<2;jump++) {
-      assert.equal(t.state.row.y-t.state.camera,350);
-      assert.ok(t.state.player.y-t.state.camera <= t.constants.H);
+      assert.equal(t.state.row.y-t.state.camera,410);
+      assert.equal(t.state.player.y-t.state.camera,515);
       let steps=0, top=Infinity;
       while(t.state.index===jump && steps<1200) {
         top=Math.min(top,t.state.player.y-t.state.camera-95);
         t.step(1/120); steps++;
       }
       const flight=steps/120-seconds;
-      assert.ok(flight>2.04 && flight<2.10,`Flugzeit: ${flight}`);
+      assert.ok(flight>2.14 && flight<2.20,`Flugzeit: ${flight}`);
       assert.ok(flight>1.75*1.16,'Mindestens 16 Prozent mehr Zeit als zuvor');
-      assert.ok(top>=10,`Kronks Kopf bleibt sichtbar: ${top}`);
+      assert.ok(top>=10 && top<=17,`Unveränderter Sprungscheitel: ${top}`);
       assert.equal(t.state.index,jump+1);
     }
   }
@@ -95,7 +95,7 @@ module.exports = (async () => {
     }
   }
   assert.equal(t.constants.SPEED,480);
-  assert.equal(t.constants.JUMP,700); assert.equal(t.constants.GRAVITY,600); assert.equal(t.constants.GAP,165);
+  assert.equal(t.constants.JUMP,700); assert.equal(t.constants.GRAVITY,600); assert.equal(t.constants.GAP,105);
   // Seitliche Eingabe beeinflusst Sprunghöhe und Fallgeschwindigkeit in keinem Zeitschritt.
   const trajectories = [];
   for (const direction of ['', 'ArrowLeft', 'ArrowRight']) {
