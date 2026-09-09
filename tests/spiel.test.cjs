@@ -39,7 +39,7 @@ async function boot(extra = {}) {
   source = source.replace('  init();', `  window.test = {
     resizeCanvas, draw, start, step, pause, chooseTopic, updateGrades, updateTopics, updateSelected, validate, makeRow,
     get state() { return {mode, questions, index, score, camera, row, oldRows, player, hold, thinking, apexUsed}; },
-    keys, pointers, constants: {W,H,GAP,GRAVITY,JUMP,SPEED},
+    keys, pointers, constants: {W,H,GAP,GRAVITY,JUMP,SPEED,ROW_Y},
     position(x, y, vy) { player.x=x; player.y=y; player.vy=vy; },
     fixture(q) { selected = {id:'test', fach:'Test', klasse:5, thema:'Test', data:{mischen:false,fragen:q}}; mode='ready'; }
   }; window.ready = init();`);
@@ -63,6 +63,25 @@ module.exports = (async () => {
   t.start(); assert.equal(t.state.questions.length,3);
   t.chooseTopic();
   const q = {frage:'Testfrage',antworten:[{text:'Ja',richtig:true},{text:'Nein',richtig:false}]};
+  // Mehr Flugzeit ohne längere Denkpause; Kronk bleibt auch nach dem Kamerawechsel im Bild.
+  const allCorrect = {...q,antworten:[{text:'Links',richtig:true},{text:'Mitte',richtig:true},{text:'Rechts',richtig:true}]};
+  for (const seconds of [0,2]) {
+    t.fixture([allCorrect,allCorrect,allCorrect]); get('thinking').value=String(seconds); t.start();
+    for (let jump=0;jump<2;jump++) {
+      assert.equal(t.state.row.y-t.state.camera,350);
+      assert.ok(t.state.player.y-t.state.camera <= t.constants.H);
+      let steps=0, top=Infinity;
+      while(t.state.index===jump && steps<1200) {
+        top=Math.min(top,t.state.player.y-t.state.camera-95);
+        t.step(1/120); steps++;
+      }
+      const flight=steps/120-seconds;
+      assert.ok(flight>2.04 && flight<2.10,`Flugzeit: ${flight}`);
+      assert.ok(flight>1.75*1.16,'Mindestens 16 Prozent mehr Zeit als zuvor');
+      assert.ok(top>=10,`Kronks Kopf bleibt sichtbar: ${top}`);
+      assert.equal(t.state.index,jump+1);
+    }
+  }
   // Retina-Auflösung folgt der tatsächlich eingepassten Fläche, auch nach Drehung/Zoom.
   const canvas = get('canvas'), field = get('.playfield');
   for (const dpr of [1, 2, 3]) {
@@ -76,7 +95,7 @@ module.exports = (async () => {
     }
   }
   assert.equal(t.constants.SPEED,480);
-  assert.equal(t.constants.JUMP,620); assert.equal(t.constants.GRAVITY,600); assert.equal(t.constants.GAP,165);
+  assert.equal(t.constants.JUMP,700); assert.equal(t.constants.GRAVITY,600); assert.equal(t.constants.GAP,165);
   // Seitliche Eingabe beeinflusst Sprunghöhe und Fallgeschwindigkeit in keinem Zeitschritt.
   const trajectories = [];
   for (const direction of ['', 'ArrowLeft', 'ArrowRight']) {
@@ -98,7 +117,9 @@ module.exports = (async () => {
   for (const seconds of [0,1,2,4,6,8,10]) {
     t.fixture([q,q]); get('thinking').value=String(seconds); t.start();
     key('ArrowLeft'); const x=t.state.player.x; t.step(1/120); assert.ok(t.state.player.x < x); key('ArrowLeft','keyup');
-    for(let i=0;i<125;i++) t.step(1/120);
+    for(let i=0;i<200 && !t.state.apexUsed;i++) t.step(1/120);
+    assert.equal(t.state.apexUsed,true);
+    t.step(1/120);
     assert.equal(t.state.thinking,seconds);
     if(seconds===0) { assert.equal(t.state.hold,0); assert.ok(t.state.player.vy>0); assert.doesNotMatch(get('status').textContent,/Denkpause/); }
     else { assert.ok(t.state.hold>0); const y=t.state.player.y; key('ArrowRight'); t.step(1/120); assert.equal(t.state.player.y,y); key('ArrowRight','keyup'); }
@@ -113,7 +134,7 @@ module.exports = (async () => {
   let routes=0;
   for(const count of [2,3,4]) for(const origin of [28,572]) for(let target=0;target<count;target++) {
     const allRight={frage:'Erreichbarkeit',antworten:Array.from({length:count},(_,i)=>({text:String(i),richtig:true}))};
-    t.fixture([allRight,allRight]); get('thinking').value='0'; t.start(); t.position(origin,465,-620);
+    t.fixture([allRight,allRight]); get('thinking').value='0'; t.start(); t.position(origin,t.state.player.y,t.state.player.vy);
     const p=t.state.row.platforms[target], goal=p.x+p.width/2;
     for(let i=0;i<300 && t.state.index===0;i++) {
       t.keys.clear(); const dx=goal-t.state.player.x;
@@ -122,20 +143,20 @@ module.exports = (async () => {
     }
     assert.equal(t.state.score,100,`Route ${count}/${origin}/${target}`); assert.equal(t.state.index,1); routes++;
     assert.equal(get('question').textContent,t.state.row.q.frage);
-    assert.equal(t.state.row.y-t.state.camera,300);
+    assert.equal(t.state.row.y-t.state.camera,t.constants.ROW_Y);
   }
   // Falsche Landung bricht, zeigt alle Lösungen; Neustart behält Sammlung.
   t.fixture([q,q]); t.start();
-  const wrong=t.state.row.platforms.find(p=>!p.richtig); t.position(wrong.x+wrong.width/2,299.5,100); t.step(1/120);
+  const wrong=t.state.row.platforms.find(p=>!p.richtig); t.position(wrong.x+wrong.width/2,t.state.row.y-.5,100); t.step(1/120);
   assert.equal(wrong.broken,true);
   for(let i=0;i<600 && t.state.mode==='playing';i++) t.step(1/120);
   assert.equal(t.state.mode,'lost'); assert.match(get('panel-text').textContent,/Richtig: Ja/);
   t.start(); assert.equal(t.state.score,0); assert.equal(t.state.index,0); assert.equal(t.state.oldRows.length,0); assert.equal(t.state.hold,0);
   // Verfehlen und vollständiger Sieg.
-  t.position(300,299.5,100); t.step(1/120);
+  t.position(300,t.state.row.y-.5,100); t.step(1/120);
   for(let i=0;i<600 && t.state.mode==='playing';i++) t.step(1/120);
   assert.equal(t.state.mode,'lost');
-  t.fixture([q]); t.start(); const right=t.state.row.platforms.find(p=>p.richtig); t.position(right.x+right.width/2,299.5,100); t.step(1/120);
+  t.fixture([q]); t.start(); const right=t.state.row.platforms.find(p=>p.richtig); t.position(right.x+right.width/2,t.state.row.y-.5,100); t.step(1/120);
   assert.equal(t.state.mode,'won'); assert.equal(t.state.score,100);
   // Schema, fehlende Datei, Syntaxfehler und abweichende Kennung.
   for(const data of [null,{fragen:[]},{fragen:[null]},{fragen:[{...q,antworten:[null,null]}]},{fragen:[{...q,antworten:[{text:'Nein',richtig:false},{text:'Auch nein',richtig:false}]}]}]) assert.throws(()=>t.validate(data));
@@ -146,5 +167,5 @@ module.exports = (async () => {
     assert.equal(b.t.state.mode,'ready'); assert.match(b.get('load-errors').textContent,new RegExp(file.replace('.','\\.')));
     assert.equal(b.get('subject').options.length,2); assert.equal(b.get('load-errors').hidden,false);
   }
-  console.log(`OK: Retina/Drehung/Zoom, Frage nur unten, lange Antworten, unveränderte vertikale Physik, Auswahl, Inhalte, 7 Denkzeiten, ${routes} Querwechsel ohne Denkpause, Tastatur/Pointer, Pause, Landungen, Neustart, Sieg und 3 Ladefehler.`);
+  console.log(`OK: Retina/Drehung/Zoom, Frage nur unten, lange Antworten, höherer Sprung mit mehr Flugzeit, Auswahl, Inhalte, 7 Denkzeiten, ${routes} Querwechsel ohne Denkpause, Tastatur/Pointer, Pause, Landungen, Neustart, Sieg und 3 Ladefehler.`);
 })();
