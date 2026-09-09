@@ -3,7 +3,8 @@
 (() => {
   const $ = id => document.getElementById(id);
   const canvas = $("canvas"), ctx = canvas.getContext("2d");
-  const W = 600, H = 540, GAP = 165, GRAVITY = 600, JUMP = 620, SPEED = 480;
+  const W = 600, H = 540, GAP = 165, GRAVITY = 600, JUMP = 700, SPEED = 480;
+  const ROW_Y = 350;
   let canvasDpr = 0, renderHeight = H;
   // Physik in unveränderten Spieleinheiten; Zeichenauflösung in echten Displaypixeln.
   function resizeCanvas() {
@@ -235,7 +236,7 @@
     questions = data.mischen ? shuffle(data.fragen) : data.fragen.slice();
     thinking = Number($("thinking").value); index = 0; score = 0; camera = 0; oldRows = [];
     if (![0, 1, 2, 4, 6, 8, 10].includes(thinking)) thinking = 2;
-    row = makeRow(300); player = { x: W / 2, y: 300 + GAP, vy: -JUMP };
+    row = makeRow(ROW_Y); player = { x: W / 2, y: ROW_Y + GAP, vy: -JUMP };
     hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0;
     mode = "playing"; clearInput(); $("overlay").hidden = true;
     $("pause").disabled = false; $("pause").textContent = "Pause"; setQuestion(); canvas.focus({preventScroll:true});
@@ -288,7 +289,7 @@
           oldRows.push(row); oldRows = oldRows.slice(-1); index++;
           if (index === questions.length) { finish(true); return; }
           row = makeRow(row.y - GAP);
-          camera = row.y - 300; setQuestion();
+          camera = row.y - ROW_Y; setQuestion();
         } else {
           hit.broken = true; failText = `„${hit.text}“ war hier nicht richtig.`;
           $("status").textContent = "Diese Plattform bricht weg …";
