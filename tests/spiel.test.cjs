@@ -9,6 +9,9 @@ class Element {
   constructor() { this.value = ''; this.hidden = false; this.disabled = false; this.textContent = ''; this.events = {}; this.options = []; this.classList = { add() {}, remove() {} }; }
   addEventListener(name, fn) { this.events[name] = fn; }
   replaceChildren(...options) { this.options = options; this.value = options[0]?.value || ''; }
+  add(option) { this.options.push(option); if (!this.value) this.value = option.value; }
+  showModal() { this.open = true; } close() { this.open = false; }
+  getBoundingClientRect() { return this.bounds || {width: 720, height: 648}; }
   focus() {} setPointerCapture() {} remove() {}
 }
 async function boot(extra = {}) {
@@ -17,10 +20,11 @@ async function boot(extra = {}) {
   get('thinking').value = '2';
   get('canvas').getContext = () => new Proxy({}, { get: (_, key) => key === 'measureText' ? text => ({width: text.length * 10}) : () => {} });
   const events = {}, docEvents = {};
-  const context = vm.createContext({ console, setTimeout, clearTimeout, requestAnimationFrame() {},
+  const storage = new Map();
+  const context = vm.createContext({ localStorage: {getItem: key => storage.get(key) || null, setItem: (key,value) => storage.set(key,String(value))}, console, setTimeout, clearTimeout, requestAnimationFrame() {},
     Option: function(text, value) { this.text = text; this.value = value; },
     Image: class { set src(value) { this.naturalWidth = 100; this.naturalHeight = 100; queueMicrotask(() => this.onload()); } },
-    document: { hidden: false, getElementById: get, addEventListener(name,fn) { docEvents[name] = fn; }, createElement: () => new Element(), head: { append(script) {
+    document: { hidden: false, getElementById: get, querySelector: get, addEventListener(name,fn) { docEvents[name] = fn; }, createElement: () => new Element(), head: { append(script) {
       queueMicrotask(() => { try {
         const code = extra[script.src] ?? fs.readFileSync(path.join(root, script.src), 'utf8');
         vm.runInContext(code, context); script.onload();
@@ -33,9 +37,9 @@ async function boot(extra = {}) {
   if (extra.catalog) context.KRONK_KATALOG.push(extra.catalog);
   let source = fs.readFileSync(path.join(root,'spiel.js'),'utf8');
   source = source.replace('  init();', `  window.test = {
-    start, step, pause, chooseTopic, updateGrades, updateTopics, updateSelected, validate, makeRow,
+    resizeCanvas, draw, start, step, pause, chooseTopic, updateGrades, updateTopics, updateSelected, validate, makeRow,
     get state() { return {mode, questions, index, score, camera, row, oldRows, player, hold, thinking, apexUsed}; },
-    keys, pointers,
+    keys, pointers, constants: {W,H,GAP,GRAVITY,JUMP,SPEED},
     position(x, y, vy) { player.x=x; player.y=y; player.vy=vy; },
     fixture(q) { selected = {id:'test', fach:'Test', klasse:5, thema:'Test', data:{mischen:false,fragen:q}}; mode='ready'; }
   }; window.ready = init();`);
@@ -59,9 +63,39 @@ module.exports = (async () => {
   t.start(); assert.equal(t.state.questions.length,3);
   t.chooseTopic();
   const q = {frage:'Testfrage',antworten:[{text:'Ja',richtig:true},{text:'Nein',richtig:false}]};
+  // Retina-Auflösung folgt der tatsächlich eingepassten Fläche, auch nach Drehung/Zoom.
+  const canvas = get('canvas'), field = get('.playfield');
+  for (const dpr of [1, 2, 3]) {
+    context.devicePixelRatio = dpr;
+    for (const bounds of [{width:744,height:640},{width:820,height:350}]) {
+      field.bounds = bounds; t.resizeCanvas();
+      const width = Math.min(bounds.width, bounds.height * 600 / 540);
+      assert.equal(canvas.width, Math.round(width*dpr));
+      assert.equal(canvas.height, Math.round(width*540/600*dpr));
+      t.draw(); assert.equal(canvas.width, Math.round(width*dpr));
+    }
+  }
+  assert.equal(t.constants.SPEED,480);
+  assert.equal(t.constants.JUMP,620); assert.equal(t.constants.GRAVITY,600); assert.equal(t.constants.GAP,165);
+  // Seitliche Eingabe beeinflusst Sprunghöhe und Fallgeschwindigkeit in keinem Zeitschritt.
+  const trajectories = [];
+  for (const direction of ['', 'ArrowLeft', 'ArrowRight']) {
+    t.fixture([q,q]); get('thinking').value='0'; t.start();
+    if (direction) t.keys.add(direction);
+    const trajectory = [];
+    for (let i=0;i<200;i++) { t.step(1/120); trajectory.push([t.state.player.y,t.state.player.vy]); }
+    trajectories.push(trajectory);
+  }
+  assert.deepEqual(trajectories[0],trajectories[1]); assert.deepEqual(trajectories[0],trajectories[2]);
+  // Lange Antworten vergrößern die Zeichenfläche; die einzige Frage bleibt unter dem Canvas.
+  t.fixture([{...q,antworten:q.antworten.map(a=>({...a,text:a.text.repeat(250)}))}]); t.start();
+  assert.ok(canvas.height/canvas.width > 540/600);
+  const html = fs.readFileSync(path.join(root,'index.html'),'utf8');
+  assert.equal((html.match(/id="question"/g)||[]).length,1);
+  assert.ok(html.indexOf('id="question"') > html.indexOf('</canvas>'));
   const key = (name,type='keydown') => events[type]({key:name,target:{tagName:'CANVAS'},preventDefault(){},repeat:false});
   // Tatsächliche Physik, alle fünf Denkzeiten, Steuerung vor/am/nach dem Scheitel.
-  for (const seconds of [0,1,2,4,6]) {
+  for (const seconds of [0,1,2,4,6,8,10]) {
     t.fixture([q,q]); get('thinking').value=String(seconds); t.start();
     key('ArrowLeft'); const x=t.state.player.x; t.step(1/120); assert.ok(t.state.player.x < x); key('ArrowLeft','keyup');
     for(let i=0;i<125;i++) t.step(1/120);
@@ -83,7 +117,7 @@ module.exports = (async () => {
     const p=t.state.row.platforms[target], goal=p.x+p.width/2;
     for(let i=0;i<300 && t.state.index===0;i++) {
       t.keys.clear(); const dx=goal-t.state.player.x;
-      if(Math.abs(dx)>400/120/2) t.keys.add(dx>0?'ArrowRight':'ArrowLeft');
+      if(Math.abs(dx)>t.constants.SPEED/120/2) t.keys.add(dx>0?'ArrowRight':'ArrowLeft');
       t.step(1/120);
     }
     assert.equal(t.state.score,100,`Route ${count}/${origin}/${target}`); assert.equal(t.state.index,1); routes++;
@@ -112,5 +146,5 @@ module.exports = (async () => {
     assert.equal(b.t.state.mode,'ready'); assert.match(b.get('load-errors').textContent,new RegExp(file.replace('.','\\.')));
     assert.equal(b.get('subject').options.length,2); assert.equal(b.get('load-errors').hidden,false);
   }
-  console.log(`OK: Auswahl, Inhalte, 5 Denkzeiten, ${routes} Querwechsel ohne Denkpause, Tastatur/Pointer, Pause, Landungen, Neustart, Sieg und 3 Ladefehler.`);
+  console.log(`OK: Retina/Drehung/Zoom, Frage nur unten, lange Antworten, unveränderte vertikale Physik, Auswahl, Inhalte, 7 Denkzeiten, ${routes} Querwechsel ohne Denkpause, Tastatur/Pointer, Pause, Landungen, Neustart, Sieg und 3 Ladefehler.`);
 })();
