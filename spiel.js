@@ -4,10 +4,9 @@
   const $ = id => document.getElementById(id);
   const canvas = $("canvas"), ctx = canvas.getContext("2d");
   const W = 600, H = 540, GRAVITY = 600, JUMP = 700, SPEED = 480;
-  // Nur die Zielreihe rückt tiefer; Absprung und Sprungkurve bleiben an derselben Stelle.
   const ROW_Y = 410, START_Y = 515, GAP = START_Y - ROW_Y;
   let canvasDpr = 0, renderHeight = H;
-  // Physik in unveränderten Spieleinheiten; Zeichenauflösung in echten Displaypixeln.
+  
   function resizeCanvas() {
     const bounds = document.querySelector(".playfield").getBoundingClientRect();
     const displayWidth = Math.min(bounds.width, bounds.height * W / renderHeight);
@@ -20,11 +19,13 @@
     }
     ctx.setTransform(canvas.width / W, 0, 0, canvas.height / renderHeight, 0, 0);
   }
+  
   const images = {};
   let mode = "loading", questions = [], index = 0, score = 0, camera = 0;
   let row, oldRows = [], player, last = 0, accumulator = 0, hold = 0, apexUsed = false, thinking = 2;
   let failText = "", facing = 1, celebration = 0;
   const keys = new Set(), pointers = new Map();
+  
   const shuffle = list => {
     const a = list.slice();
     for (let i = a.length - 1; i > 0; i--) {
@@ -33,9 +34,10 @@
     }
     return a;
   };
+  
   let collections = [], selected = null;
 
-  // --- KRONK CHARAKTER & FREISCHALT-SYSTEM ---
+  // --- KRONK CHARAKTER, FREISCHALT-SYSTEM & LERNSTAND ---
   const kronkLevel = [
     { id: 'kronk', name: 'Standard Kronk', pointsNeeded: 0 },
     { id: 'kronk_silber', name: 'Silberner Kronk', pointsNeeded: 1000 },
@@ -44,6 +46,11 @@
   let gesamtPunkte = 0;
   let freigeschalteteKronks = ['kronk'];
   let aktiverKronk = 'kronk';
+  
+  // NEU: Didaktik & Gamification
+  let fehlerSpeicher = {}; 
+  let consecutiveCorrect = 0;
+  let currentThinking = 2;
 
   function ladeSpielstand() {
     const pts = localStorage.getItem('kronk_gesamtpunkte');
@@ -52,12 +59,16 @@
     if (chars) freigeschalteteKronks = JSON.parse(chars);
     const aktiv = localStorage.getItem('kronk_aktiv');
     if (aktiv) aktiverKronk = aktiv;
+    
+    const fehler = localStorage.getItem('kronk_fehler');
+    if (fehler) fehlerSpeicher = JSON.parse(fehler);
   }
 
   function speichereSpielstand() {
     localStorage.setItem('kronk_gesamtpunkte', gesamtPunkte);
     localStorage.setItem('kronk_freigeschaltet', JSON.stringify(freigeschalteteKronks));
     localStorage.setItem('kronk_aktiv', aktiverKronk);
+    localStorage.setItem('kronk_fehler', JSON.stringify(fehlerSpeicher));
   }
 
   function aktualisiereKronkMenue() {
@@ -92,6 +103,7 @@
   }
   $("unlock-continue").addEventListener("click", closeUnlock);
   $("unlock-dialog").addEventListener("cancel", e => { e.preventDefault(); closeUnlock(); });
+  
   function pruefeFreischaltungen() {
     let neuFreigeschaltet = false;
     kronkLevel.forEach(char => {
@@ -106,11 +118,8 @@
       aktualisiereKronkMenue();
     }
   }
-  // -------------------------------------------
 
-  function collectionTitle(c) {
-    return `${c.fach} · Klasse ${c.klasse} · ${c.thema}${c.beispiel ? " (Beispiel)" : ""}`;
-  }
+  function collectionTitle(c) { return `${c.fach} · Klasse ${c.klasse} · ${c.thema}${c.beispiel ? " (Beispiel)" : ""}`; }
   function fillSelect(id, options) {
     const select = $(id), previous = select.value;
     select.replaceChildren(...options.map(([value, text]) => new Option(text, value)));
@@ -150,6 +159,7 @@
     aktualisiereKronkMenue();
     updateSelected(); $("subject").focus({preventScroll:true});
   }
+  
   function loadCollection(entry) {
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
@@ -169,6 +179,7 @@
       document.head.append(script);
     });
   }
+  
   async function loadCollections() {
     const list = window.KRONK_KATALOG;
     if (!Array.isArray(list) || !list.length || !window.KRONK_SAMMLUNGEN) throw Error("Die zentrale Liste aufgaben.js fehlt oder ist fehlerhaft.");
@@ -202,16 +213,27 @@
       if (q.erklaerung !== undefined && typeof q.erklaerung !== "string") throw Error(`Frage ${i + 1}: erklaerung muss Text sein.`);
     });
   }
+  
   function makeRow(y) {
     const q = questions[index];
     const answers = shuffle(q.antworten);
     const gap = 10, margin = 12, width = (W - margin * 2 - gap * (answers.length - 1)) / answers.length;
-    return { y, q, platforms: answers.map((a, i) => ({...a, x: margin + i * (width + gap), width, broken: false})) };
+    // NEU: Bewegliche Plattformen für ältere Klassen (ab Klasse 7)
+    const isMoving = selected && selected.klasse >= 7;
+    return { y, q, platforms: answers.map((a, i) => ({
+      ...a, 
+      x: margin + i * (width + gap), 
+      width, 
+      broken: false,
+      vx: isMoving ? (Math.random() > 0.5 ? 25 : -25) : 0
+    })) };
   }
+  
   function clearInput() {
     keys.clear(); pointers.clear();
     $("left").classList.remove("held"); $("right").classList.remove("held");
   }
+  
   function showPanel(title, text, button, settings = false) {
     $("panel-title").textContent = title; $("panel-text").textContent = text;
     $("start").textContent = button; $("time-label").hidden = !settings;
@@ -219,29 +241,46 @@
     $("choose-topic").hidden = !["paused", "won", "lost"].includes(mode);
     $("overlay").hidden = false; clearInput();
   }
+  
   function setQuestion() {
     $("question").textContent = row.q.frage;
     $("score").textContent = `${score} Punkte (Gesamt: ${gesamtPunkte})`;
     $("progress").textContent = `Aufgabe ${index + 1} von ${questions.length}`;
     $("status").textContent = "Füße auf eine richtige Plattform!";
-    // Auch lange Antworten bleiben vollständig sichtbar; die Frage ist echter HTML-Text darunter.
     ctx.font = "600 22px system-ui";
     const answerHeight = Math.max(...row.platforms.map(p => Math.max(52, textLines(p.text, p.width - 16).length * 26 + 18)));
     renderHeight = Math.max(H, row.y - camera + 16 + answerHeight + 20);
     resizeCanvas();
   }
+  
   function start() {
     if (!selected || !["ready", "won", "lost"].includes(mode)) return;
     resetRound();
     const data = selected.data;
-    questions = data.mischen ? shuffle(data.fragen) : data.fragen.slice();
-    thinking = Number($("thinking").value); index = 0; score = 0; camera = 0; oldRows = [];
+    
+    // NEU: Intelligente Wiederholung basierend auf Fehler-Speicher
+    let fehlerFuerThema = fehlerSpeicher[selected.id] || [];
+    if (data.mischen) {
+      let baseFragen = data.fragen.slice();
+      let priorisiert = baseFragen.filter(q => fehlerFuerThema.includes(q.frage));
+      let normal = baseFragen.filter(q => !fehlerFuerThema.includes(q.frage));
+      questions = [...shuffle(priorisiert), ...shuffle(normal)];
+    } else {
+      questions = data.fragen.slice();
+    }
+
+    thinking = Number($("thinking").value); 
     if (![0, 1, 2, 4, 6, 8, 10].includes(thinking)) thinking = 2;
+    currentThinking = thinking;
+    consecutiveCorrect = 0;
+    
+    index = 0; score = 0; camera = 0; oldRows = [];
     row = makeRow(ROW_Y); player = { x: W / 2, y: START_Y, vy: -JUMP };
     hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0;
     mode = "playing"; clearInput(); $("overlay").hidden = true;
     $("pause").disabled = false; $("pause").textContent = "Pause"; setQuestion(); canvas.focus({preventScroll:true});
   }
+  
   function pause() {
     if ($("unlock-dialog").open) return;
     if (mode === "playing") {
@@ -251,19 +290,31 @@
       mode = "playing"; $("pause").textContent = "Pause"; $("overlay").hidden = true; accumulator = 0; last = 0; canvas.focus({preventScroll:true});
     }
   }
+  
   function finish(won) {
     mode = won ? "won" : "lost"; $("pause").disabled = true;
     showPanel(won ? "Ganz oben angekommen!" : "Noch ein Sprung?", won ? `Kronk hat alle ${questions.length} Aufgaben geschafft. ${score} Punkte!` : `${score} Punkte. ${failText || "Du hast die Plattform verfehlt."} Richtig: ${row.q.antworten.filter(a => a.richtig).map(a => a.text).join(", ")} ${row.q.erklaerung || ""}`, "Noch einmal spielen", true);
     $("status").textContent = won ? "Alle Aufgaben geschafft!" : "Lies die Lösung und versuche es noch einmal.";
   }
+  
   function step(dt) {
     if (mode !== "playing" || $("unlock-dialog").open) return;
+    
+    // NEU: Plattformen aktualisieren (Bewegung)
+    row.platforms.forEach(p => {
+      if (p.vx) {
+        p.x += p.vx * dt;
+        if (p.x <= 10 || p.x + p.width >= W - 10) p.vx *= -1; // Abprallen an den Rändern
+      }
+    });
+
     const left = keys.has("ArrowLeft") || [...pointers.values()].includes(-1);
     const right = keys.has("ArrowRight") || [...pointers.values()].includes(1);
     const direction = Number(right) - Number(left);
     if (direction) facing = direction;
     player.x = Math.max(28, Math.min(W - 28, player.x + direction * SPEED * dt));
     const previousY = player.y;
+    
     if (hold > 0) {
       hold = Math.max(0, hold - dt);
       $("status").textContent = `Denkpause · ${Math.ceil(hold)} s · Kronk lässt sich weiter steuern`;
@@ -272,15 +323,26 @@
       player.vy += GRAVITY * dt;
       if (!apexUsed && player.vy >= 0) {
         apexUsed = true;
-        if (thinking > 0) { hold = thinking; player.vy = 0; }
+        // NEU: Adaptive Denkpause
+        if (currentThinking > 0) { hold = currentThinking; player.vy = 0; }
       }
       player.y += player.vy * dt;
     }
     celebration = Math.max(0, celebration - dt);
+    
     if (!failText && player.vy > 0 && previousY <= row.y && player.y >= row.y) {
       const hit = row.platforms.find(p => !p.broken && player.x >= p.x && player.x <= p.x + p.width);
       if (hit) {
         if (hit.richtig) {
+          // NEU: Adaptive Belohnung (schnellere Runden) und Fehler löschen
+          consecutiveCorrect++;
+          if (consecutiveCorrect >= 3 && currentThinking > 0.5) {
+             currentThinking = Math.max(0, currentThinking - 0.5);
+          }
+          if (fehlerSpeicher[selected.id]) {
+             fehlerSpeicher[selected.id] = fehlerSpeicher[selected.id].filter(f => f !== row.q.frage);
+          }
+          
           score += 100;
           gesamtPunkte += 100;
           pruefeFreischaltungen();
@@ -292,13 +354,30 @@
           row = makeRow(row.y - GAP);
           camera = row.y - ROW_Y; setQuestion();
         } else {
+          // NEU: Fehler merken, Zeit resetten und Screen-Shake
+          consecutiveCorrect = 0;
+          currentThinking = thinking; 
+          
+          if (!fehlerSpeicher[selected.id]) fehlerSpeicher[selected.id] = [];
+          if (!fehlerSpeicher[selected.id].includes(row.q.frage)) {
+              fehlerSpeicher[selected.id].push(row.q.frage);
+              speichereSpielstand();
+          }
+
           hit.broken = true; failText = `„${hit.text}“ war hier nicht richtig.`;
           $("status").textContent = "Diese Plattform bricht weg …";
+          
+          // Löst die Screen-Shake CSS Animation aus
+          const pf = document.querySelector(".playfield");
+          pf.classList.remove("shake");
+          void pf.offsetWidth; // Reflow erzwingen
+          pf.classList.add("shake");
         }
       }
     }
     if (player.y - camera > H + 110) finish(false);
   }
+  
   function textLines(text, maxWidth) {
     const lines = []; let line = "";
     for (const word of text.split(/\s+/)) {
@@ -321,6 +400,7 @@
     ctx.fillStyle = "#293f77";
     lines.forEach((s, i) => ctx.fillText(s, x, y + 32 + i * 26));
   }
+  
   function drawRow(r, old = false) {
     const y = r.y - camera;
     if (y < -200 || y > H + 100) return;
@@ -335,6 +415,7 @@
     }
     ctx.globalAlpha = 1;
   }
+  
   function draw() {
     if (canvasDpr !== (window.devicePixelRatio || 1)) resizeCanvas();
     const height = renderHeight;
@@ -352,11 +433,13 @@
       ctx.fillStyle = "#e94232"; ctx.fillRect(player.x - 7, player.y - camera - 3, 14, 3);
     }
   }
+  
   function frame(time) {
     const dt = Math.min((time - last) / 1000 || 0, .05); last = time;
     if (mode === "playing" && !$("unlock-dialog").open) { accumulator += dt; while (accumulator >= 1 / 120) { step(1 / 120); accumulator -= 1 / 120; } } else accumulator = 0;
     showNextUnlock(); draw(); requestAnimationFrame(frame);
   }
+  
   for (const [id, direction] of [["left", -1], ["right", 1]]) {
     const button = $(id);
     button.addEventListener("pointerdown", e => { e.preventDefault(); if (mode !== "playing") return; button.setPointerCapture(e.pointerId); pointers.set(e.pointerId, direction); button.classList.add("held"); });
@@ -364,16 +447,25 @@
     button.addEventListener("pointerup", release); button.addEventListener("pointercancel", release); button.addEventListener("lostpointercapture", release);
     button.addEventListener("contextmenu", e => e.preventDefault());
   }
+  
   window.addEventListener("keydown", e => {
     if ($("unlock-dialog").open || e.target.tagName === "SELECT") return;
     if (["ArrowLeft", "ArrowRight"].includes(e.key)) { e.preventDefault(); if (mode === "playing") keys.add(e.key); }
     if (e.key.toLowerCase() === "p" && !e.repeat) pause();
+    
+    // NEU: Barrierefreie Alternative – Mit den Tasten 1, 2, 3 oder 4 direkt über der Plattform platzieren
+    if (["1", "2", "3", "4"].includes(e.key) && mode === "playing" && row) {
+      const idx = parseInt(e.key) - 1;
+      if (idx < row.platforms.length) {
+        player.x = row.platforms[idx].x + row.platforms[idx].width / 2;
+      }
+    }
   });
+  
   window.addEventListener("keyup", e => keys.delete(e.key));
   window.addEventListener("blur", () => { clearInput(); if (mode === "playing") pause(); });
   document.addEventListener("visibilitychange", () => { if (document.hidden && mode === "playing") pause(); });
   
-  // Event-Listener für das neue Charakter-Menü
   $("kronk-select").addEventListener("change", async (e) => {
     aktiverKronk = e.target.value;
     speichereSpielstand();
