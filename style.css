@@ -1,25 +1,11 @@
 /* ================================================================
    Kronwerk-Quiz – Gestaltungssystem
    Farbwelt: Blau des Schriftzugs + Orange der Website, viel Weiß.
-   Kein Logo, kein Schulname im Code – nur die Farben und eine
-   dezente, an eine Bastionsmauer erinnernde Linie als Zitat auf
-   den Namen "Kronwerk" (Zinnenmuster im Header).
-
-   Hinweis: Es wird bewusst kein externer Webfont (z.B. Google
-   Fonts) eingebunden – das würde bei jedem Aufruf IP-Adressen an
-   einen Drittanbieter übertragen, was für eine Schulseite
-   datenschutzrechtlich heikel ist. Die Typografie-Hierarchie
-   entsteht stattdessen über Schriftschnitt/Laufweite der
-   System-Schrift.
    ================================================================ */
 
 :root {
-  /* Marken-Basis – Namen bewusst beibehalten, falls sie zur
-     Laufzeit ausgelesen werden (z.B. für Canvas-Zeichnungen) */
   --school-blue:#293f77;
   --school-orange:#ff9900;
-
-  /* abgeleitete Töne */
   --blue-900:#172b59;
   --blue-700:#1e3060;
   --blue-100:#edf1f8;
@@ -27,7 +13,6 @@
   --orange-ink:#a65b00;
   --orange-100:#fff0d8;
   --orange-050:#fff6e8;
-
   --ink:var(--school-blue);
   --ink-soft:#52617b;
   --paper:#ffffff;
@@ -36,12 +21,10 @@
   --danger:#b52820;
   --danger-bg:#fff0ed;
   --danger-ink:#882119;
-
   --radius-sm:10px;
   --radius-md:14px;
   --radius-lg:18px;
   --radius-xl:24px;
-
   --shadow-card:0 8px 30px rgba(41,63,119,.07);
   --shadow-pop:0 24px 80px rgba(23,43,89,.25);
   --ease:cubic-bezier(.2,.8,.2,1);
@@ -76,7 +59,6 @@ button:focus-visible,select:focus-visible,canvas:focus-visible{
   box-shadow:0 0 0 6px var(--orange-100);
 }
 
-/* ---------- Grundgerüst ---------- */
 .game{
   max-width:820px; margin:auto;
   display:flex; flex-direction:column; gap:10px;
@@ -84,9 +66,6 @@ button:focus-visible,select:focus-visible,canvas:focus-visible{
   min-height:650px;
 }
 
-/* ---------- Kopfzeile ----------
-   Die gezackte Linie oben zitiert eine Bastionsmauer (Kronwerk =
-   kronenförmiges Festungswerk) – abstrakt, ohne Wappen/Schriftzug. */
 header{
   position:relative;
   display:flex; justify-content:space-between; align-items:center; gap:16px;
@@ -120,7 +99,6 @@ h1 span{ font-weight:500; letter-spacing:0; color:var(--orange-ink); }
 #set-title{ overflow-wrap:anywhere; }
 #score{ text-align:right; color:var(--ink); font-variant-numeric:tabular-nums; }
 
-/* ---------- Spielfläche ---------- */
 .stage{
   position:relative;
   display:flex; flex-direction:column; flex:1;
@@ -155,7 +133,6 @@ canvas{ position:absolute; inset:0; display:block; width:100%; height:100%; obje
 
 #status{ flex-shrink:0; font-size:13px; min-height:28px; padding:4px 12px 8px; margin:0; color:var(--ink); text-align:center; }
 
-/* ---------- Auswahl-Overlay / Karten ---------- */
 .overlay{
   position:absolute; inset:0; z-index:2;
   display:flex; align-items:flex-start;
@@ -190,7 +167,6 @@ canvas{ position:absolute; inset:0; display:block; width:100%; height:100%; obje
 .primary:active:not(:disabled){ transform:translateY(2px); box-shadow:0 1px 0 var(--blue-900); }
 .secondary{ margin-top:8px; background:var(--blue-100); color:var(--school-blue); border:1px solid var(--line); }
 
-/* ---------- Steuerung ---------- */
 .controls{ display:flex; gap:14px; flex-shrink:0; }
 .controls button{
   flex:1; background:var(--school-orange); color:var(--school-blue);
@@ -231,9 +207,6 @@ footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom
   .controls span{ font-size:14px; margin:0 4px; }
 }
 
-/* ================================================================
-   Freischaltungen: modale Karte, die Runde wartet auf Bestätigung
-   ================================================================ */
 .unlock-card{
   width:min(420px,calc(100% - 32px));
   max-height:calc(100dvh - 32px);
@@ -270,6 +243,16 @@ footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom
   to{ opacity:1; transform:none; }
 }
 
+/* NEU: Visueller Feinschliff für brechende Plattformen */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px) rotate(-1deg); }
+  40% { transform: translateX(4px) rotate(1deg); }
+  60% { transform: translateX(-4px) rotate(-1deg); }
+  80% { transform: translateX(4px) rotate(1deg); }
+}
+.shake { animation: shake 0.4s ease-in-out; }
+
 @media(max-height:650px){
   .unlock-card{ padding:18px; }
   .unlock-portrait{ width:120px; height:120px; margin-bottom:10px; }
@@ -279,4 +262,5 @@ footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom
 @media(prefers-reduced-motion:reduce){
   .unlock-card[open]{ animation:none; }
   button{ transition:none; }
+  .shake { animation:none; }
 }
