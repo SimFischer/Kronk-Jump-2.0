@@ -15,14 +15,14 @@
   <header><div class="brand"><h1>KRONK <span>springt!</span></h1></div><button id="pause" disabled>Pause</button></header>
   <div class="meta"><span id="set-title">Wähle deine Aufgabensammlung</span><span id="score">0 Punkte</span></div>
   <div class="stage">
-    <div class="playfield"><canvas id="canvas" width="600" height="540" tabindex="0" aria-label="Spielfeld. Steuere Kronk mit den Pfeiltasten oder den beiden Richtungstasten auf die richtige Antwortplattform."></canvas></div>
+    <div class="playfield"><canvas id="canvas" width="600" height="540" tabindex="0" aria-label="Spielfeld. Steuere Kronk mit den Pfeiltasten, Tasten 1-4 oder den beiden Richtungstasten auf die richtige Antwortplattform."></canvas></div>
     <section class="question" aria-label="Aktuelle Aufgabe" aria-live="polite"><span id="progress">Mit Kronk nach oben</span><h2 id="question">Bereit für den nächsten Sprung?</h2></section>
     <p id="status" role="status">Wähle ein Thema und starte das Spiel.</p>
     <div id="overlay" class="overlay">
       <div class="card">
         <img src="assets/kronk-normal.png" alt="Kronk, das Schulmaskottchen" width="110" height="100">
         <h2 id="panel-title">Hoch hinaus mit Kronk!</h2>
-        <p id="panel-text">Kronk springt von allein. Halte links oder rechts gedrückt und lande mit seinen Füßen auf der richtigen Antwort. Falsche Plattformen brechen weg!</p>
+        <p id="panel-text">Kronk springt von allein. Halte links oder rechts gedrückt (oder nutze die Tasten 1–4) und lande auf der richtigen Antwort. Falsche Plattformen brechen weg!</p>
         <div id="selection">
           <label>Fach <select id="subject" disabled></select></label>
           <label>Klassenstufe <select id="grade" disabled></select></label>
@@ -37,7 +37,7 @@
     </div>
   </div>
   <nav class="controls" aria-label="Spielsteuerung"><button id="left" aria-label="Kronk nach links bewegen">◀ <span>Links halten</span></button><button id="right" aria-label="Kronk nach rechts bewegen"><span>Rechts halten</span> ▶</button></nav>
-  <footer>Touch: Richtung halten · Tastatur: ← → · P: Pause</footer>
+  <footer>Touch: Richtung halten · Tastatur: ← → (oder Tasten 1–4) · P: Pause</footer>
 </main>
 <dialog id="unlock-dialog" class="unlock-card" aria-labelledby="unlock-title" aria-describedby="unlock-description">
   <p class="unlock-badge">★ NEU FREIGESCHALTET ★</p>
