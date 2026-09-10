@@ -36,7 +36,8 @@
   };
   
   let collections = [], selected = null;
-  let particles = []; // Konfetti / Partikel für Erfolgseffekt
+  let particles = []; 
+  let successFlashTimer = 0; // Timer für das grüne Aufleuchten im Canvas
 
   // --- KRONK CHARAKTER, FREISCHALT-SYSTEM & LERNSTAND ---
   const kronkLevel = [
@@ -146,7 +147,7 @@
     renderHeight = H;
     questions = []; index = 0; score = 0; camera = 0; oldRows = []; row = null; player = null;
     hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0; last = 0; facing = 1;
-    particles = [];
+    particles = []; successFlashTimer = 0;
     clearInput(); $("score").textContent = `0 Punkte (Gesamt: ${gesamtPunkte})`;
     $("pause").disabled = true; $("pause").textContent = "Pause";
   }
@@ -299,6 +300,9 @@
   function step(dt) {
     if (mode !== "playing" || $("unlock-dialog").open) return;
     
+    // Flash Timer herunterzählen
+    if (successFlashTimer > 0) successFlashTimer -= dt;
+
     // Partikel aktualisieren
     particles.forEach(p => {
       p.x += p.vx * dt;
@@ -354,23 +358,20 @@
           speichereSpielstand();
           
           // Konfetti / Partikel erzeugen
-          for (let i = 0; i < 15; i++) {
+          for (let i = 0; i < 20; i++) {
             particles.push({
               x: player.x,
               y: row.y,
-              vx: (Math.random() - 0.5) * 250,
-              vy: Math.random() * -300 - 50,
-              color: Math.random() > 0.5 ? "#2ecc71" : "#ff9900",
-              size: Math.random() * 6 + 4,
-              life: 0.6
+              vx: (Math.random() - 0.5) * 300,
+              vy: Math.random() * -350 - 50,
+              color: Math.random() > 0.4 ? "#2ecc71" : "#ff9900",
+              size: Math.random() * 8 + 4,
+              life: 0.8
             });
           }
 
-          // Grünes Aufleuchten auslösen
-          const pf = document.querySelector(".playfield");
-          pf.classList.remove("success-flash");
-          void pf.offsetWidth;
-          pf.classList.add("success-flash");
+          // Grünes Aufleuchten im Canvas auslösen
+          successFlashTimer = 0.4;
 
           $("score").textContent = `${score} Punkte (Gesamt: ${gesamtPunkte})`;
           player.y = row.y; player.vy = -JUMP; hold = 0; apexUsed = false; celebration = .5;
@@ -388,7 +389,7 @@
               speichereSpielstand();
           }
 
-          hit.broken = true; failText = `„${hit.text}“ war hier nicht richtig.`;
+          hit.broken = true; failTest = `„${hit.text}“ war hier nicht richtig.`;
           $("status").textContent = "Diese Plattform bricht weg …";
           
           const pf = document.querySelector(".playfield");
@@ -443,16 +444,22 @@
     if (canvasDpr !== (window.devicePixelRatio || 1)) resizeCanvas();
     const height = renderHeight;
     ctx.clearRect(0, 0, W, height);
-    ctx.fillStyle = "#f0f4fa"; ctx.fillRect(0, 0, W, height);
-    ctx.strokeStyle = "#dce4f0"; ctx.lineWidth = 1;
+    
+    // Hintergrund (wird bei Erfolg kurz grün)
+    ctx.fillStyle = successFlashTimer > 0 ? "rgba(46, 204, 113, 0.25)" : "#f0f4fa";
+    ctx.fillRect(0, 0, W, height);
+    
+    ctx.strokeStyle = successFlashTimer > 0 ? "rgba(39, 174, 96, 0.4)" : "#dce4f0";
+    ctx.lineWidth = 1;
     for (let y = ((-camera * .3) % 60) - 60; y < height; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    
     if (!player) return;
     oldRows.forEach(r => drawRow(r, true)); drawRow(row);
     
     // Partikel zeichnen
     particles.forEach(p => {
       ctx.fillStyle = p.color;
-      ctx.globalAlpha = Math.max(0, p.life / 0.6);
+      ctx.globalAlpha = Math.max(0, p.life / 0.8);
       ctx.fillRect(p.x, p.y - camera, p.size, p.size);
     });
     ctx.globalAlpha = 1;
