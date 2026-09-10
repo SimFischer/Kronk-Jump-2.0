@@ -36,6 +36,7 @@
   };
   
   let collections = [], selected = null;
+  let particles = []; // Konfetti / Partikel für Erfolgseffekt
 
   // --- KRONK CHARAKTER, FREISCHALT-SYSTEM & LERNSTAND ---
   const kronkLevel = [
@@ -47,7 +48,6 @@
   let freigeschalteteKronks = ['kronk'];
   let aktiverKronk = 'kronk';
   
-  // NEU: Didaktik & Gamification
   let fehlerSpeicher = {}; 
   let consecutiveCorrect = 0;
   let currentThinking = 2;
@@ -146,6 +146,7 @@
     renderHeight = H;
     questions = []; index = 0; score = 0; camera = 0; oldRows = []; row = null; player = null;
     hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0; last = 0; facing = 1;
+    particles = [];
     clearInput(); $("score").textContent = `0 Punkte (Gesamt: ${gesamtPunkte})`;
     $("pause").disabled = true; $("pause").textContent = "Pause";
   }
@@ -218,7 +219,6 @@
     const q = questions[index];
     const answers = shuffle(q.antworten);
     const gap = 10, margin = 12, width = (W - margin * 2 - gap * (answers.length - 1)) / answers.length;
-    // NEU: Bewegliche Plattformen für ältere Klassen (ab Klasse 7)
     const isMoving = selected && selected.klasse >= 7;
     return { y, q, platforms: answers.map((a, i) => ({
       ...a, 
@@ -258,7 +258,6 @@
     resetRound();
     const data = selected.data;
     
-    // NEU: Intelligente Wiederholung basierend auf Fehler-Speicher
     let fehlerFuerThema = fehlerSpeicher[selected.id] || [];
     if (data.mischen) {
       let baseFragen = data.fragen.slice();
@@ -300,11 +299,19 @@
   function step(dt) {
     if (mode !== "playing" || $("unlock-dialog").open) return;
     
-    // NEU: Plattformen aktualisieren (Bewegung)
+    // Partikel aktualisieren
+    particles.forEach(p => {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 400 * dt;
+      p.life -= dt;
+    });
+    particles = particles.filter(p => p.life > 0);
+
     row.platforms.forEach(p => {
       if (p.vx) {
         p.x += p.vx * dt;
-        if (p.x <= 10 || p.x + p.width >= W - 10) p.vx *= -1; // Abprallen an den Rändern
+        if (p.x <= 10 || p.x + p.width >= W - 10) p.vx *= -1;
       }
     });
 
@@ -323,7 +330,6 @@
       player.vy += GRAVITY * dt;
       if (!apexUsed && player.vy >= 0) {
         apexUsed = true;
-        // NEU: Adaptive Denkpause
         if (currentThinking > 0) { hold = currentThinking; player.vy = 0; }
       }
       player.y += player.vy * dt;
@@ -334,7 +340,6 @@
       const hit = row.platforms.find(p => !p.broken && player.x >= p.x && player.x <= p.x + p.width);
       if (hit) {
         if (hit.richtig) {
-          // NEU: Adaptive Belohnung (schnellere Runden) und Fehler löschen
           consecutiveCorrect++;
           if (consecutiveCorrect >= 3 && currentThinking > 0.5) {
              currentThinking = Math.max(0, currentThinking - 0.5);
@@ -347,6 +352,26 @@
           gesamtPunkte += 100;
           pruefeFreischaltungen();
           speichereSpielstand();
+          
+          // Konfetti / Partikel erzeugen
+          for (let i = 0; i < 15; i++) {
+            particles.push({
+              x: player.x,
+              y: row.y,
+              vx: (Math.random() - 0.5) * 250,
+              vy: Math.random() * -300 - 50,
+              color: Math.random() > 0.5 ? "#2ecc71" : "#ff9900",
+              size: Math.random() * 6 + 4,
+              life: 0.6
+            });
+          }
+
+          // Grünes Aufleuchten auslösen
+          const pf = document.querySelector(".playfield");
+          pf.classList.remove("success-flash");
+          void pf.offsetWidth;
+          pf.classList.add("success-flash");
+
           $("score").textContent = `${score} Punkte (Gesamt: ${gesamtPunkte})`;
           player.y = row.y; player.vy = -JUMP; hold = 0; apexUsed = false; celebration = .5;
           oldRows.push(row); oldRows = oldRows.slice(-1); index++;
@@ -354,7 +379,6 @@
           row = makeRow(row.y - GAP);
           camera = row.y - ROW_Y; setQuestion();
         } else {
-          // NEU: Fehler merken, Zeit resetten und Screen-Shake
           consecutiveCorrect = 0;
           currentThinking = thinking; 
           
@@ -367,10 +391,9 @@
           hit.broken = true; failText = `„${hit.text}“ war hier nicht richtig.`;
           $("status").textContent = "Diese Plattform bricht weg …";
           
-          // Löst die Screen-Shake CSS Animation aus
           const pf = document.querySelector(".playfield");
           pf.classList.remove("shake");
-          void pf.offsetWidth; // Reflow erzwingen
+          void pf.offsetWidth;
           pf.classList.add("shake");
         }
       }
@@ -425,6 +448,15 @@
     for (let y = ((-camera * .3) % 60) - 60; y < height; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
     if (!player) return;
     oldRows.forEach(r => drawRow(r, true)); drawRow(row);
+    
+    // Partikel zeichnen
+    particles.forEach(p => {
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, p.life / 0.6);
+      ctx.fillRect(p.x, p.y - camera, p.size, p.size);
+    });
+    ctx.globalAlpha = 1;
+
     const img = celebration > 0 || mode === "won" ? images.jubel : player.vy < 0 ? images.sprung : images.normal;
     if (img) {
       const height = 95, width = height * img.naturalWidth / img.naturalHeight;
@@ -453,7 +485,6 @@
     if (["ArrowLeft", "ArrowRight"].includes(e.key)) { e.preventDefault(); if (mode === "playing") keys.add(e.key); }
     if (e.key.toLowerCase() === "p" && !e.repeat) pause();
     
-    // NEU: Barrierefreie Alternative – Mit den Tasten 1, 2, 3 oder 4 direkt über der Plattform platzieren
     if (["1", "2", "3", "4"].includes(e.key) && mode === "playing" && row) {
       const idx = parseInt(e.key) - 1;
       if (idx < row.platforms.length) {
