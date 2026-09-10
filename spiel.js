@@ -37,9 +37,8 @@
   
   let collections = [], selected = null;
   let particles = []; 
-  let successFlashTimer = 0; // Timer für das grüne Aufleuchten im Canvas
+  let successFlashTimer = 0;
 
-  // --- KRONK CHARAKTER, FREISCHALT-SYSTEM & LERNSTAND ---
   const kronkLevel = [
     { id: 'kronk', name: 'Standard Kronk', pointsNeeded: 0 },
     { id: 'kronk_silber', name: 'Silberner Kronk', pointsNeeded: 1000 },
@@ -292,18 +291,26 @@
   }
   
   function finish(won) {
-    mode = won ? "won" : "lost"; $("pause").disabled = true;
-    showPanel(won ? "Ganz oben angekommen!" : "Noch ein Sprung?", won ? `Kronk hat alle ${questions.length} Aufgaben geschafft. ${score} Punkte!` : `${score} Punkte. ${failText || "Du hast die Plattform verfehlt."} Richtig: ${row.q.antworten.filter(a => a.richtig).map(a => a.text).join(", ")} ${row.q.erklaerung || ""}`, "Noch einmal spielen", true);
+    mode = won ? "won" : "lost"; 
+    $("pause").disabled = true;
+    
+    const richtigeAntworten = row && row.q && row.q.antworten ? row.q.antworten.filter(a => a.richtig).map(a => a.text).join(", ") : "";
+    const erklaerung = row && row.q && row.q.erklaerung ? row.q.erklaerung : "";
+    
+    showPanel(
+      won ? "Ganz oben angekommen!" : "Noch ein Sprung?", 
+      won ? `Kronk hat alle ${questions.length} Aufgaben geschafft. ${score} Punkte!` : `${score} Punkte. ${failText || "Du hast die Plattform verfehlt."} Richtig: ${richtigeAntworten}. ${erklaerung}`, 
+      "Noch einmal spielen", 
+      true
+    );
     $("status").textContent = won ? "Alle Aufgaben geschafft!" : "Lies die Lösung und versuche es noch einmal.";
   }
   
   function step(dt) {
     if (mode !== "playing" || $("unlock-dialog").open) return;
     
-    // Flash Timer herunterzählen
     if (successFlashTimer > 0) successFlashTimer -= dt;
 
-    // Partikel aktualisieren
     particles.forEach(p => {
       p.x += p.vx * dt;
       p.y += p.vy * dt;
@@ -348,7 +355,7 @@
           if (consecutiveCorrect >= 3 && currentThinking > 0.5) {
              currentThinking = Math.max(0, currentThinking - 0.5);
           }
-          if (fehlerSpeicher[selected.id]) {
+          if (selected && fehlerSpeicher[selected.id]) {
              fehlerSpeicher[selected.id] = fehlerSpeicher[selected.id].filter(f => f !== row.q.frage);
           }
           
@@ -357,7 +364,6 @@
           pruefeFreischaltungen();
           speichereSpielstand();
           
-          // Konfetti / Partikel erzeugen
           for (let i = 0; i < 20; i++) {
             particles.push({
               x: player.x,
@@ -370,7 +376,6 @@
             });
           }
 
-          // Grünes Aufleuchten im Canvas auslösen
           successFlashTimer = 0.4;
 
           $("score").textContent = `${score} Punkte (Gesamt: ${gesamtPunkte})`;
@@ -383,19 +388,24 @@
           consecutiveCorrect = 0;
           currentThinking = thinking; 
           
-          if (!fehlerSpeicher[selected.id]) fehlerSpeicher[selected.id] = [];
-          if (!fehlerSpeicher[selected.id].includes(row.q.frage)) {
-              fehlerSpeicher[selected.id].push(row.q.frage);
-              speichereSpielstand();
+          if (selected) {
+            if (!fehlerSpeicher[selected.id]) fehlerSpeicher[selected.id] = [];
+            if (!fehlerSpeicher[selected.id].includes(row.q.frage)) {
+                fehlerSpeicher[selected.id].push(row.q.frage);
+                speichereSpielstand();
+            }
           }
 
-          hit.broken = true; failTest = `„${hit.text}“ war hier nicht richtig.`;
+          hit.broken = true; 
+          failText = `„${hit.text}“ war hier nicht richtig.`;
           $("status").textContent = "Diese Plattform bricht weg …";
           
           const pf = document.querySelector(".playfield");
-          pf.classList.remove("shake");
-          void pf.offsetWidth;
-          pf.classList.add("shake");
+          if (pf) {
+            pf.classList.remove("shake");
+            void pf.offsetWidth;
+            pf.classList.add("shake");
+          }
         }
       }
     }
@@ -445,7 +455,6 @@
     const height = renderHeight;
     ctx.clearRect(0, 0, W, height);
     
-    // Hintergrund (wird bei Erfolg kurz grün)
     ctx.fillStyle = successFlashTimer > 0 ? "rgba(46, 204, 113, 0.25)" : "#f0f4fa";
     ctx.fillRect(0, 0, W, height);
     
@@ -456,7 +465,6 @@
     if (!player) return;
     oldRows.forEach(r => drawRow(r, true)); drawRow(row);
     
-    // Partikel zeichnen
     particles.forEach(p => {
       ctx.fillStyle = p.color;
       ctx.globalAlpha = Math.max(0, p.life / 0.8);
