@@ -243,7 +243,6 @@ footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom
   to{ opacity:1; transform:none; }
 }
 
-/* NEU: Visueller Feinschliff für brechende Plattformen */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20% { transform: translateX(-4px) rotate(-1deg); }
@@ -252,6 +251,12 @@ footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom
   80% { transform: translateX(4px) rotate(1deg); }
 }
 .shake { animation: shake 0.4s ease-in-out; }
+
+@keyframes success-flash {
+  0% { background-color: rgba(46, 204, 113, 0.4); }
+  100% { background-color: #f0f4fa; }
+}
+.success-flash { animation: success-flash 0.4s ease-out; }
 
 @media(max-height:650px){
   .unlock-card{ padding:18px; }
@@ -263,4 +268,5 @@ footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom
   .unlock-card[open]{ animation:none; }
   button{ transition:none; }
   .shake { animation:none; }
+  .success-flash { animation:none; }
 }
