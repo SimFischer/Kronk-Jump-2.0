@@ -1,75 +1,282 @@
-:root { color-scheme:light; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:#293f77; background:#f4f6fa; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
-* { box-sizing:border-box; }
-[hidden] { display:none !important; }
-body { margin:0; padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); min-height:100vh; }
-button,select { font:inherit; }
-button { cursor:pointer; border:0; font-weight:750; }
-button:focus-visible,select:focus-visible,canvas:focus-visible { outline:4px solid #ff9900; outline-offset:3px; }
-button:disabled { opacity:.6; cursor:wait; }
-.game { max-width:820px; margin:auto; display:flex; flex-direction:column; gap:8px; height:calc(100vh - 24px); height:calc(100dvh - 24px); min-height:650px; }
-header { display:flex; justify-content:space-between; align-items:center; color:#293f77; gap:16px; }
-h1 { font-size:24px; letter-spacing:1px; margin:0; }
-h1 span { font-weight:450; letter-spacing:0; color:#a65b00; }
-header button { padding:10px 18px; border-radius:12px; background:#293f77; color:white; }
-.meta { display:flex; justify-content:space-between; gap:12px; font-size:14px; font-weight:650; color:#52617b; }
-#set-title { overflow-wrap:anywhere; }
-#score { text-align:right; color:#293f77; }
-.stage { position:relative; display:flex; flex-direction:column; flex:1; min-height:calc(var(--question-height, 100px) + 358px); border-radius:18px; background:#f0f4fa; }
-.question { margin:12px 12px 0; padding:12px 16px; color:#293f77; background:#fff6e8; border:2px solid #293f77; border-top:5px solid #ff9900; border-radius:14px; box-shadow:0 4px 0 #293f7725; flex-shrink:0; overflow-wrap:anywhere; }
-#progress { font-size:12px; font-weight:750; color:#52617b; }
-h2 { font-size:23px; line-height:1.3; margin:5px 0; }
-.playfield { position:relative; flex:1; min-height:330px; }
-canvas { position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:contain; }
-#status { flex-shrink:0; font-size:13px; min-height:28px; padding:4px 12px 8px; margin:0; color:#293f77; text-align:center; }
-.overlay { position:absolute; inset:0; z-index:2; display:flex; align-items:flex-start; background:#e8edf5e8; padding:12px; overflow:auto; border-radius:18px; }
-.card { width:100%; max-width:420px; margin:auto; flex-shrink:0; background:white; padding:18px; border-radius:20px; text-align:center; box-shadow:0 12px 50px #293f7730; overflow-wrap:anywhere; }
-.card img { object-fit:contain; height:64px; }
-.card p { font-size:15px; line-height:1.45; margin:10px 0; }
-.card label { display:block; font-size:14px; font-weight:650; text-align:left; margin:10px 0; }
-.card select { width:100%; min-width:0; padding:9px; margin-top:4px; border:1px solid #aab7ce; border-radius:8px; background:white; }
-#selection { display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
-#selection label:nth-child(3),#collection-info,#load-errors { grid-column:1 / -1; }
-#collection-info { color:#52617b; font-size:13px; margin:0; }
-#load-errors { text-align:left; white-space:pre-line; padding:10px; background:#fff0ed; border:2px solid #b52820; color:#882119; }
-.primary,.secondary { width:100%; border-radius:12px; padding:13px; }
-.primary { background:#293f77; color:white; }
-.secondary { margin-top:8px; background:#edf1f8; color:#293f77; }
-.controls { display:flex; gap:14px; flex-shrink:0; }
-.controls button { flex:1; background:#ff9900; color:#293f77; border-radius:16px; min-height:66px; font-size:24px; touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
-.controls span { font-size:16px; vertical-align:middle; margin:0 10px; }
-.controls button:active,.controls button.held { background:#ffbc59; transform:translateY(2px); }
-footer { text-align:center; color:#52617b; font-size:12px; padding-bottom:2px; }
-@media(max-height:850px) { .card img { display:none; } .card { padding:14px; } .card p { margin:6px 0; } .card label { margin:6px 0; } }
-@media(max-width:430px) { body { padding:8px; } .game { height:calc(100dvh - 16px); } .question { margin:8px 8px 0; padding:10px 12px; } h2 { font-size:20px; } .controls span { font-size:14px; margin:0 4px; } }
+/* ================================================================
+   Kronwerk-Quiz – Gestaltungssystem
+   Farbwelt: Blau des Schriftzugs + Orange der Website, viel Weiß.
+   Kein Logo, kein Schulname im Code – nur die Farben und eine
+   dezente, an eine Bastionsmauer erinnernde Linie als Zitat auf
+   den Namen "Kronwerk" (Zinnenmuster im Header).
 
-/* Schuldesign: Blau des Kronwerk-Schriftzugs, Orange der Website, viel Weiß. */
-:root { --school-blue:#293f77; --school-orange:#ff9900; }
-header { background:#fff; padding:12px 16px; border-radius:16px; border-top:4px solid var(--school-orange); box-shadow:0 4px 18px #293f770a; }
-.school-name { margin:0 0 4px; font-size:11px; letter-spacing:1.6px; line-height:1.4; }
-.school-name strong { font-weight:800; }
-h1 { font-size:25px; line-height:1.2; letter-spacing:.5px; }
-.meta { padding:0 4px; align-items:center; }
-.stage { border:1px solid #d6deeb; box-shadow:0 8px 30px #293f7708; }
-.card { border:1px solid #d6deeb; border-top:5px solid var(--school-orange); }
-.card select { color:var(--school-blue); min-height:44px; font-size:16px; background:#fafbfe; }
-#selection label:nth-child(4) { grid-column:1 / -1; }
-.primary { box-shadow:0 3px 0 #172b59; }
-button:disabled { cursor:default; }
-button:focus-visible,select:focus-visible,canvas:focus-visible { outline:3px solid #293f77; outline-offset:3px; box-shadow:0 0 0 6px #ff9900; }
-.controls button { box-shadow:0 3px 0 #cc7900; }
-@media(hover:hover) { .primary:hover:not(:disabled),header button:hover:not(:disabled) { background:#1e3060; } .secondary:hover { background:#dce4f2; } .controls button:hover { background:#ffad33; } }
-@media(max-width:430px) { header { padding:10px 12px; gap:8px; } .school-name { font-size:9px; letter-spacing:1px; } h1 { font-size:22px; } header button { padding:10px 12px; } .meta { font-size:12px; } }
+   Hinweis: Es wird bewusst kein externer Webfont (z.B. Google
+   Fonts) eingebunden – das würde bei jedem Aufruf IP-Adressen an
+   einen Drittanbieter übertragen, was für eine Schulseite
+   datenschutzrechtlich heikel ist. Die Typografie-Hierarchie
+   entsteht stattdessen über Schriftschnitt/Laufweite der
+   System-Schrift.
+   ================================================================ */
 
-/* Freischaltungen als modale Karte; die Runde wartet auf die Bestätigung. */
-.unlock-card { width:min(420px,calc(100% - 32px)); max-height:calc(100dvh - 32px); overflow:auto; padding:28px; border:1px solid #d6deeb; border-top:6px solid #ff9900; border-radius:24px; background:#fff; color:#293f77; text-align:center; box-shadow:0 24px 80px #172b5940; }
-.unlock-card::backdrop { background:#172b598c; backdrop-filter:blur(5px); }
-.unlock-card[open] { animation:unlock-appear .3s ease-out; }
-.unlock-badge { display:inline-block; margin:0 0 18px; padding:8px 12px; border-radius:999px; background:#fff0d8; color:#855000; font-size:12px; font-weight:800; letter-spacing:1px; }
-.unlock-portrait { display:grid; place-items:center; width:200px; height:200px; margin:0 auto 18px; border:2px solid #ffcc80; border-radius:50%; background:radial-gradient(circle,#fff 15%,#fff0d8 70%); }
-.unlock-portrait img { display:block; width:180px; height:180px; object-fit:contain; }
-.unlock-card h2 { font-size:28px; }
-.unlock-card p { line-height:1.5; }
-.unlock-hint { color:#52617b; font-size:14px; margin-bottom:22px; }
-@keyframes unlock-appear { from { opacity:0; transform:translateY(12px) scale(.96); } to { opacity:1; transform:none; } }
-@media(max-height:650px) { .unlock-card { padding:18px; } .unlock-portrait { width:120px; height:120px; margin-bottom:10px; } .unlock-portrait img { width:110px; height:110px; } .unlock-badge { margin-bottom:10px; } }
-@media(prefers-reduced-motion:reduce) { .unlock-card[open] { animation:none; } }
+:root {
+  /* Marken-Basis – Namen bewusst beibehalten, falls sie zur
+     Laufzeit ausgelesen werden (z.B. für Canvas-Zeichnungen) */
+  --school-blue:#293f77;
+  --school-orange:#ff9900;
+
+  /* abgeleitete Töne */
+  --blue-900:#172b59;
+  --blue-700:#1e3060;
+  --blue-100:#edf1f8;
+  --orange-700:#cc7900;
+  --orange-ink:#a65b00;
+  --orange-100:#fff0d8;
+  --orange-050:#fff6e8;
+
+  --ink:var(--school-blue);
+  --ink-soft:#52617b;
+  --paper:#ffffff;
+  --canvas-bg:#f4f6fa;
+  --line:#d6deeb;
+  --danger:#b52820;
+  --danger-bg:#fff0ed;
+  --danger-ink:#882119;
+
+  --radius-sm:10px;
+  --radius-md:14px;
+  --radius-lg:18px;
+  --radius-xl:24px;
+
+  --shadow-card:0 8px 30px rgba(41,63,119,.07);
+  --shadow-pop:0 24px 80px rgba(23,43,89,.25);
+  --ease:cubic-bezier(.2,.8,.2,1);
+
+  color-scheme:light;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--ink);
+  background:var(--canvas-bg);
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+
+*{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+
+body{
+  margin:0;
+  padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  min-height:100vh;
+}
+
+button,select{ font:inherit; }
+button{
+  cursor:pointer; border:0; font-weight:750;
+  -webkit-tap-highlight-color:transparent;
+  transition:background-color .15s var(--ease), transform .1s var(--ease), box-shadow .15s var(--ease);
+}
+button:disabled{ opacity:.6; cursor:default; }
+button:focus-visible,select:focus-visible,canvas:focus-visible{
+  outline:3px solid var(--school-blue);
+  outline-offset:3px;
+  box-shadow:0 0 0 6px var(--orange-100);
+}
+
+/* ---------- Grundgerüst ---------- */
+.game{
+  max-width:820px; margin:auto;
+  display:flex; flex-direction:column; gap:10px;
+  height:calc(100vh - 24px); height:calc(100dvh - 24px);
+  min-height:650px;
+}
+
+/* ---------- Kopfzeile ----------
+   Die gezackte Linie oben zitiert eine Bastionsmauer (Kronwerk =
+   kronenförmiges Festungswerk) – abstrakt, ohne Wappen/Schriftzug. */
+header{
+  position:relative;
+  display:flex; justify-content:space-between; align-items:center; gap:16px;
+  background:var(--paper);
+  padding:22px 18px 14px;
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-card);
+}
+header::before{
+  content:"";
+  position:absolute; top:0; left:18px; right:18px; height:10px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='10'%3E%3Crect width='12' height='10' fill='%23ff9900'/%3E%3Crect x='12' y='5' width='12' height='5' fill='%23ff9900'/%3E%3C/svg%3E");
+  background-repeat:repeat-x;
+}
+header button{
+  padding:10px 18px;
+  border-radius:var(--radius-md);
+  background:var(--school-blue);
+  color:var(--paper);
+  box-shadow:0 3px 0 var(--blue-900);
+}
+header button:active:not(:disabled){ transform:translateY(2px); box-shadow:0 1px 0 var(--blue-900); }
+
+.school-name{ margin:0 0 4px; font-size:11px; letter-spacing:1.6px; line-height:1.4; color:var(--ink-soft); }
+.school-name strong{ font-weight:800; color:var(--ink); }
+
+h1{ font-size:26px; font-weight:800; letter-spacing:-.2px; line-height:1.15; margin:0; }
+h1 span{ font-weight:500; letter-spacing:0; color:var(--orange-ink); }
+
+.meta{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:0 4px; font-size:14px; font-weight:650; color:var(--ink-soft); }
+#set-title{ overflow-wrap:anywhere; }
+#score{ text-align:right; color:var(--ink); font-variant-numeric:tabular-nums; }
+
+/* ---------- Spielfläche ---------- */
+.stage{
+  position:relative;
+  display:flex; flex-direction:column; flex:1;
+  min-height:calc(var(--question-height, 100px) + 358px);
+  border-radius:var(--radius-lg);
+  background:#f0f4fa;
+  border:1px solid var(--line);
+  box-shadow:0 8px 30px rgba(41,63,119,.03);
+}
+
+.question{
+  margin:12px 12px 0; padding:12px 16px;
+  color:var(--ink);
+  background:var(--orange-050);
+  border:2px solid var(--school-blue);
+  border-top:5px solid var(--school-orange);
+  border-radius:var(--radius-md);
+  box-shadow:0 4px 0 rgba(41,63,119,.15);
+  flex-shrink:0; overflow-wrap:anywhere;
+}
+#progress{ font-size:12px; font-weight:750; color:var(--ink-soft); }
+h2{ font-size:24px; font-weight:800; letter-spacing:-.1px; line-height:1.25; margin:5px 0; }
+
+.playfield{
+  position:relative; flex:1; min-height:330px;
+  margin:0 12px 12px;
+  border-radius:var(--radius-md);
+  overflow:hidden;
+  box-shadow:inset 0 0 0 1px var(--line);
+}
+canvas{ position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:contain; }
+
+#status{ flex-shrink:0; font-size:13px; min-height:28px; padding:4px 12px 8px; margin:0; color:var(--ink); text-align:center; }
+
+/* ---------- Auswahl-Overlay / Karten ---------- */
+.overlay{
+  position:absolute; inset:0; z-index:2;
+  display:flex; align-items:flex-start;
+  background:rgba(232,237,245,.91);
+  padding:12px; overflow:auto; border-radius:var(--radius-lg);
+}
+.card{
+  width:100%; max-width:420px; margin:auto; flex-shrink:0;
+  background:var(--paper); padding:18px; border-radius:var(--radius-xl);
+  text-align:center; overflow-wrap:anywhere;
+  border:1px solid var(--line);
+  border-top:5px solid var(--school-orange);
+  box-shadow:var(--shadow-card);
+}
+.card img{ object-fit:contain; height:64px; }
+.card p{ font-size:15px; line-height:1.45; margin:10px 0; }
+.card label{ display:block; font-size:14px; font-weight:650; text-align:left; margin:10px 0; }
+.card select{
+  width:100%; min-width:0; padding:9px; margin-top:4px;
+  border:1px solid #aab7ce; border-radius:8px;
+  background:#fafbfe; color:var(--school-blue);
+  min-height:44px; font-size:16px;
+}
+
+#selection{ display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
+#selection label:nth-child(n+3), #collection-info, #load-errors{ grid-column:1 / -1; }
+#collection-info{ color:var(--ink-soft); font-size:13px; margin:0; }
+#load-errors{ text-align:left; white-space:pre-line; padding:10px; background:var(--danger-bg); border:2px solid var(--danger); color:var(--danger-ink); border-radius:var(--radius-sm); }
+
+.primary,.secondary{ width:100%; border-radius:var(--radius-md); padding:13px; }
+.primary{ background:var(--school-blue); color:var(--paper); box-shadow:0 3px 0 var(--blue-900); }
+.primary:active:not(:disabled){ transform:translateY(2px); box-shadow:0 1px 0 var(--blue-900); }
+.secondary{ margin-top:8px; background:var(--blue-100); color:var(--school-blue); border:1px solid var(--line); }
+
+/* ---------- Steuerung ---------- */
+.controls{ display:flex; gap:14px; flex-shrink:0; }
+.controls button{
+  flex:1; background:var(--school-orange); color:var(--school-blue);
+  border-radius:16px; min-height:66px; font-size:24px;
+  box-shadow:0 3px 0 var(--orange-700);
+  touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
+}
+.controls span{ font-size:16px; vertical-align:middle; margin:0 10px; }
+.controls button:active,.controls button.held{ background:#ffbc59; transform:translateY(2px); box-shadow:0 1px 0 var(--orange-700); }
+
+footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom:2px; }
+
+@media(hover:hover){
+  .primary:hover:not(:disabled), header button:hover:not(:disabled){ background:var(--blue-700); }
+  .secondary:hover{ background:#dce4f2; }
+  .controls button:hover{ background:#ffad33; }
+}
+
+@media(max-height:850px){
+  .card img{ display:none; }
+  .card{ padding:14px; }
+  .card p{ margin:6px 0; }
+  .card label{ margin:6px 0; }
+}
+
+@media(max-width:430px){
+  body{ padding:8px; }
+  .game{ height:calc(100dvh - 16px); }
+  header{ padding:18px 12px 10px; gap:8px; }
+  header::before{ left:12px; right:12px; height:8px; background-size:20px 8px; }
+  .school-name{ font-size:9px; letter-spacing:1px; }
+  h1{ font-size:22px; }
+  header button{ padding:10px 12px; }
+  .meta{ font-size:12px; }
+  .question{ margin:8px 8px 0; padding:10px 12px; }
+  h2{ font-size:20px; }
+  .playfield{ margin:0 8px 8px; }
+  .controls span{ font-size:14px; margin:0 4px; }
+}
+
+/* ================================================================
+   Freischaltungen: modale Karte, die Runde wartet auf Bestätigung
+   ================================================================ */
+.unlock-card{
+  width:min(420px,calc(100% - 32px));
+  max-height:calc(100dvh - 32px);
+  overflow:auto; padding:28px;
+  border:1px solid var(--line);
+  border-top:6px solid var(--school-orange);
+  border-radius:var(--radius-xl);
+  background:var(--paper);
+  color:var(--ink);
+  text-align:center;
+  box-shadow:var(--shadow-pop);
+}
+.unlock-card::backdrop{ background:rgba(23,43,89,.55); backdrop-filter:blur(5px); }
+.unlock-card[open]{ animation:unlock-appear .3s ease-out; }
+
+.unlock-badge{
+  display:inline-block; margin:0 0 18px; padding:8px 12px;
+  border-radius:999px; background:var(--orange-100); color:#855000;
+  font-size:12px; font-weight:800; letter-spacing:1px;
+}
+.unlock-portrait{
+  display:grid; place-items:center; width:200px; height:200px;
+  margin:0 auto 18px; border-radius:50%;
+  background:radial-gradient(circle,#fff 15%,var(--orange-100) 70%);
+  box-shadow:0 0 0 3px #fff, 0 0 0 6px #ffcc80;
+}
+.unlock-portrait img{ display:block; width:180px; height:180px; object-fit:contain; }
+.unlock-card h2{ font-size:29px; }
+.unlock-card p{ line-height:1.5; }
+.unlock-hint{ color:var(--ink-soft); font-size:14px; margin-bottom:22px; }
+
+@keyframes unlock-appear{
+  from{ opacity:0; transform:translateY(12px) scale(.96); }
+  to{ opacity:1; transform:none; }
+}
+
+@media(max-height:650px){
+  .unlock-card{ padding:18px; }
+  .unlock-portrait{ width:120px; height:120px; margin-bottom:10px; }
+  .unlock-portrait img{ width:110px; height:110px; }
+  .unlock-badge{ margin-bottom:10px; }
+}
+@media(prefers-reduced-motion:reduce){
+  .unlock-card[open]{ animation:none; }
+  button{ transition:none; }
+}
