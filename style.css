@@ -1,6 +1,5 @@
 /* ================================================================
    Kronwerk-Quiz – Gestaltungssystem
-   Farbwelt: Blau des Schriftzugs + Orange der Website, viel Weiß.
    ================================================================ */
 
 :root {
@@ -179,33 +178,14 @@ canvas{ position:absolute; inset:0; display:block; width:100%; height:100%; obje
 
 footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom:2px; }
 
-@media(hover:hover){
-  .primary:hover:not(:disabled), header button:hover:not(:disabled){ background:var(--blue-700); }
-  .secondary:hover{ background:#dce4f2; }
-  .controls button:hover{ background:#ffad33; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px) rotate(-1deg); }
+  40% { transform: translateX(4px) rotate(1deg); }
+  60% { transform: translateX(-4px) rotate(-1deg); }
+  80% { transform: translateX(4px) rotate(1deg); }
 }
-
-@media(max-height:850px){
-  .card img{ display:none; }
-  .card{ padding:14px; }
-  .card p{ margin:6px 0; }
-  .card label{ margin:6px 0; }
-}
-
-@media(max-width:430px){
-  body{ padding:8px; }
-  .game{ height:calc(100dvh - 16px); }
-  header{ padding:18px 12px 10px; gap:8px; }
-  header::before{ left:12px; right:12px; height:8px; background-size:20px 8px; }
-  .school-name{ font-size:9px; letter-spacing:1px; }
-  h1{ font-size:22px; }
-  header button{ padding:10px 12px; }
-  .meta{ font-size:12px; }
-  .question{ margin:8px 8px 0; padding:10px 12px; }
-  h2{ font-size:20px; }
-  .playfield{ margin:0 8px 8px; }
-  .controls span{ font-size:14px; margin:0 4px; }
-}
+.shake { animation: shake 0.4s ease-in-out; }
 
 .unlock-card{
   width:min(420px,calc(100% - 32px));
@@ -243,30 +223,8 @@ footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom
   to{ opacity:1; transform:none; }
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-4px) rotate(-1deg); }
-  40% { transform: translateX(4px) rotate(1deg); }
-  60% { transform: translateX(-4px) rotate(-1deg); }
-  80% { transform: translateX(4px) rotate(1deg); }
-}
-.shake { animation: shake 0.4s ease-in-out; }
-
-@keyframes success-flash {
-  0% { background-color: rgba(46, 204, 113, 0.4); }
-  100% { background-color: #f0f4fa; }
-}
-.success-flash { animation: success-flash 0.4s ease-out; }
-
-@media(max-height:650px){
-  .unlock-card{ padding:18px; }
-  .unlock-portrait{ width:120px; height:120px; margin-bottom:10px; }
-  .unlock-portrait img{ width:110px; height:110px; }
-  .unlock-badge{ margin-bottom:10px; }
-}
 @media(prefers-reduced-motion:reduce){
   .unlock-card[open]{ animation:none; }
   button{ transition:none; }
   .shake { animation:none; }
-  .success-flash { animation:none; }
 }
