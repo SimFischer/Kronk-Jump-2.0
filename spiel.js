@@ -220,13 +220,11 @@
     const q = questions[index];
     const answers = shuffle(q.antworten);
     const gap = 10, margin = 12, width = (W - margin * 2 - gap * (answers.length - 1)) / answers.length;
-    const isMoving = selected && (selected.klasse === "E" || selected.klasse >= 7);
     return { y, q, platforms: answers.map((a, i) => ({
       ...a, 
       x: margin + i * (width + gap), 
       width, 
-      broken: false,
-      vx: isMoving ? (Math.random() > 0.5 ? 25 : -25) : 0
+      broken: false
     })) };
   }
   
@@ -308,13 +306,6 @@
       p.life -= dt;
     });
     particles = particles.filter(p => p.life > 0);
-
-    row.platforms.forEach(p => {
-      if (p.vx) {
-        p.x += p.vx * dt;
-        if (p.x <= 10 || p.x + p.width >= W - 10) p.vx *= -1;
-      }
-    });
 
     const left = keys.has("ArrowLeft") || [...pointers.values()].includes(-1);
     const right = keys.has("ArrowRight") || [...pointers.values()].includes(1);
