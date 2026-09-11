@@ -23,6 +23,7 @@ Die Frage steht in einer festen, kontrastreichen Box unterhalb des Spielfelds, d
 | Deutsch | 5 | Wortarten – 6 ursprüngliche Aufgaben | `aufgaben/deutsch-5-wortarten.js` |
 | Deutsch | 6 | Zeitformen (Beispiel) | `aufgaben/deutsch-6-zeitformen.js` |
 | Deutsch | 6 | Satzglieder (Beispiel) | `aufgaben/deutsch-6-satzglieder.js` |
+| Deutsch | E | Aufklärung – 20 Fragen | `aufgaben/deutsch-e-aufklaerung.js` |
 | Religion | 6 | Christliche Feste (Beispiel) | `aufgaben/religion-6-feste.js` |
 
 Die als Beispiele gekennzeichneten Sammlungen sind kurze Demonstrationen, keine vollständigen Unterrichtsreihen.
@@ -62,7 +63,7 @@ Die Kennung in den eckigen Klammern muss eindeutig sein. Ändere sie beim Kopier
 { id: "englisch-5-wortschatz", fach: "Englisch", klasse: 5, thema: "Wortschatz", datei: "aufgaben/englisch-5-wortschatz.js" }
 ```
 
-`id` muss **genau** der Kennung in der neuen Aufgabendatei entsprechen. `datei` muss **genau** den relativen Pfad inklusive Groß-/Kleinschreibung enthalten. `klasse` ist eine ganze Zahl ohne Anführungszeichen. Für eine Demonstration zusätzlich `beispiel: true` ergänzen; das Spiel zeigt dann „(Beispiel)“ an.
+`id` muss **genau** der Kennung in der neuen Aufgabendatei entsprechen. `datei` muss **genau** den relativen Pfad inklusive Groß-/Kleinschreibung enthalten. `klasse` ist eine positive ganze Zahl ohne Anführungszeichen oder `"E"` für den E-Jahrgang. Der E-Jahrgang erscheint nach den nummerierten Klassen; die Sammlung ist unter Deutsch → E-Jahrgang → Aufklärung auswählbar. Für eine Demonstration zusätzlich `beispiel: true` ergänzen; das Spiel zeigt dann „(Beispiel)“ an.
 
 Mehr ist nicht nötig: **keine Änderung an `index.html` oder `spiel.js`**. Beide Dateien in GitHub speichern/committen, die Veröffentlichung unter **Actions** abwarten und den Spiellink neu laden. Zum Entfernen einer Sammlung genügt es, ihren Eintrag aus `aufgaben.js` zu entfernen.
 
