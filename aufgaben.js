@@ -7,6 +7,7 @@ window.KRONK_KATALOG = [
   { id: "deutsch-5-grammatik-schnellcheck", fach: "Deutsch", klasse: 5, thema: "Grammatik – Schnellcheck", datei: "aufgaben/deutsch-5-grammatik-schnellcheck.js" },
   { id: "deutsch-6-zeitformen", fach: "Deutsch", klasse: 6, thema: "Zeitformen", datei: "aufgaben/deutsch-6-zeitformen.js", beispiel: true },
   { id: "deutsch-6-satzglieder", fach: "Deutsch", klasse: 6, thema: "Satzglieder", datei: "aufgaben/deutsch-6-satzglieder.js", beispiel: true },
+  { id: "deutsch-e-aufklaerung", fach: "Deutsch", klasse: "E", thema: "Aufklärung", datei: "aufgaben/deutsch-e-aufklaerung.js" },
   { id: "religion-6-feste", fach: "Religion", klasse: 6, thema: "Christliche Feste", datei: "aufgaben/religion-6-feste.js", beispiel: true },
   { id: "religion-7-urgemeinde-konstantin", fach: "Religion", klasse: 7, thema: "Urgemeinde und konstantinische Wende", datei: "aufgaben/religion-7-urgemeinde-konstantin.js" }
 ];
