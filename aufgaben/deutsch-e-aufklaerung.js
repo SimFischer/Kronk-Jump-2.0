@@ -39,22 +39,40 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
       "erklaerung": "Sapere aude fordert dazu auf, mutig den eigenen Verstand zu gebrauchen."
     },
     {
-      "frage": "Was hält Menschen laut Kant unmündig?",
+      "frage": "Hauptursache für Unmündigkeit nach Kant?",
       "antworten": [
         {
-          "text": "Zu viel Bildung",
-          "richtig": false
-        },
-        {
-          "text": "Zu viel Freiheit",
+          "text": "Angeborener Mangel an Verstand",
           "richtig": false
         },
         {
           "text": "Faulheit und Feigheit",
           "richtig": true
+        },
+        {
+          "text": "Fehlender Zugang zu Büchern",
+          "richtig": false
         }
       ],
       "erklaerung": "Kant nennt Faulheit und Feigheit als Ursachen der selbst verschuldeten Unmündigkeit."
+    },
+    {
+      "frage": "Warum fällt Befreiung schwer?",
+      "antworten": [
+        {
+          "text": "Weil es bequem ist, Vormünder nutzen",
+          "richtig": true
+        },
+        {
+          "text": "Weil eigene Entscheidungen verboten sind",
+          "richtig": false
+        },
+        {
+          "text": "Weil die Natur es so vorgesehen hat",
+          "richtig": false
+        }
+      ],
+      "erklaerung": "Es ist so bequem, unmündig zu sein, wenn man Vormünder hat, die für einen denken."
     },
     {
       "frage": "Was braucht öffentliche Aufklärung?",
@@ -240,19 +258,19 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
       "frage": "Was meint Säkularisierung?",
       "antworten": [
         {
-          "text": "Die Loslösung staatlicher und gesellschaftlicher Bereiche von kirchlichen Bindungen",
+          "text": "Loslösung staatlicher Bereiche von der Kirche",
           "richtig": true
         },
         {
-          "text": "Die vollständige Abschaffung aller Religionen",
+          "text": "Vollständige Abschaffung aller Religionen",
           "richtig": false
         },
         {
-          "text": "Die alleinige Herrschaft der Kirche über den Staat",
+          "text": "Alleinhewrschaft der Kirche",
           "richtig": false
         }
       ],
-      "erklaerung": "Säkularisierung bezeichnet die Entflechtung von Politik, Gesellschaft und kirchlicher Institutionen hin zu weltlicher Unabhängigkeit."
+      "erklaerung": "Säkularisierung bezeichnet die Entflechtung von Politik, Gesellschaft und kirchlichen Institutionen."
     }
   ]
 };
