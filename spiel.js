@@ -119,7 +119,8 @@
     }
   }
 
-  function collectionTitle(c) { return `${c.fach} · Klasse ${c.klasse} · ${c.thema}${c.beispiel ? " (Beispiel)" : ""}`; }
+  function gradeTitle(grade) { return String(grade) === "E" ? "E-Jahrgang" : `Klasse ${grade}`; }
+  function collectionTitle(c) { return `${c.fach} · ${gradeTitle(c.klasse)} · ${c.thema}${c.beispiel ? " (Beispiel)" : ""}`; }
   function fillSelect(id, options) {
     const select = $(id), previous = select.value;
     select.replaceChildren(...options.map(([value, text]) => new Option(text, value)));
@@ -132,8 +133,8 @@
     updateSelected();
   }
   function updateGrades() {
-    const grades = [...new Set(collections.filter(c => c.fach === $("subject").value).map(c => String(c.klasse)))].sort((a,b) => Number(a)-Number(b));
-    fillSelect("grade", grades.map(g => [g, `Klasse ${g}`]));
+    const grades = [...new Set(collections.filter(c => c.fach === $("subject").value).map(c => String(c.klasse)))].sort((a,b) => a === "E" ? 1 : b === "E" ? -1 : Number(a)-Number(b));
+    fillSelect("grade", grades.map(g => [g, gradeTitle(g)]));
     updateTopics();
   }
   function updateSelected() {
@@ -188,7 +189,7 @@
     for (const entry of list) {
       try {
         if (!entry || ![entry.id, entry.fach, entry.thema, entry.datei].every(v => typeof v === "string" && v.trim()) ||
-            !Number.isInteger(entry.klasse) || entry.klasse < 1 || !/^aufgaben\/[a-z0-9-]+\.js$/.test(entry.datei) ||
+            !(entry.klasse === "E" || (Number.isInteger(entry.klasse) && entry.klasse >= 1)) || !/^aufgaben\/[a-z0-9-]+\.js$/.test(entry.datei) ||
             (entry.beispiel !== undefined && typeof entry.beispiel !== "boolean")) throw Error("Ungültiger Katalogeintrag in aufgaben.js: id, fach, klasse, thema und datei prüfen.");
         const label = JSON.stringify([entry.fach, entry.klasse, entry.thema]);
         if (ids.has(entry.id) || files.has(entry.datei) || labels.has(label)) throw Error(`Doppelter Katalogeintrag: ${entry.id}`);
@@ -219,7 +220,7 @@
     const q = questions[index];
     const answers = shuffle(q.antworten);
     const gap = 10, margin = 12, width = (W - margin * 2 - gap * (answers.length - 1)) / answers.length;
-    const isMoving = selected && selected.klasse >= 7;
+    const isMoving = selected && (selected.klasse === "E" || selected.klasse >= 7);
     return { y, q, platforms: answers.map((a, i) => ({
       ...a, 
       x: margin + i * (width + gap), 
