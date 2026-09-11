@@ -57,24 +57,6 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
       "erklaerung": "Kant nennt Faulheit und Feigheit als Ursachen der selbst verschuldeten Unmündigkeit."
     },
     {
-      "frage": "Wie sichern Vormünder ihre Macht?",
-      "antworten": [
-        {
-          "text": "Sie machen Angst",
-          "richtig": true
-        },
-        {
-          "text": "Sie fördern Kritik",
-          "richtig": false
-        },
-        {
-          "text": "Sie geben Freiheit",
-          "richtig": false
-        }
-      ],
-      "erklaerung": "Vormünder stellen selbstständiges Denken und Handeln als gefährlich dar."
-    },
-    {
       "frage": "Was braucht öffentliche Aufklärung?",
       "antworten": [
         {
@@ -255,112 +237,22 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
       "erklaerung": "Bildung soll Menschen zu vernünftigem Urteil und verantwortlichem Handeln befähigen."
     },
     {
-      "frage": "Wo diskutierte man neue Texte?",
-      "antworten": [
-        {
-          "text": "Nur bei Hof",
-          "richtig": false
-        },
-        {
-          "text": "Nur im Gottesdienst",
-          "richtig": false
-        },
-        {
-          "text": "In Lesegesellschaften",
-          "richtig": true
-        }
-      ],
-      "erklaerung": "Lesegesellschaften, Salons und gedruckte Medien förderten den öffentlichen Austausch."
-    },
-    {
-      "frage": "Was soll Literatur leisten?",
-      "antworten": [
-        {
-          "text": "Unterhalten und bilden",
-          "richtig": true
-        },
-        {
-          "text": "Nur ablenken",
-          "richtig": false
-        },
-        {
-          "text": "Kritik verhindern",
-          "richtig": false
-        }
-      ],
-      "erklaerung": "Literatur sollte unterhalten, nützen und zum eigenen Nachdenken anregen."
-    },
-    {
-      "frage": "Was sollte die Encyclopédie tun?",
-      "antworten": [
-        {
-          "text": "Wissen geheim halten",
-          "richtig": false
-        },
-        {
-          "text": "Wissen zugänglich machen",
-          "richtig": true
-        },
-        {
-          "text": "Wissen nur predigen",
-          "richtig": false
-        }
-      ],
-      "erklaerung": "Die Encyclopédie sammelte und ordnete Wissen für ein größeres Publikum."
-    },
-    {
-      "frage": "Was kennzeichnet gute Experimente?",
-      "antworten": [
-        {
-          "text": "Einmaligkeit",
-          "richtig": false
-        },
-        {
-          "text": "Geheimhaltung",
-          "richtig": false
-        },
-        {
-          "text": "Wiederholbarkeit",
-          "richtig": true
-        }
-      ],
-      "erklaerung": "Wissenschaftliche Beobachtungen sollen nachvollziehbar und Experimente wiederholbar sein."
-    },
-    {
       "frage": "Was meint Säkularisierung?",
       "antworten": [
         {
-          "text": "Weniger Kirchenmacht",
+          "text": "Die Loslösung staatlicher und gesellschaftlicher Bereiche von kirchlichen Bindungen",
           "richtig": true
         },
         {
-          "text": "Ende jedes Glaubens",
+          "text": "Die vollständige Abschaffung aller Religionen",
           "richtig": false
         },
         {
-          "text": "Mehr Glaubenszwang",
+          "text": "Die alleinige Herrschaft der Kirche über den Staat",
           "richtig": false
         }
       ],
-      "erklaerung": "Religion und Kirche bestimmen gesellschaftliche Bereiche nicht mehr selbstverständlich. Religion verschwindet dabei nicht einfach."
-    },
-    {
-      "frage": "Was kennzeichnet den Deismus?",
-      "antworten": [
-        {
-          "text": "Kein Schöpfergott",
-          "richtig": false
-        },
-        {
-          "text": "Schöpfung ohne Dauereingriff",
-          "richtig": true
-        },
-        {
-          "text": "Ständige Gotteswunder",
-          "richtig": false
-        }
-      ],
-      "erklaerung": "Der Deismus nimmt einen Schöpfergott an, der nicht ständig durch Wunder in die Naturgesetze eingreift."
+      "erklaerung": "Säkularisierung bezeichnet die Entflechtung von Politik, Gesellschaft und kirchlicher Institutionen hin zu weltlicher Unabhängigkeit."
     }
   ]
 };
