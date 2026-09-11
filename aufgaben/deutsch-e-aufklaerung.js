@@ -18,7 +18,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Mündigkeit bedeutet, den eigenen Verstand ohne die Leitung anderer zu gebrauchen."
+      "erklaerung": "Mündigkeit bedeutet nach Immanuel Kant, den eigenen Verstand ohne die fremde Leitung und Bevormundung durch andere Menschen zu benutzen."
     },
     {
       "frage": "Wie lautet Kants Wahlspruch?",
@@ -36,7 +36,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Sapere aude fordert dazu auf, mutig den eigenen Verstand zu gebrauchen."
+      "erklaerung": "Der berühmte lateinische Wahlspruch der Aufklärung lautet 'Sapere aude!', was übersetzt so viel bedeutet wie: 'Habe den Mut, dich deines eigenen Verstandes zu bedienen!'"
     },
     {
       "frage": "Hauptursache für Unmündigkeit nach Kant?",
@@ -54,7 +54,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Kant nennt Faulheit und Feigheit als Ursachen der selbst verschuldeten Unmündigkeit."
+      "erklaerung": "Kant argumentiert, dass die Menschen selbst an ihrer Unmündigkeit schuld sind, weil sie aus Bequemlichkeit (Faulheit) und Angst vor Verantwortung (Feigheit) lieber andere für sich denken lassen."
     },
     {
       "frage": "Warum fällt Befreiung schwer?",
@@ -72,7 +72,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Es ist so bequem, unmündig zu sein, wenn man Vormünder hat, die für einen denken."
+      "erklaerung": "Es ist äußerst bequem, sich auf Vormünder (wie Geistliche, Ärzte oder Lehrer) zu verlassen, die einem die Entscheidungen und das Nachdenken gegen ein Gefühl der Sicherheit abnehmen."
     },
     {
       "frage": "Was braucht öffentliche Aufklärung?",
@@ -90,7 +90,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Kant fordert die Freiheit, öffentlich von der eigenen Vernunft Gebrauch zu machen."
+      "erklaerung": "Um Aufklärung in der Gesellschaft zu verbreiten, ist laut Kant vor allem Freiheit notwendig – insbesondere die freie, öffentliche Meinungsäußerung und der Vernunftgebrauch."
     },
     {
       "frage": "Wie gelingt selbstständiges Denken?",
@@ -108,7 +108,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": true
         }
       ],
-      "erklaerung": "Eigene Versuche und Fehler helfen, die gewohnte Unmündigkeit zu überwinden."
+      "erklaerung": "Der Weg aus der Unmündigkeit erfordert Mut zu eigenen Schritten, eigenen Versuchen und auch Fehlern, anstatt blind den Gewohnheiten oder Vorbildern zu folgen."
     },
     {
       "frage": "Worauf setzt der Rationalismus?",
@@ -126,7 +126,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Der Rationalismus sucht sichere Erkenntnis durch logisch begründetes Denken."
+      "erklaerung": "Der Rationalismus als philosophische Strömung vertritt die Ansicht, dass wahre und sichere Erkenntnis vor allem durch die menschliche Vernunft (Ratio) und logisches Denken gewonnen wird."
     },
     {
       "frage": "Was ist Vorbild des Rationalismus?",
@@ -144,7 +144,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Die Mathematik gilt als Vorbild für allgemeingültige und logisch hergeleitete Erkenntnisse."
+      "erklaerung": "Die Mathematik diente den Rationalisten als ideales Vorbild, weil sie auf klaren, unumstößlichen und logisch hergeleiteten Axiomen und Gesetzen aufbaut."
     },
     {
       "frage": "Worauf stützt sich der Empirismus?",
@@ -162,7 +162,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": true
         }
       ],
-      "erklaerung": "Der Empirismus stützt Wissen auf Erfahrung und Beobachtung."
+      "erklaerung": "Im Gegensatz zum Rationalismus geht der Empirismus davon aus, dass alles Wissen aus Sinneswahrnehmungen, praktischer Erfahrung und systematischer Beobachtung stammt."
     },
     {
       "frage": "Was betont der Sensualismus zusätzlich?",
@@ -180,7 +180,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Der Sensualismus bezieht auch Gefühle, körperliche Empfindungen und innere Erfahrungen ein."
+      "erklaerung": "Der Sensualismus erweitert den Empirismus stark, indem er den Fokus besonders auf körperliche Empfindungen, Sinneseindrücke und die emotionale Wahrnehmung des Menschen richtet."
     },
     {
       "frage": "Wie heißt Kants Erkenntnisposition?",
@@ -198,7 +198,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Kants Kritizismus prüft die Bedingungen, Möglichkeiten und Grenzen menschlicher Erkenntnis."
+      "erklaerung": "Kant nannte seine philosophische Haltung den Kritizismus. Er prüfte kritisch das menschliche Erkenntnisvermögen, um herauszufinden, was wir überhaupt sicher wissen können."
     },
     {
       "frage": "Was verbindet Kant bei der Erkenntnis?",
@@ -216,7 +216,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": true
         }
       ],
-      "erklaerung": "Die Sinne liefern Eindrücke; der Verstand ordnet und verbindet sie zu Wissen."
+      "erklaerung": "Berühmt ist Kants Synthese: 'Gedanken ohne Inhalt sind leer, Anschauungen ohne Begriffe sind blind.' Die Sinne liefern das Rohmaterial, der Verstand formt daraus geordnetes Wissen."
     },
     {
       "frage": "Was muss aufgeklärtes Denken beachten?",
@@ -234,7 +234,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Aufgeklärtes Denken prüft Aussagen und reflektiert die Reichweite des eigenen Wissens."
+      "erklaerung": "Aufgeklärtes Denken zeichnet sich dadurch aus, dass es dogmatische Glaubenssätze hinterfragt und gleichzeitig die natürlichen Grenzen des menschlichen Erkenntnisvermögens reflektiert."
     },
     {
       "frage": "Was soll Erziehung fördern?",
@@ -252,7 +252,7 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         }
       ],
-      "erklaerung": "Bildung soll Menschen zu vernünftigem Urteil und verantwortlichem Handeln befähigen."
+      "erklaerung": "Die Aufklärung forderte eine radikale Reform der Pädagogik: Ziel von Erziehung und Unterricht sollte es sein, die selbstständige Urteilskraft und Mündigkeit junger Menschen zu stärken."
     },
     {
       "frage": "Was meint Säkularisierung?",
@@ -266,11 +266,11 @@ window.KRONK_SAMMLUNGEN["deutsch-e-aufklaerung"] = {
           "richtig": false
         },
         {
-          "text": "Alleinhewrschaft der Kirche",
+          "text": "Alleinherrschaft der Kirche",
           "richtig": false
         }
       ],
-      "erklaerung": "Säkularisierung bezeichnet die Entflechtung von Politik, Gesellschaft und kirchlichen Institutionen."
+      "erklaerung": "Säkularisierung beschreibt den historischen Prozess der Entflechtung, bei dem Politik, Wissenschaft, Recht und Kultur von der unmittelbaren kirchlichen Vorherrschaft unabhängig wurden."
     }
   ]
 };
