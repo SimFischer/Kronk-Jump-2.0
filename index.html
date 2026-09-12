@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#293f77">
   <meta name="description" content="Mit Kronk von Antwort zu Antwort springen. Ein Lernspiel mit austauschbaren Aufgaben.">
   <title>Kronk springt!</title>
-  <link rel="stylesheet" href="style.css?v=ipad-retina-1">
+  <link rel="stylesheet" href="style.css?v=feedback-20260912">
   <script defer src="aufgaben.js?v=religion-7-20260910"></script>
-  <script defer src="spiel.js?v=lower-answers-1"></script>
+  <script defer src="spiel.js?v=feedback-20260912"></script>
 </head>
 <body>
 <main class="game">
@@ -39,6 +39,42 @@
   <nav class="controls" aria-label="Spielsteuerung"><button id="left" aria-label="Kronk nach links bewegen">◀ <span>Links halten</span></button><button id="right" aria-label="Kronk nach rechts bewegen"><span>Rechts halten</span> ▶</button></nav>
   <footer>Touch: Richtung halten · Tastatur: ← → (oder Tasten 1–4) · P: Pause</footer>
 </main>
+<dialog id="feedback-dialog" class="feedback-card" aria-labelledby="feedback-title" aria-describedby="feedback-intro">
+  <div class="feedback-heading">
+    <span class="feedback-badge">LERNPAUSE</span>
+    <p id="feedback-progress" class="feedback-progress"></p>
+    <h2 id="feedback-title" tabindex="-1" autofocus></h2>
+    <p id="feedback-intro"></p>
+  </div>
+  <section class="feedback-task" aria-labelledby="feedback-task-title">
+    <h3 id="feedback-task-title">Deine Aufgabe</h3>
+    <p id="feedback-question"></p>
+  </section>
+  <section id="feedback-chosen-block" class="feedback-chosen" aria-labelledby="feedback-chosen-title">
+    <h3 id="feedback-chosen-title">Deine Antwort · noch nicht richtig</h3>
+    <p id="feedback-chosen"></p>
+  </section>
+  <section class="feedback-correct" aria-labelledby="feedback-correct-title">
+    <h3 id="feedback-correct-title">Die richtige Antwort</h3>
+    <ul id="feedback-correct"></ul>
+  </section>
+  <section id="feedback-explanation-block" class="feedback-explanation" aria-labelledby="feedback-explanation-title">
+    <h3 id="feedback-explanation-title">Warum ist das richtig?</h3>
+    <p id="feedback-explanation"></p>
+  </section>
+  <p id="feedback-reflection" class="feedback-reflection"></p>
+  <details id="feedback-settings" class="feedback-settings">
+    <summary>Mehr Zeit zum Nachdenken?</summary>
+    <label for="feedback-thinking">Denkpause pro Sprung</label>
+    <select id="feedback-thinking"><option value="0">0 Sekunden – ohne Denkpause</option><option value="1">1 Sekunde</option><option value="2">2 Sekunden</option><option value="4">4 Sekunden</option><option value="6">6 Sekunden</option><option value="8">8 Sekunden</option><option value="10">10 Sekunden</option></select>
+  </details>
+  <div class="feedback-actions">
+    <button id="feedback-retry" class="primary">Aufgabe nochmal üben</button>
+    <p class="feedback-keep">Deine bisherigen Punkte bleiben beim Üben erhalten.</p>
+    <button id="feedback-restart" class="secondary">Neue Runde starten</button>
+    <button id="feedback-topics" class="feedback-link">Zur Themenauswahl</button>
+  </div>
+</dialog>
 <dialog id="unlock-dialog" class="unlock-card" aria-labelledby="unlock-title" aria-describedby="unlock-description">
   <p class="unlock-badge">★ NEU FREIGESCHALTET ★</p>
   <div class="unlock-portrait"><img id="unlock-image" width="180" height="180" alt=""></div>

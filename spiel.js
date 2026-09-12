@@ -144,6 +144,7 @@
     $("collection-info").textContent = selected ? `${selected.data.fragen.length} Aufgaben${selected.beispiel ? " · Kleine Beispielsammlung zum Ausprobieren" : ""}` : "";
   }
   function resetRound() {
+    closeFeedback();
     renderHeight = H;
     questions = []; index = 0; score = 0; camera = 0; oldRows = []; row = null; player = null;
     hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0; last = 0; facing = 1;
@@ -289,12 +290,82 @@
     }
   }
   
-  function finish(won) {
-    mode = won ? "won" : "lost"; $("pause").disabled = true;
-    showPanel(won ? "Ganz oben angekommen!" : "Noch ein Sprung?", won ? `Kronk hat alle ${questions.length} Aufgaben geschafft. ${score} Punkte!` : `${score} Punkte. ${failText || "Du hast die Plattform verfehlt."} Richtig: ${row.q.antworten.filter(a => a.richtig).map(a => a.text).join(", ")} ${row.q.erklaerung || ""}`, "Noch einmal spielen", true);
-    $("status").textContent = won ? "Alle Aufgaben geschafft!" : "Lies die Lösung und versuche es noch einmal.";
+  function closeFeedback() {
+    if ($("feedback-dialog").open) $("feedback-dialog").close();
   }
-  
+
+  function showFeedback() {
+    const q = row.q;
+    const chosen = row.platforms.find(p => p.broken);
+    const correct = q.antworten.filter(a => a.richtig);
+    $("overlay").hidden = true;
+    $("feedback-title").textContent = chosen ? "Schau dir die Lösung an" : "Die Plattform knapp verfehlt";
+    $("feedback-intro").textContent = chosen
+      ? "Diese Antwort passt noch nicht. Vergleiche sie mit der Lösung und probiere die Aufgabe danach noch einmal."
+      : "Das war ein verfehlter Sprung. Nimm dir Zeit für die Lösung und versuche es noch einmal.";
+    $("feedback-progress").textContent = index + " von " + questions.length + " Aufgaben geschafft · " + score + " Punkte";
+    $("feedback-question").textContent = q.frage;
+    $("feedback-chosen-block").hidden = !chosen;
+    $("feedback-chosen").textContent = chosen ? chosen.text : "";
+    $("feedback-correct-title").textContent = correct.length === 1 ? "Die richtige Antwort" : "Die richtigen Antworten";
+    $("feedback-correct").replaceChildren(...correct.map(a => {
+      const item = document.createElement("li");
+      item.textContent = a.text;
+      return item;
+    }));
+    $("feedback-explanation-block").hidden = !q.erklaerung || !q.erklaerung.trim();
+    $("feedback-explanation").textContent = q.erklaerung || "";
+    $("feedback-reflection").textContent = correct.length === 1
+      ? "Erkläre dir kurz: Warum passt diese Antwort zur Aufgabe?"
+      : "Erkläre dir kurz: Warum passen diese Antworten zur Aufgabe? Für den Sprung genügt eine davon.";
+    $("feedback-thinking").value = $("thinking").value;
+    $("feedback-settings").open = false;
+    $("feedback-dialog").showModal();
+    $("feedback-title").focus({preventScroll:true});
+    $("feedback-dialog").scrollTop = 0;
+  }
+
+  function retryQuestion() {
+    if (mode !== "lost" || !row) return;
+    const requested = Number($("feedback-thinking").value);
+    if ([0, 1, 2, 4, 6, 8, 10].includes(requested)) {
+      thinking = requested;
+      $("thinking").value = String(thinking);
+    }
+    closeFeedback();
+    row = makeRow(row.y);
+    camera = row.y - ROW_Y;
+    player = { x: W / 2, y: row.y + GAP, vy: -JUMP };
+    hold = 0; apexUsed = false; failText = ""; celebration = 0;
+    accumulator = 0; last = 0; facing = 1; particles = [];
+    consecutiveCorrect = 0; currentThinking = thinking;
+    mode = "playing"; clearInput(); $("overlay").hidden = true;
+    $("pause").disabled = false; $("pause").textContent = "Pause";
+    setQuestion(); canvas.focus({preventScroll:true});
+  }
+
+  $("feedback-retry").addEventListener("click", retryQuestion);
+  $("feedback-restart").addEventListener("click", () => {
+    $("thinking").value = $("feedback-thinking").value;
+    start();
+  });
+  $("feedback-topics").addEventListener("click", chooseTopic);
+  $("feedback-dialog").addEventListener("cancel", e => {
+    e.preventDefault(); chooseTopic();
+  });
+
+  function finish(won) {
+    mode = won ? "won" : "lost";
+    $("pause").disabled = true;
+    clearInput();
+    if (won) {
+      showPanel("Ganz oben angekommen!", "Kronk hat alle " + questions.length + " Aufgaben geschafft. " + score + " Punkte!", "Noch einmal spielen", true);
+    } else {
+      showFeedback();
+    }
+    $("status").textContent = won ? "Alle Aufgaben geschafft!" : "Lernpause: Lösung ansehen und erneut üben.";
+  }
+
   function step(dt) {
     if (mode !== "playing" || $("unlock-dialog").open) return;
     
@@ -473,7 +544,7 @@
   }
   
   window.addEventListener("keydown", e => {
-    if ($("unlock-dialog").open || e.target.tagName === "SELECT") return;
+    if ($("unlock-dialog").open || $("feedback-dialog").open || e.target.tagName === "SELECT") return;
     if (["ArrowLeft", "ArrowRight"].includes(e.key)) { e.preventDefault(); if (mode === "playing") keys.add(e.key); }
     if (e.key.toLowerCase() === "p" && !e.repeat) pause();
     
