@@ -217,10 +217,23 @@
     });
   }
   
-  function makeRow(y) {
+  function makeRow(y, previousX = null) {
     const q = questions[index];
     const answers = shuffle(q.antworten);
     const gap = 10, margin = 12, width = (W - margin * 2 - gap * (answers.length - 1)) / answers.length;
+    // After a correct landing, usually require a new horizontal position.
+    // Keep a small random chance, so the previous lane is not always wrong.
+    if (previousX !== null) {
+      const sameLane = answers.findIndex((a, i) => {
+        const x = margin + i * (width + gap);
+        return previousX >= x && previousX <= x + width;
+      });
+      const wrongLanes = answers.map((a, i) => a.richtig ? -1 : i).filter(i => i >= 0);
+      if (sameLane >= 0 && answers[sameLane].richtig && wrongLanes.length && Math.random() < 0.9) {
+        const other = wrongLanes[Math.floor(Math.random() * wrongLanes.length)];
+        [answers[sameLane], answers[other]] = [answers[other], answers[sameLane]];
+      }
+    }
     return { y, q, platforms: answers.map((a, i) => ({
       ...a, 
       x: margin + i * (width + gap), 
@@ -439,7 +452,7 @@
           player.y = row.y; player.vy = -JUMP; hold = 0; apexUsed = false; celebration = .5;
           oldRows.push(row); oldRows = oldRows.slice(-1); index++;
           if (index === questions.length) { finish(true); return; }
-          row = makeRow(row.y - GAP);
+          row = makeRow(row.y - GAP, player.x);
           camera = row.y - ROW_Y; setQuestion();
         } else {
           consecutiveCorrect = 0;
