@@ -2,6 +2,7 @@
  * und genau einen Eintrag ergänzen. Anleitung und Beispiel: README.md. */
 window.KRONK_SAMMLUNGEN = Object.create(null);
 window.KRONK_KATALOG = [
+  { id: "mathe-5-kleines-1x1", fach: "Mathematik", klasse: 5, thema: "Das kleine 1x1", datei: "aufgaben/mathe-5-kleines-1x1.js" },
   { id: "deutsch-5-wortarten", fach: "Deutsch", klasse: 5, thema: "Wortarten", datei: "aufgaben/deutsch-5-wortarten.js" },
   { id: "deutsch-5-grammatik-grundwissen", fach: "Deutsch", klasse: 5, thema: "Grammatik (Wiederholung Grundschule)", datei: "aufgaben/deutsch-5-grammatik-grundwissen.js" },
   { id: "deutsch-5-grammatik-schnellcheck", fach: "Deutsch", klasse: 5, thema: "Grammatik – Schnellcheck", datei: "aufgaben/deutsch-5-grammatik-schnellcheck.js" },
