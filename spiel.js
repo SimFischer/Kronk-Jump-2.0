@@ -8,22 +8,43 @@
   let canvasDpr = 0, renderHeight = H;
   
   function resizeCanvas() {
-    const bounds = document.querySelector(".playfield").getBoundingClientRect();
+    const field = document.querySelector(".playfield");
+    const bounds = field.getBoundingClientRect();
     const displayWidth = Math.min(bounds.width, bounds.height * W / renderHeight);
     if (displayWidth <= 0) return;
-    canvasDpr = window.devicePixelRatio || 1;
-    const width = Math.max(1, Math.round(displayWidth * canvasDpr));
-    const height = Math.max(1, Math.round(displayWidth * renderHeight / W * canvasDpr));
+    const dpr = window.devicePixelRatio || 1;
+    canvasDpr = dpr;
+    // Erst die Gerätepixel festlegen, dann die CSS-Größe exakt daraus
+    // zurückrechnen. Würden beide getrennt gerundet, passte das Verhältnis
+    // nicht mehr genau zur Pixeldichte und der Browser müsste das fertige
+    // Bild um Bruchteile eines Pixels skalieren – alles wirkte verwaschen.
+    // Bei ganzzahliger Pixeldichte zusätzlich auf ein Vielfaches davon
+    // abrunden, damit die CSS-Größe eine ganze Zahl bleibt: Browser legen
+    // CSS-Pixel auf ein 1/64-Raster, krumme Werte verschieben die Fläche
+    // wieder um Bruchteile eines Gerätepixels.
+    const raster = Number.isInteger(dpr) ? dpr : 1;
+    const trim = value => Math.max(raster, value - value % raster);
+    const width = trim(Math.round(displayWidth * dpr));
+    const height = trim(Math.round(width * renderHeight / W));
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width; canvas.height = height;
     }
     // Der sichtbare Rahmen sitzt an der Zeichenfläche selbst, damit um sie
     // herum keine andersfarbigen Streifen stehen bleiben.
     if (canvas.style) {
-      canvas.style.width = `${Math.round(displayWidth)}px`;
-      canvas.style.height = `${Math.round(displayWidth * renderHeight / W)}px`;
+      canvas.style.width = `${width / dpr}px`;
+      canvas.style.height = `${height / dpr}px`;
+      // Zentrierung selbst rechnen und auf das Gerätepixelraster einrasten.
+      // Über top/left 50 Prozent plus translate(-50%,-50%) landet die Fläche
+      // sonst auf einem halben Pixel und wird ebenfalls weichgezeichnet.
+      const originX = bounds.left || 0, originY = bounds.top || 0;
+      const left = originX + (bounds.width - width / dpr) / 2;
+      const top = originY + (bounds.height - height / dpr) / 2;
+      canvas.style.left = `${Math.round(left * dpr) / dpr - originX}px`;
+      canvas.style.top = `${Math.round(top * dpr) / dpr - originY}px`;
+      canvas.style.transform = "none";
     }
-    ctx.setTransform(canvas.width / W, 0, 0, canvas.height / renderHeight, 0, 0);
+    ctx.setTransform(width / W, 0, 0, height / renderHeight, 0, 0);
   }
   
   const images = {};
