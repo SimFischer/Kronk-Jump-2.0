@@ -1,0 +1,17 @@
+{
+  "name": "Kronk springt!",
+  "short_name": "Kronk",
+  "description": "Mit Kronk von Antwort zu Antwort springen. Ein Lernspiel mit austauschbaren Aufgaben.",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f6fa",
+  "theme_color": "#293f77",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

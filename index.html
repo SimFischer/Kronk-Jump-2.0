@@ -6,9 +6,15 @@
   <meta name="theme-color" content="#293f77">
   <meta name="description" content="Mit Kronk von Antwort zu Antwort springen. Ein Lernspiel mit austauschbaren Aufgaben.">
   <title>Kronk springt!</title>
-  <link rel="stylesheet" href="style.css?v=hoehenwelt-20260913b">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Kronk">
+  <link rel="stylesheet" href="style.css?v=lernpause-20260913d">
     <script defer src="aufgaben.js?v=grammatik-start-20260912"></script>
-  <script defer src="spiel.js?v=hoehenwelt-20260913b"></script>
+  <script defer src="spiel.js?v=lernpause-20260913d"></script>
 </head>
 <body>
 <main class="game">
@@ -17,6 +23,7 @@
   <div class="stage">
     <div class="playfield"><canvas id="canvas" width="600" height="540" tabindex="0" aria-label="Spielfeld. Steuere Kronk mit den Pfeiltasten, den Tasten 1 bis 4, den beiden Richtungstasten oder indem du die linke bzw. rechte Hälfte des Spielfelds gedrückt hältst. Ziel ist die richtige Antwortplattform."></canvas></div>
     <section class="question" aria-label="Aktuelle Aufgabe" aria-live="polite"><span id="progress">Mit Kronk nach oben</span><h2 id="question">Bereit für den nächsten Sprung?</h2></section>
+    <div id="answer-controls" class="answer-controls" role="group" aria-label="Antwort auswählen" hidden></div>
     <p id="status" role="status">Wähle ein Thema und starte das Spiel.</p>
     <div id="overlay" class="overlay">
       <div class="card">
@@ -53,6 +60,7 @@
   <section id="feedback-chosen-block" class="feedback-chosen" aria-labelledby="feedback-chosen-title">
     <h3 id="feedback-chosen-title">Deine Antwort · noch nicht richtig</h3>
     <p id="feedback-chosen"></p>
+    <p id="feedback-chosen-why" class="feedback-chosen-why" hidden></p>
   </section>
   <section class="feedback-correct" aria-labelledby="feedback-correct-title">
     <h3 id="feedback-correct-title">Die richtige Antwort</h3>

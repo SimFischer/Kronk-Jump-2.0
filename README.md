@@ -14,7 +14,7 @@ Ein Lern-Jump-Spiel mit dem Schulmaskottchen Kronk. Reines HTML, CSS und JavaScr
 
 Pause über den Knopf oder **P**. Beim Verlassen des Browserfensters bzw. Wechseln des Tabs pausiert das Spiel automatisch. Über **Weiterspielen** fortsetzen. Neustart und Themenauswahl löschen Punkte, Fortschritt, Plattformen, Eingaben und Denkpause der alten Runde.
 
-Die Frage steht in einer festen, kontrastreichen Box als scharfer HTML-Text und bewegt sich nicht mit Kronk. Im Hochformat sitzt sie unterhalb des Spielfelds, direkt über der Steuerung; im Querformat (iPad quer, Laptop, Beamer) rückt sie in eine eigene Spalte rechts neben das Spielfeld, sodass ohne Scrollen alles gleichzeitig sichtbar bleibt. Das Spielfeld nutzt die tatsächliche Display-Pixeldichte und passt sich bei Größenwechseln und Drehung proportional an. Frage und Antwortkarten wechseln gemeinsam.
+Die Frage steht in einer festen, kontrastreichen Box als scharfer HTML-Text und bewegt sich nicht mit Kronk. Sie sitzt in jedem Format unterhalb des Spielfelds, direkt unter den Antwortkarten und über der Steuerung – der Blickweg von der Frage zu den Antworten bleibt damit kurz. Im Querformat (iPad quer, Laptop, Beamer) rücken Kopfzeile, Fragebox und Steuerung enger zusammen, sodass ohne Scrollen alles gleichzeitig sichtbar bleibt. Das Spielfeld nutzt die tatsächliche Display-Pixeldichte und passt sich bei Größenwechseln und Drehung proportional an. Frage und Antwortkarten wechseln gemeinsam.
 
 ## Darstellung im Spielfeld
 
@@ -84,7 +84,14 @@ Mehr ist nicht nötig: **keine Änderung an `index.html` oder `spiel.js`**. Beid
 - Mindestens eine Antwort mit `richtig: true`. Mehrere richtige Antworten sind erlaubt; jede trägt Kronk.
 - `frage` und `text` enthalten nichtleeren Text, `richtig` ist `true` oder `false` ohne Anführungszeichen.
 - `mischen: true` mischt die Fragen; `false` erhält ihre Reihenfolge. Antwortpositionen werden immer gemischt.
-- `erklaerung` ist optionaler Text. Nach einem Fehler werden auch mit Erklärung alle richtigen Antworten angezeigt.
+- `erklaerung` ist optionaler Text zur Aufgabe. Nach einem Fehler werden auch mit Erklärung alle richtigen Antworten angezeigt.
+- `warum` ist optionaler Text **an einer falschen Antwort**. Er erscheint in der Lernpause direkt unter der eigenen Antwort und erklärt den Denkfehler, statt nur die Lösung zu zeigen. Das ist der wirksamste Zusatz je Aufgabe – ein Satz genügt:
+
+```js
+{ text: "besser", richtig: false, warum: "Das ist der Komparativ – die Vergleichsstufe, nicht die Höchststufe." }
+```
+
+  Die Beispielsammlung `aufgaben/deutsch-6-zeitformen.js` zeigt das Feld im Zusammenhang.
 - Kurze Antwortwörter oder Wortgruppen passen am besten auf Plattformen. Für längere Antworten zwei Plattformen verwenden. Fragen dürfen mehrzeilig sein und werden vollständig umgebrochen.
 - Anführungszeichen, Kommas und Klammern beibehalten. Keine Schülernamen oder anderen personenbezogenen Daten eintragen.
 
@@ -99,8 +106,22 @@ Eine fehlende, ungültige oder falsch registrierte Sammlung erscheint mit Datein
 - `aufgaben.js`: zentrale Liste der Sammlungen.
 - `aufgaben/`: eine JavaScript-Datei je Sammlung. Dynamisches Laden über lokale Script-Tags funktioniert auch ohne Backend.
 - `spiel.js`: Laden, Schema-Prüfung, Steuerung, Physik, Kollisionen und Spielzustände.
-- `assets/`: Kronk-Motive (Normal, Jubel, Sprung) je Charakter, auf Anzeigegröße skaliert – zusammen rund 0,8 MB statt vorher 31,6 MB.
+- `assets/`: Kronk-Motive (Normal, Jubel, Sprung) je Charakter, auf Anzeigegröße skaliert – zusammen rund 0,8 MB statt vorher 31,6 MB. Dazu `icon-192.png` und `icon-512.png` für den Home-Bildschirm.
+- `sw.js`: Service Worker für den Offline-Betrieb.
+- `manifest.json`: Angaben für den Start vom Home-Bildschirm.
 - `tests/spiel.test.cjs`: automatisierte Entwicklungstests mit Node.js, optional ausführbar über `node tests/spiel.test.cjs`. Zum Spielen wird Node.js nicht benötigt.
+
+## Offline und Home-Bildschirm
+
+Beim ersten Aufruf über den Weblink legt ein Service Worker Spiel und Aufgaben im Browser ab. Danach startet das Spiel auch ohne Netz – praktisch bei wackeligem Schul-WLAN. Code und Aufgabendateien werden bevorzugt frisch geladen, damit eine neue Sammlung sofort erscheint; Bilder kommen aus dem Speicher. Die Liste der Aufgabendateien liest der Service Worker aus `aufgaben.js`, eine neue Sammlung wird also ohne Änderung an `sw.js` mitgespeichert.
+
+Auf dem iPad in Safari über **Teilen → Zum Home-Bildschirm** ablegen: Das Spiel startet dann ohne Safari-Leiste im Vollbild. Beim direkten Öffnen von `index.html` auf dem Computer (`file://`) ist kein Offline-Betrieb möglich; dort wird der Service Worker nicht angemeldet.
+
+Nach einem Update genügt einmaliges Neuladen. Erscheint noch die alte Fassung, hilft ein Neuladen mit Strg+Shift+R bzw. Cmd+Shift+R.
+
+## Bedienung ohne Blick aufs Spielfeld
+
+Unterhalb des Spielfelds liegt je Antwort ein echter Knopf. Sie sind nicht sichtbar, erscheinen aber, sobald man sie mit der Tabulatortaste anspringt, und tragen die Beschriftung „Antwort 2 von 3: Ich spiele." Damit lässt sich dieselbe Runde mit Tastatur oder Screenreader spielen: Frage anhören, Knopf auslösen, Kronk landet auf dieser Karte. Frage und Statuszeile melden sich über `aria-live` von selbst.
 
 GitHub Pages verwendet weiterhin die vorhandene Konfiguration. Alle Spielpfade sind relativ und funktionieren unter der Projektadresse `/Kronk-Jump-2.0/`. Auf dem Computer lässt sich `index.html` auch direkt öffnen; auf dem iPad den veröffentlichten Weblink verwenden, optional über Safari zum Home-Bildschirm hinzufügen. Kein Offline-/Service-Worker-Modus.
 
@@ -110,7 +131,7 @@ Die Physik rechnet mit festen Schritten von 1/120 Sekunde. `GRAVITY = 600`, `JUM
 
 Automatisiert geprüft: abhängige Auswahl und Inhalte, alle sieben Denkzeiten, 18 Querwechsel zwischen beiden Randpositionen und jeder Plattformmitte bei 2–4 Antworten ohne Denkpause, Tastatur- und Pointer-Ereignisse, Denkpause mit seitlicher Steuerung, manuelle und automatische Pause, richtige/falsche/verfehlte Landungen, Sieg, Neustart, Themenrückkehr sowie fehlende/fehlerhafte Aufgabendateien.
 
-Zusätzlich im Chromium-Browser bei 1440 × 900, 1280 × 720 sowie den iPad-ähnlichen Ansichten 768 × 1024 und 1024 × 768 geprüft; in allen vier Größen ist die Seite ohne Scrollen vollständig sichtbar. Das ersetzt keinen Praxistest auf einem echten iPad mit Safari und echten Mehrfinger-Touchgesten. Kein gespeicherter Lernstand oder Bestenliste; das Canvas-Spiel bietet keine vollständig gleichwertige Screenreader-Spielweise.
+Zusätzlich im Chromium-Browser bei 1440 × 900, 1280 × 720 sowie den iPad-ähnlichen Ansichten 768 × 1024 und 1024 × 768 geprüft; in allen vier Größen ist die Seite ohne Scrollen vollständig sichtbar. Das ersetzt keinen Praxistest auf einem echten iPad mit Safari und echten Mehrfinger-Touchgesten. Keine Bestenliste. Punkte, freigeschaltete Charaktere und Fehlerfragen liegen im `localStorage` des jeweiligen Geräts.
 
 ## Rechte
 

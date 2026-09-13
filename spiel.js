@@ -17,6 +17,12 @@
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width; canvas.height = height;
     }
+    // Der sichtbare Rahmen sitzt an der Zeichenfläche selbst, damit um sie
+    // herum keine andersfarbigen Streifen stehen bleiben.
+    if (canvas.style) {
+      canvas.style.width = `${Math.round(displayWidth)}px`;
+      canvas.style.height = `${Math.round(displayWidth * renderHeight / W)}px`;
+    }
     ctx.setTransform(canvas.width / W, 0, 0, canvas.height / renderHeight, 0, 0);
   }
   
@@ -149,6 +155,7 @@
     questions = []; index = 0; score = 0; camera = 0; oldRows = []; row = null; player = null;
     hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0; last = 0; facing = 1;
     particles = [];
+    renderAnswerControls();
     clearInput(); $("score").textContent = `0 Punkte · Gesamt ${gesamtPunkte.toLocaleString("de-DE")}`;
     $("pause").disabled = true; $("pause").textContent = "Pause";
   }
@@ -213,6 +220,9 @@
           q.antworten.some(a => !a || typeof a.text !== "string" || !a.text.trim() || typeof a.richtig !== "boolean") || !q.antworten.some(a => a.richtig)) {
         throw Error(`Frage ${i + 1}: Fragetext, 2–4 Antworten und mindestens einmal richtig: true erforderlich.`);
       }
+      if (q.antworten.some(a => a.warum !== undefined && typeof a.warum !== "string")) {
+        throw Error(`Frage ${i + 1}: warum muss Text sein.`);
+      }
       if (q.erklaerung !== undefined && typeof q.erklaerung !== "string") throw Error(`Frage ${i + 1}: erklaerung muss Text sein.`);
     });
   }
@@ -255,12 +265,42 @@
     $("overlay").hidden = false; clearInput();
   }
   
+  function attr(element, name, value) {
+    if (typeof element.setAttribute === "function") element.setAttribute(name, value);
+  }
+
+  // Kronk auf die Mitte einer Antwortkarte setzen – gemeinsame Grundlage
+  // für die Ziffern 1–4 und die Antwortknöpfe.
+  function aimAt(i) {
+    if (mode !== "playing" || !row || !player || !row.platforms[i]) return;
+    const p = row.platforms[i];
+    player.x = Math.max(28, Math.min(W - 28, p.x + p.width / 2));
+    $("status").textContent = `Feld ${i + 1} gewählt · „${p.text}“`;
+  }
+
+  // Dieselbe Runde ohne Blick aufs Spielfeld: je Antwort ein echter Knopf.
+  function renderAnswerControls() {
+    const box = $("answer-controls");
+    if (!box) return;
+    if (!row) { box.hidden = true; box.replaceChildren(); return; }
+    box.hidden = false;
+    box.replaceChildren(...row.platforms.map((p, i) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = `${i + 1}. ${p.text}`;
+      attr(button, "aria-label", `Antwort ${i + 1} von ${row.platforms.length}: ${p.text}`);
+      button.addEventListener("click", () => aimAt(i));
+      return button;
+    }));
+  }
+
   function setQuestion() {
     $("question").textContent = row.q.frage;
     $("score").textContent = `${score} Punkte · Gesamt ${gesamtPunkte.toLocaleString("de-DE")}`;
     $("progress").textContent = `Aufgabe ${index + 1} von ${questions.length}`;
     $("status").textContent = "Füße auf eine richtige Plattform!";
     renderHeight = Math.max(H, row.y - camera + 16 + rowHeight(row) + 24);
+    renderAnswerControls();
     resizeCanvas();
   }
   
@@ -318,6 +358,10 @@
     $("feedback-question").textContent = q.frage;
     $("feedback-chosen-block").hidden = !chosen;
     $("feedback-chosen").textContent = chosen ? chosen.text : "";
+    // Rückmeldung auf den eigenen Denkfehler, nicht nur auf die Lösung.
+    const warum = chosen && typeof chosen.warum === "string" ? chosen.warum.trim() : "";
+    $("feedback-chosen-why").textContent = warum;
+    $("feedback-chosen-why").hidden = !warum;
     $("feedback-correct-title").textContent = correct.length === 1 ? "Die richtige Antwort" : "Die richtigen Antworten";
     $("feedback-correct").replaceChildren(...correct.map(a => {
       const item = document.createElement("li");
@@ -487,8 +531,9 @@
      Zeichnen: Höhenwelt, Antwortkarten, Zielhilfe, Denkpause
      ================================================================ */
   const SURFACE = 22;                                  // Höhe der Landefläche mit Ziffer
-  const LINE_H = 27, CARD_PAD_TOP = 12, CARD_PAD_BOTTOM = 14;
-  const ANSWER_FONT = '700 24px system-ui, -apple-system, "Segoe UI", sans-serif';
+  const CARD_PAD_TOP = 12, CARD_PAD_BOTTOM = 14;
+  const ANSWER_SIZES = [24, 22, 20, 18, 16];
+  const answerFont = size => `700 ${size}px system-ui, -apple-system, "Segoe UI", sans-serif`;
   const UI_FONT = '750 15px system-ui, -apple-system, "Segoe UI", sans-serif';
   const BLUE = "#293f77", BLUE_DARK = "#172b59", ORANGE = "#ff9900";
   const GREEN = "#2f8f5b", GREEN_SOFT = "#eaf7ef", RED = "#d3392c", RED_SOFT = "#fdeeec";
@@ -521,8 +566,10 @@
       if (ctx.measureText(next).width <= maxWidth) { line = next; continue; }
       if (line) lines.push(line);
       line = "";
+      // Sehr lange Wörter werden getrennt – mit Bindestrich, damit die
+      // Trennstelle als solche zu erkennen ist.
       for (const char of word) {
-        if (ctx.measureText(line + char).width > maxWidth && line) { lines.push(line); line = ""; }
+        if (line && ctx.measureText(line + char + "-").width > maxWidth) { lines.push(line + "-"); line = ""; }
         line += char;
       }
     }
@@ -530,12 +577,27 @@
     return lines;
   }
 
-  function cardHeight(p) {
-    ctx.font = ANSWER_FONT;
-    const lines = textLines(p.text, p.width - 26).length;
-    return SURFACE + CARD_PAD_TOP + lines * LINE_H + CARD_PAD_BOTTOM;
+  // Alle Karten einer Reihe teilen sich eine Schriftgröße: die größte,
+  // bei der kein Antwortwort mitten im Wort umbrochen werden muss.
+  function measureRow(r) {
+    if (r.fontSize) return r;
+    r.fontSize = ANSWER_SIZES[ANSWER_SIZES.length - 1];
+    for (const size of ANSWER_SIZES) {
+      ctx.font = answerFont(size);
+      const passt = r.platforms.every(p =>
+        p.text.split(/\s+/).every(word => ctx.measureText(word).width <= p.width - 26));
+      if (passt) { r.fontSize = size; break; }
+    }
+    r.lineHeight = Math.round(r.fontSize * 1.14);
+    return r;
   }
-  function rowHeight(r) { return Math.max(...r.platforms.map(cardHeight)); }
+  function cardHeight(r, p) {
+    measureRow(r);
+    ctx.font = answerFont(r.fontSize);
+    const lines = textLines(p.text, p.width - 26).length;
+    return SURFACE + CARD_PAD_TOP + lines * r.lineHeight + CARD_PAD_BOTTOM;
+  }
+  function rowHeight(r) { return Math.max(...r.platforms.map(p => cardHeight(r, p))); }
 
   /* ---------------- Hintergrund: Himmel, Wolken, Höhenleiste ---------------- */
   const CLOUDS = [
@@ -595,8 +657,8 @@
   }
 
   /* ---------------- Antwortkarten ---------------- */
-  function drawPlatform(p, i, y) {
-    const h = cardHeight(p);
+  function drawPlatform(r, p, i, y) {
+    const h = cardHeight(r, p);
     const fill = p.broken ? RED_SOFT : p.solved ? GREEN_SOFT : "#ffffff";
     const edge = p.broken ? RED : p.solved ? GREEN : "#c6d4ea";
     const bar = p.broken ? RED : p.solved ? GREEN : BLUE;
@@ -624,10 +686,11 @@
       ctx.fillText(p.solved ? "RICHTIG" : "FALSCH", p.x + p.width - 12, y + 16);
     }
 
-    ctx.font = ANSWER_FONT; ctx.textAlign = "center";
+    ctx.font = answerFont(r.fontSize); ctx.textAlign = "center";
     ctx.fillStyle = p.broken ? "#8d2a20" : p.solved ? "#1d6340" : BLUE;
+    const baseline = y + SURFACE + CARD_PAD_TOP + Math.round(r.fontSize * 0.82);
     textLines(p.text, p.width - 26).forEach((s, n) =>
-      ctx.fillText(s, p.x + p.width / 2, y + SURFACE + CARD_PAD_TOP + 20 + n * LINE_H));
+      ctx.fillText(s, p.x + p.width / 2, baseline + n * r.lineHeight));
     ctx.restore();
 
     // Bruchstücke der weggebrochenen Plattform
@@ -658,7 +721,8 @@
     if (old) { drawTrail(r); return; }
     const y = r.y - camera;
     if (y < -260 || y > H + 160) return;
-    r.platforms.forEach((p, i) => drawPlatform(p, i, y));
+    measureRow(r);
+    r.platforms.forEach((p, i) => drawPlatform(r, p, i, y));
   }
 
   /* ---------------- Zielhilfe, Schatten, Denkpause ---------------- */
@@ -679,7 +743,7 @@
     ctx.restore();
 
     ctx.save(); ctx.lineWidth = 4; ctx.strokeStyle = ORANGE;
-    roundPath(target.x - 4, rowY - 4, target.width + 8, cardHeight(target) + 8, 18); ctx.stroke();
+    roundPath(target.x - 4, rowY - 4, target.width + 8, cardHeight(row, target) + 8, 18); ctx.stroke();
     ctx.restore();
   }
 
@@ -778,12 +842,7 @@
     if (["ArrowLeft", "ArrowRight"].includes(e.key)) { e.preventDefault(); if (mode === "playing") keys.add(e.key); }
     if (e.key.toLowerCase() === "p" && !e.repeat) pause();
     
-    if (["1", "2", "3", "4"].includes(e.key) && mode === "playing" && row) {
-      const idx = parseInt(e.key) - 1;
-      if (idx < row.platforms.length) {
-        player.x = row.platforms[idx].x + row.platforms[idx].width / 2;
-      }
-    }
+    if (["1", "2", "3", "4"].includes(e.key)) aimAt(Number(e.key) - 1);
   });
   
   window.addEventListener("keyup", e => keys.delete(e.key));
@@ -831,5 +890,13 @@
     } catch (e) { mode = "error"; showPanel("Dateien prüfen", e.message, "Bitte Dateien korrigieren"); $("start").disabled = true; }
     resizeCanvas(); requestAnimationFrame(frame);
   }
+  // Offline-Betrieb; beim direkten Öffnen der Datei (file://) nicht möglich.
+  if (typeof navigator !== "undefined" && navigator.serviceWorker &&
+      typeof location !== "undefined" && /^https?:$/.test(location.protocol)) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+  }
+
   init();
 })();
