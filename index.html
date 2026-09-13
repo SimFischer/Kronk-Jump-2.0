@@ -12,9 +12,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Kronk">
-  <link rel="stylesheet" href="style.css?v=vollbild-20260913e">
+  <link rel="stylesheet" href="style.css?v=landeanflug-20260913f">
     <script defer src="aufgaben.js?v=grammatik-start-20260912"></script>
-  <script defer src="spiel.js?v=vollbild-20260913e"></script>
+  <script defer src="spiel.js?v=landeanflug-20260913f"></script>
 </head>
 <body>
 <main class="game">
@@ -31,20 +31,25 @@
         <h2 id="panel-title">Hoch hinaus mit Kronk!</h2>
         <p id="panel-text">Kronk springt von allein. Halte die linke oder rechte Hälfte des Spielfelds gedrückt – am Computer gehen auch ← → oder die Ziffer der Antwortkarte. Der rote Fußmarker muss auf der richtigen Karte landen; falsche Karten brechen weg.</p>
         <div id="selection">
-          <label>Fach <select id="subject" disabled></select></label>
-          <label>Klassenstufe <select id="grade" disabled></select></label>
+          <label>Spielart <select id="gamemode">
+            <option value="sprung" selected>Springen</option>
+            <option value="landung">Landeanflug (auf Zeit)</option>
+          </select></label>
+          <label class="half">Fach <select id="subject" disabled></select></label>
+          <label class="half">Klassenstufe <select id="grade" disabled></select></label>
           <label>Thema <select id="topic" disabled></select></label>
           <label>Charakter <select id="kronk-select"></select></label>
           <p id="collection-info"></p><p id="load-errors" role="alert" hidden></p>
         </div>
         <label id="time-label">Denkpause pro Sprung <select id="thinking"><option value="0">0 Sekunden – ohne Denkpause</option><option value="1">1 Sekunde</option><option value="2" selected>2 Sekunden</option><option value="4">4 Sekunden</option><option value="6">6 Sekunden</option><option value="8">8 Sekunden</option><option value="10">10 Sekunden</option></select></label>
+        <label id="quickland-label" class="switch" hidden><input type="checkbox" id="quickland" checked> Sofort landen erlauben (▼ oder ↓)</label>
         <button id="start" class="primary" disabled>Sammlungen werden geladen …</button>
         <button id="choose-topic" class="secondary" hidden>Zur Themenauswahl</button>
       </div>
     </div>
   </div>
-  <nav class="controls" aria-label="Spielsteuerung"><button id="left" data-hint="← oder linke Spielfeldhälfte" aria-label="Kronk nach links bewegen">◀ <span>Links halten</span></button><button id="right" data-hint="→ oder rechte Spielfeldhälfte" aria-label="Kronk nach rechts bewegen"><span>Rechts halten</span> ▶</button></nav>
-  <footer>Tippen und halten: linke oder rechte Hälfte des Spielfelds · Tastatur: ← → oder die Ziffern 1–4 der Antwortkarten · P: Pause</footer>
+  <nav class="controls" aria-label="Spielsteuerung"><button id="left" data-hint="← oder linke Spielfeldhälfte" aria-label="Kronk nach links bewegen">◀ <span>Links halten</span></button><button id="right" data-hint="→ oder rechte Spielfeldhälfte" aria-label="Kronk nach rechts bewegen"><span>Rechts halten</span> ▶</button><button id="drop" class="drop" data-hint="↓ oder Leertaste" aria-label="Kronk sofort sinken lassen" hidden><span>Jetzt landen</span> ▼</button></nav>
+  <footer>Tippen und halten: linke oder rechte Hälfte des Spielfelds · Tastatur: ← → oder die Ziffern 1–4 der Antwortkarten · P: Pause · Landeanflug: ↓ zum sofortigen Sinken</footer>
 </main>
 <dialog id="feedback-dialog" class="feedback-card" aria-labelledby="feedback-title" aria-describedby="feedback-intro">
   <div class="feedback-heading">

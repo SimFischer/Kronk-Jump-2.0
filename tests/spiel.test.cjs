@@ -56,8 +56,8 @@ async function boot(extra = {}) {
   let source = fs.readFileSync(path.join(root,'spiel.js'),'utf8');
   source = source.replace('  init();', `  window.test = {
     resizeCanvas, draw, start, step, pause, chooseTopic, updateGrades, updateTopics, updateSelected, validate, makeRow,
-    get state() { return {mode, questions, index, score, camera, row, oldRows, player, hold, thinking, apexUsed}; },
-    keys, pointers, constants: {W,H,GAP,GRAVITY,JUMP,SPEED,ROW_Y},
+    get state() { return {mode, questions, index, score, camera, row, oldRows, player, hold, thinking, apexUsed, spielart, sinkt, laufzeit}; },
+    keys, pointers, constants: {W,H,GAP,GRAVITY,JUMP,SPEED,ROW_Y,SINK_TIME,SINK_SPEED,HOVER},
     position(x, y, vy) { player.x=x; player.y=y; player.vy=vy; },
     fixture(q) { selected = {id:'test', fach:'Test', klasse:5, thema:'Test', data:{mischen:false,fragen:q}}; mode='ready'; }
   }; window.ready = init();`);
@@ -275,6 +275,111 @@ module.exports = (async () => {
     const b = await boot({vollbild:{}, displayMode:'standalone'});
     assert.equal(b.get('fullscreen').hidden, true);
   }
+  // ---- Landeanflug -------------------------------------------------------
+  {
+    const b = await boot();
+    const landung = (schnell = true) => {
+      b.get('gamemode').value = 'landung';
+      b.get('quickland').checked = schnell;
+      b.t.fixture([q,q]); b.t.start();
+    };
+    landung();
+    const {ROW_Y, HOVER, SINK_TIME, SINK_SPEED} = b.t.constants;
+    assert.equal(b.t.state.spielart, 'landung');
+    assert.equal(b.t.state.player.y, ROW_Y - HOVER, 'Kronk schwebt über der Reihe');
+    assert.equal(b.t.state.hold, SINK_TIME);
+    assert.equal(b.t.state.sinkt, false);
+    // Vor Ablauf der Zeit bleibt die Höhe unverändert, seitlich geht es weiter.
+    const hoehe = b.t.state.player.y;
+    b.t.keys.add('ArrowLeft');
+    for (let i=0;i<120;i++) b.t.step(1/120);
+    b.t.keys.clear();
+    assert.equal(b.t.state.player.y, hoehe, 'Kronk sinkt nicht vor der Zeit');
+    assert.ok(b.t.state.player.x < 300, 'seitliche Steuerung wirkt beim Schweben');
+    assert.ok(Math.abs(b.t.state.hold - (SINK_TIME - 1)) < 1e-6);
+    assert.ok(Math.abs(b.t.state.laufzeit - 1) < 1e-6, 'die Rundenzeit läuft mit');
+    // Nach Ablauf der 10 Sekunden sinkt er von allein und landet.
+    for (let i=0;i<120*(SINK_TIME-1) && !b.t.state.sinkt;i++) b.t.step(1/120);
+    assert.equal(b.t.state.sinkt, true);
+    const schritte = Math.ceil(HOVER / SINK_SPEED * 120) + 2;
+    for (let i=0;i<schritte;i++) b.t.step(1/120);
+    assert.ok(b.t.state.index === 1 || b.t.state.row.platforms.some(p=>p.broken),
+      'nach dem Sinken ist die Karte unter Kronk ausgewertet');
+  }
+  {
+    // Sofort landen: ↓ lässt Kronk vor Ablauf der Zeit sinken.
+    const b = await boot();
+    b.get('gamemode').value = 'landung'; b.get('quickland').checked = true;
+    const allCorrect2 = {frage:'Landen',antworten:[{text:'A',richtig:true},{text:'B',richtig:true}]};
+    b.t.fixture([allCorrect2,allCorrect2]); b.t.start();
+    const ziel = b.t.state.row.platforms[0];
+    b.t.position(ziel.x + ziel.width/2, b.t.state.player.y, 0);
+    b.events.keydown({key:'ArrowDown',target:{tagName:'CANVAS'},preventDefault(){},repeat:false});
+    assert.equal(b.t.state.sinkt, true);
+    assert.equal(b.t.state.hold, 0);
+    for (let i=0;i<200 && b.t.state.index===0;i++) b.t.step(1/120);
+    assert.equal(b.t.state.index, 1, 'richtige Karte zählt auch beim schnellen Landen');
+    assert.equal(b.t.state.score, 100);
+    assert.equal(b.t.state.player.y, b.t.state.row.y - b.t.constants.HOVER, 'danach schwebt er wieder');
+    assert.equal(b.t.state.hold, b.t.constants.SINK_TIME);
+    assert.ok(b.t.state.laufzeit > 0);
+  }
+  {
+    // Ist „Sofort landen“ aus, ändert die Taste nichts.
+    const b = await boot();
+    b.get('gamemode').value = 'landung'; b.get('quickland').checked = false;
+    b.t.fixture([q,q]); b.t.start();
+    b.events.keydown({key:'ArrowDown',target:{tagName:'CANVAS'},preventDefault(){},repeat:false});
+    assert.equal(b.t.state.sinkt, false);
+    assert.equal(b.t.state.hold, b.t.constants.SINK_TIME);
+    assert.equal(b.get('drop').hidden, true, 'ohne die Einstellung kein Knopf');
+  }
+  {
+    // Sieg zeigt Gesamtzeit und merkt sich die Bestzeit je Sammlung.
+    const b = await boot();
+    b.get('gamemode').value = 'landung'; b.get('quickland').checked = true;
+    const eins = {frage:'Nur eine',antworten:[{text:'A',richtig:true},{text:'B',richtig:true}]};
+    b.t.fixture([eins]); b.t.start();
+    const ziel1 = b.t.state.row.platforms[0];
+    b.t.position(ziel1.x + ziel1.width/2, b.t.state.player.y, 0);
+    b.events.keydown({key:'ArrowDown',target:{tagName:'CANVAS'},preventDefault(){},repeat:false});
+    for (let i=0;i<200 && b.t.state.mode==='playing';i++) b.t.step(1/120);
+    assert.equal(b.t.state.mode,'won');
+    assert.match(b.get('panel-text').textContent, /Gesamtzeit 0:0\d\./);
+    assert.match(b.get('panel-text').textContent, /neue Bestzeit/);
+    const gespeichert = JSON.parse(b.storage.get('kronk_bestzeit'));
+    assert.ok(gespeichert.test > 0, 'Bestzeit gespeichert');
+    // Zweite, langsamere Runde überschreibt die Bestzeit nicht.
+    b.t.start();
+    const ziel2 = b.t.state.row.platforms[0];
+    b.t.position(ziel2.x + ziel2.width/2, b.t.state.player.y, 0);
+    for (let i=0;i<120*3;i++) b.t.step(1/120);
+    b.events.keydown({key:'ArrowDown',target:{tagName:'CANVAS'},preventDefault(){},repeat:false});
+    for (let i=0;i<200 && b.t.state.mode==='playing';i++) b.t.step(1/120);
+    assert.equal(b.t.state.mode,'won');
+    assert.match(b.get('panel-text').textContent, /Deine Bestzeit/);
+    assert.equal(JSON.parse(b.storage.get('kronk_bestzeit')).test, gespeichert.test, 'langsamere Runde ändert nichts');
+  }
+  {
+    // Falsche Karte beendet die Runde wie im Sprungmodus.
+    const b = await boot();
+    b.get('gamemode').value = 'landung'; b.get('quickland').checked = true;
+    b.t.fixture([q,q]); b.t.start();
+    const falsch = b.t.state.row.platforms.find(p=>!p.richtig);
+    b.t.position(falsch.x+falsch.width/2, b.t.state.player.y, 0);
+    b.events.keydown({key:'ArrowDown',target:{tagName:'CANVAS'},preventDefault(){},repeat:false});
+    for (let i=0;i<900 && b.t.state.mode==='playing';i++) b.t.step(1/120);
+    assert.equal(b.t.state.mode,'lost');
+    assert.equal(falsch.broken,true);
+  }
+  // Die Spielart bleibt für die nächste Sitzung gespeichert.
+  {
+    const b = await boot({storage:{kronk_spielart:'landung', kronk_schnelllanden:'0'}});
+    assert.equal(b.get('gamemode').value, 'landung');
+    assert.equal(b.get('quickland').checked, false);
+    assert.equal(b.get('time-label').hidden, true, 'Denkpause gehört nicht zum Landeanflug');
+    assert.equal(b.get('quickland-label').hidden, false);
+  }
   // Schema, fehlende Datei, Syntaxfehler und abweichende Kennung.
   for(const data of [null,{fragen:[]},{fragen:[null]},{fragen:[{...q,antworten:[null,null]}]},{fragen:[{...q,antworten:[{text:'Nein',richtig:false},{text:'Auch nein',richtig:false}]}]}]) assert.throws(()=>t.validate(data));
   for(const [file,code] of [['fehlt.js',undefined],['kaputt.js','(()'],['falsche-id.js','window.KRONK_SAMMLUNGEN.anders = {};']]) {
@@ -284,5 +389,5 @@ module.exports = (async () => {
     assert.equal(b.t.state.mode,'ready'); assert.match(b.get('load-errors').textContent,new RegExp(file.replace('.','\\.')));
     assert.equal(b.get('subject').options.length,3); assert.equal(b.get('load-errors').hidden,false);
   }
-  console.log(`OK: Retina/Drehung/Zoom, Frage nur unten, lange Antworten, höherer Sprung mit mehr Flugzeit, Auswahl, Inhalte, 7 Denkzeiten, ${routes} Querwechsel ohne Denkpause, Tastatur/Pointer, Pause, Landungen, Neustart, Sieg, Vollbild, beschädigter/gesperrter Spielstand, fehlende Kronk-Bilder und 3 Ladefehler.`);
+  console.log(`OK: Retina/Drehung/Zoom, Frage nur unten, lange Antworten, höherer Sprung mit mehr Flugzeit, Auswahl, Inhalte, 7 Denkzeiten, ${routes} Querwechsel ohne Denkpause, Tastatur/Pointer, Pause, Landungen, Neustart, Sieg, Landeanflug mit Zeit und Bestzeit, Vollbild, beschädigter/gesperrter Spielstand, fehlende Kronk-Bilder und 3 Ladefehler.`);
 })();

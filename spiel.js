@@ -4,6 +4,9 @@
   const $ = id => document.getElementById(id);
   const canvas = $("canvas"), ctx = canvas.getContext("2d");
   const W = 600, H = 540, GRAVITY = 600, JUMP = 700, SPEED = 480;
+  // Landeanflug: Kronk schwebt HOVER Pixel über der Reihe, sinkt nach
+  // SINK_TIME Sekunden (oder auf Knopfdruck) mit SINK_SPEED nach unten.
+  const SINK_TIME = 10, SINK_SPEED = 400, HOVER = 210;
   const ROW_Y = 410, START_Y = 515, GAP = START_Y - ROW_Y;
   let canvasDpr = 0, renderHeight = H;
   
@@ -51,6 +54,8 @@
   let mode = "loading", questions = [], index = 0, score = 0, camera = 0;
   let row, oldRows = [], player, last = 0, accumulator = 0, hold = 0, apexUsed = false, thinking = 2;
   let failText = "", facing = 1, celebration = 0;
+  let spielart = "sprung", sinkt = false, schnellLanden = true;
+  let laufzeit = 0, letzteZeit = -1, bestzeiten = {};
   const keys = new Set(), pointers = new Map();
   
   const shuffle = list => {
@@ -107,6 +112,18 @@
     const aktiv = leseSpeicher('kronk_aktiv');
     aktiverKronk = freigeschalteteKronks.includes(aktiv) ? aktiv : 'kronk';
 
+    spielart = leseSpeicher('kronk_spielart') === 'landung' ? 'landung' : 'sprung';
+    schnellLanden = leseSpeicher('kronk_schnelllanden') !== '0';
+
+    bestzeiten = {};
+    const zeiten = leseJson('kronk_bestzeit');
+    if (zeiten && typeof zeiten === "object" && !Array.isArray(zeiten)) {
+      for (const [id, wert] of Object.entries(zeiten)) {
+        const zahl = Number(wert);
+        if (Number.isFinite(zahl) && zahl > 0) bestzeiten[id] = zahl;
+      }
+    }
+
     const fehler = leseJson('kronk_fehler');
     fehlerSpeicher = {};
     if (fehler && typeof fehler === "object" && !Array.isArray(fehler)) {
@@ -120,6 +137,9 @@
   // entfernt), sonst wächst der Merkzettel mit jeder Änderung weiter.
   function raeumeFehlerAuf() {
     let geaendert = false;
+    for (const id of Object.keys(bestzeiten)) {
+      if (!collections.some(c => c.id === id)) { delete bestzeiten[id]; geaendert = true; }
+    }
     for (const id of Object.keys(fehlerSpeicher)) {
       const collection = collections.find(c => c.id === id);
       const fragen = collection ? collection.data.fragen.map(q => q.frage) : [];
@@ -138,6 +158,9 @@
       localStorage.setItem('kronk_freigeschaltet', JSON.stringify(freigeschalteteKronks));
       localStorage.setItem('kronk_aktiv', aktiverKronk);
       localStorage.setItem('kronk_fehler', JSON.stringify(fehlerSpeicher));
+      localStorage.setItem('kronk_spielart', spielart);
+      localStorage.setItem('kronk_schnelllanden', schnellLanden ? '1' : '0');
+      localStorage.setItem('kronk_bestzeit', JSON.stringify(bestzeiten));
     } catch (_) { /* privates Fenster oder Speicher voll */ }
   }
 
@@ -189,6 +212,35 @@
     }
   }
 
+  function zeitText(sekunden) {
+    const ganz = Math.max(0, Math.floor(sekunden));
+    return `${Math.floor(ganz / 60)}:${String(ganz % 60).padStart(2, "0")}`;
+  }
+  // Im Landeanflug läuft die Zeit mit; sie steht neben den Punkten.
+  function zeigePunkte() {
+    const basis = `${score} Punkte · Gesamt ${gesamtPunkte.toLocaleString("de-DE")}`;
+    $("score").textContent = spielart === "landung" ? `${basis} · Zeit ${zeitText(laufzeit)}` : basis;
+    letzteZeit = Math.floor(laufzeit);
+  }
+  // Schreibt nur, wenn sich der Text wirklich ändert: sonst meldet sich die
+  // Vorlesehilfe bei jedem Einzelbild neu.
+  function setzeStatus(text) {
+    if ($("status").textContent !== text) $("status").textContent = text;
+  }
+
+  // Zeigt die Bedienelemente, die zur gewählten Spielart gehören.
+  function uebernehmeSpielart() {
+    if ($("gamemode")) $("gamemode").value = spielart;
+    if ($("quickland")) $("quickland").checked = schnellLanden;
+    if ($("drop")) $("drop").hidden = !(spielart === "landung" && schnellLanden);
+    if ($("feedback-settings")) $("feedback-settings").hidden = spielart === "landung";
+  }
+
+  const ERKLAERUNG = {
+    sprung: "Kronk springt von allein. Halte die linke oder rechte Hälfte des Spielfelds gedrückt – am Computer gehen auch ← → oder die Ziffer der Antwortkarte. Der rote Fußmarker muss auf der richtigen Karte landen; falsche Karten brechen weg.",
+    landung: "Kronk schwebt über den Karten und wandert zur Seite, solange du hältst – am Computer mit ← → oder der Ziffer der Antwortkarte. Nach 10 Sekunden sinkt er von allein; mit ▼ geht es sofort runter. Die Zeit läuft mit und steht am Ende der Runde."
+  };
+
   function gradeTitle(grade) { return String(grade) === "E" ? "E-Jahrgang" : `Klasse ${grade}`; }
   function collectionTitle(c) { return `${c.fach} · ${gradeTitle(c.klasse)} · ${c.thema}${c.beispiel ? " (Beispiel)" : ""}`; }
   function fillSelect(id, options) {
@@ -218,19 +270,19 @@
     renderHeight = H;
     questions = []; index = 0; score = 0; camera = 0; oldRows = []; row = null; player = null;
     hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0; last = 0; facing = 1;
-    particles = [];
+    particles = []; sinkt = false; laufzeit = 0; letzteZeit = -1;
     renderAnswerControls();
-    clearInput(); $("score").textContent = `0 Punkte · Gesamt ${gesamtPunkte.toLocaleString("de-DE")}`;
+    clearInput(); zeigePunkte();
     $("pause").disabled = true; $("pause").textContent = "Pause";
   }
   function chooseTopic() {
     resetRound(); mode = "ready";
-    showPanel("Hoch hinaus mit Kronk!", "Kronk springt von allein. Halte die linke oder rechte Hälfte des Spielfelds gedrückt – am Computer gehen auch ← → oder die Ziffer der Antwortkarte. Der rote Fußmarker muss auf der richtigen Karte landen; falsche Karten brechen weg.", "Los geht’s!", true);
+    showPanel("Hoch hinaus mit Kronk!", ERKLAERUNG[spielart], "Los geht’s!", true);
     $("selection").hidden = false; $("choose-topic").hidden = true;
     $("question").textContent = "Bereit für den nächsten Sprung?";
     $("progress").textContent = "Mit Kronk nach oben";
     $("status").textContent = "Wähle ein Thema und starte das Spiel.";
-    aktualisiereKronkMenue();
+    aktualisiereKronkMenue(); uebernehmeSpielart();
     updateSelected(); $("subject").focus({preventScroll:true});
   }
   
@@ -323,7 +375,10 @@
   
   function showPanel(title, text, button, settings = false) {
     $("panel-title").textContent = title; $("panel-text").textContent = text;
-    $("start").textContent = button; $("time-label").hidden = !settings;
+    $("start").textContent = button;
+    // Denkpause gehört zum Springen, „Sofort landen“ zum Landeanflug.
+    $("time-label").hidden = !settings || spielart === "landung";
+    if ($("quickland-label")) $("quickland-label").hidden = !settings || spielart !== "landung";
     $("selection").hidden = mode !== "ready" && mode !== "error";
     $("choose-topic").hidden = !["paused", "won", "lost"].includes(mode);
     $("overlay").hidden = false; clearInput();
@@ -360,7 +415,7 @@
 
   function setQuestion() {
     $("question").textContent = row.q.frage;
-    $("score").textContent = `${score} Punkte · Gesamt ${gesamtPunkte.toLocaleString("de-DE")}`;
+    zeigePunkte();
     $("progress").textContent = `Aufgabe ${index + 1} von ${questions.length}`;
     $("status").textContent = "Füße auf eine richtige Plattform!";
     renderHeight = Math.max(H, row.y - camera + 16 + rowHeight(row) + 24);
@@ -383,18 +438,33 @@
       questions = data.fragen.slice();
     }
 
+    spielart = $("gamemode") && $("gamemode").value === "landung" ? "landung" : "sprung";
+    schnellLanden = $("quickland") ? !!$("quickland").checked : true;
+    uebernehmeSpielart(); speichereSpielstand();
+
     thinking = Number($("thinking").value); 
     if (![0, 1, 2, 4, 6, 8, 10].includes(thinking)) thinking = 2;
     currentThinking = thinking;
     consecutiveCorrect = 0;
     
-    index = 0; score = 0; camera = 0; oldRows = [];
-    row = makeRow(ROW_Y); player = { x: W / 2, y: START_Y, vy: -JUMP };
-    hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0;
+    index = 0; score = 0; camera = 0; oldRows = []; laufzeit = 0; letzteZeit = -1;
+    row = makeRow(ROW_Y);
+    player = spielart === "landung"
+      ? { x: W / 2, y: ROW_Y - HOVER, vy: 0 }
+      : { x: W / 2, y: START_Y, vy: -JUMP };
+    hold = spielart === "landung" ? SINK_TIME : 0;
+    sinkt = false; apexUsed = false; failText = ""; celebration = 0; accumulator = 0;
     mode = "playing"; clearInput(); $("overlay").hidden = true;
     $("pause").disabled = false; $("pause").textContent = "Pause"; setQuestion(); canvas.focus({preventScroll:true});
   }
   
+  // Vorzeitiges Absinken: nur im Landeanflug und nur, wenn erlaubt.
+  function starteSinkflug() {
+    if (mode !== "playing" || spielart !== "landung" || sinkt || !schnellLanden || !player) return;
+    hold = 0; sinkt = true;
+    setzeStatus("Kronk sinkt – jetzt zählt die Karte unter ihm!");
+  }
+
   function pause() {
     if ($("unlock-dialog").open) return;
     if (mode === "playing") {
@@ -454,8 +524,11 @@
     closeFeedback();
     row = makeRow(row.y);
     camera = row.y - ROW_Y;
-    player = { x: W / 2, y: row.y + GAP, vy: -JUMP };
-    hold = 0; apexUsed = false; failText = ""; celebration = 0;
+    player = spielart === "landung"
+      ? { x: W / 2, y: row.y - HOVER, vy: 0 }
+      : { x: W / 2, y: row.y + GAP, vy: -JUMP };
+    hold = spielart === "landung" ? SINK_TIME : 0;
+    sinkt = false; apexUsed = false; failText = ""; celebration = 0;
     accumulator = 0; last = 0; facing = 1; particles = [];
     consecutiveCorrect = 0; currentThinking = thinking;
     mode = "playing"; clearInput(); $("overlay").hidden = true;
@@ -478,7 +551,15 @@
     $("pause").disabled = true;
     clearInput();
     if (won) {
-      showPanel("Ganz oben angekommen!", "Kronk hat alle " + questions.length + " Aufgaben geschafft. " + score + " Punkte!", "Noch einmal spielen", true);
+      let text = `Kronk hat alle ${questions.length} Aufgaben geschafft. ${score} Punkte!`;
+      if (spielart === "landung") {
+        const beste = selected ? bestzeiten[selected.id] : undefined;
+        const neu = !beste || laufzeit < beste;
+        if (selected && neu) { bestzeiten[selected.id] = laufzeit; speichereSpielstand(); }
+        text += ` Gesamtzeit ${zeitText(laufzeit)}.`;
+        text += neu ? " Das ist deine neue Bestzeit!" : ` Deine Bestzeit für diese Sammlung: ${zeitText(beste)}.`;
+      }
+      showPanel("Ganz oben angekommen!", text, "Noch einmal spielen", true);
     } else {
       showFeedback();
     }
@@ -511,10 +592,22 @@
     player.x = Math.max(28, Math.min(W - 28, player.x + direction * SPEED * dt));
     const previousY = player.y;
     
-    if (hold > 0) {
+    if (spielart === "landung") {
+      laufzeit += dt;
+      if (Math.floor(laufzeit) !== letzteZeit) zeigePunkte();
+      if (sinkt) {
+        player.y += SINK_SPEED * dt;
+      } else {
+        hold = Math.max(0, hold - dt);
+        setzeStatus(hold
+          ? `Landeanflug · ${Math.ceil(hold)} s · ${aimLabel()}`
+          : "Kronk sinkt – jetzt zählt die Karte unter ihm!");
+        if (!hold) sinkt = true;
+      }
+    } else if (hold > 0) {
       hold = Math.max(0, hold - dt);
-      $("status").textContent = `Denkpause · ${Math.ceil(hold)} s · ${aimLabel()}`;
-      if (!hold) $("status").textContent = "Jetzt auf der richtigen Antwort landen!";
+      setzeStatus(`Denkpause · ${Math.ceil(hold)} s · ${aimLabel()}`);
+      if (!hold) setzeStatus("Jetzt auf der richtigen Antwort landen!");
     } else {
       player.vy += GRAVITY * dt;
       if (!apexUsed && player.vy >= 0) {
@@ -525,7 +618,8 @@
     }
     celebration = Math.max(0, celebration - dt);
     
-    if (!failText && player.vy > 0 && previousY <= row.y && player.y >= row.y) {
+    const faellt = spielart === "landung" ? sinkt : player.vy > 0;
+    if (!failText && faellt && previousY <= row.y && player.y >= row.y) {
       const hit = row.platforms.find(p => !p.broken && player.x >= p.x && player.x <= p.x + p.width);
       if (hit) {
         if (hit.richtig) {
@@ -561,13 +655,17 @@
           void pf.offsetWidth;
           pf.classList.add("success-flash");
 
-          $("score").textContent = `${score} Punkte · Gesamt ${gesamtPunkte.toLocaleString("de-DE")}`;
+          zeigePunkte();
           hit.solved = true;
           player.y = row.y; player.vy = -JUMP; hold = 0; apexUsed = false; celebration = .5;
           oldRows.push(row); oldRows = oldRows.slice(-1); index++;
           if (index === questions.length) { finish(true); return; }
           row = makeRow(row.y - GAP, player.x);
-          camera = row.y - ROW_Y; setQuestion();
+          camera = row.y - ROW_Y;
+          if (spielart === "landung") {
+            player.y = row.y - HOVER; player.vy = 0; sinkt = false; hold = SINK_TIME;
+          }
+          setQuestion();
         } else {
           consecutiveCorrect = 0;
           currentThinking = thinking; 
@@ -902,9 +1000,16 @@
     field.addEventListener("contextmenu", e => e.preventDefault());
   }
 
+  {
+    const button = $("drop");
+    button.addEventListener("pointerdown", e => { e.preventDefault(); starteSinkflug(); });
+    button.addEventListener("contextmenu", e => e.preventDefault());
+  }
+
   window.addEventListener("keydown", e => {
     if ($("unlock-dialog").open || $("feedback-dialog").open || e.target.tagName === "SELECT") return;
     if (["ArrowLeft", "ArrowRight"].includes(e.key)) { e.preventDefault(); if (mode === "playing") keys.add(e.key); }
+    if (["ArrowDown", " ", "Spacebar"].includes(e.key)) { e.preventDefault(); if (!e.repeat) starteSinkflug(); }
     if (e.key.toLowerCase() === "p" && !e.repeat) pause();
     if (e.key.toLowerCase() === "f" && !e.repeat) toggleVollbild();
     
@@ -970,6 +1075,21 @@
   }
   zeigeVollbildKnopf();
 
+  $("gamemode").addEventListener("change", e => {
+    spielart = e.target.value === "landung" ? "landung" : "sprung";
+    uebernehmeSpielart(); speichereSpielstand();
+    // Der Einstellungsblock unter dem Startknopf wechselt mit.
+    if (["ready", "won", "lost", "paused"].includes(mode)) {
+      $("time-label").hidden = spielart === "landung";
+      $("quickland-label").hidden = spielart !== "landung";
+    }
+    if (mode === "ready") $("panel-text").textContent = ERKLAERUNG[spielart];
+  });
+  $("quickland").addEventListener("change", e => {
+    schnellLanden = !!e.target.checked;
+    uebernehmeSpielart(); speichereSpielstand();
+  });
+
   $("subject").addEventListener("change", updateGrades);
   $("grade").addEventListener("change", updateTopics);
   $("topic").addEventListener("change", updateSelected);
@@ -1005,7 +1125,7 @@
       $("start").disabled = true;
       ladeSpielstand();
       raeumeFehlerAuf();
-      aktualisiereKronkMenue();
+      aktualisiereKronkMenue(); uebernehmeSpielart();
       const bilder = await ladeKronkBilder(aktiverKronk);
       if (!bilder) throw Error(`Kronk-Bilder fehlen: assets/${aktiverKronk}-*.png`);
       Object.assign(images, bilder);

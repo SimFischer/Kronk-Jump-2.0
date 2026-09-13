@@ -4,6 +4,15 @@ Ein Lern-Jump-Spiel mit dem Schulmaskottchen Kronk. Reines HTML, CSS und JavaScr
 
 **Spielen:** https://simfischer.github.io/Kronk-Jump-2.0/
 
+## Zwei Spielarten
+
+Im Startbildschirm wird oben die **Spielart** gewählt; die Wahl bleibt für das nächste Mal gespeichert.
+
+- **Springen** – der bisherige Modus. Kronk hüpft von unten nach oben, am Sprungscheitel hält er für die eingestellte Denkpause an.
+- **Landeanflug (auf Zeit)** – Kronk schwebt über den Antwortkarten und wandert seitlich, solange gehalten wird. Nach **10 Sekunden** sinkt er von allein auf die Karte unter ihm. Ist **Sofort landen erlauben** aktiv (Standard), geht es mit dem Knopf **▼**, der Taste **↓** oder der Leertaste schon vorher runter. Im Hintergrund läuft die Rundenzeit mit und steht neben den Punkten; am Ende zeigt der Abschluss die **Gesamtzeit** und die **Bestzeit** für diese Sammlung, die im Browser gespeichert wird. Eine falsche Karte beendet die Runde wie beim Springen – mit Lernpause, Lösung und der Möglichkeit, die Aufgabe zu wiederholen.
+
+Beide Spielarten nutzen dieselben Sammlungen, dieselbe Steuerung zur Seite, dieselben Punkte und dieselbe Freischaltung der Kronk-Figuren.
+
 ## Spielen und auswählen
 
 1. Fach, Klassenstufe und Thema auswählen. Die nachfolgenden Felder passen sich automatisch an. Es erscheinen nur Sammlungen, deren Dateien erfolgreich geladen und geprüft wurden.

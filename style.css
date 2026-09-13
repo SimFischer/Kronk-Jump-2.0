@@ -180,7 +180,12 @@ canvas{
 }
 
 #selection{ display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
-#selection label:nth-child(n+3), #collection-info, #load-errors{ grid-column:1 / -1; }
+#selection > label, #collection-info, #load-errors{ grid-column:1 / -1; }
+#selection .half{ grid-column:auto; }
+
+/* Ja/Nein-Einstellung: Kästchen und Text in einer Zeile, große Trefferfläche. */
+.card label.switch{ display:flex; align-items:center; gap:10px; line-height:1.35; }
+.card label.switch input{ width:22px; height:22px; flex:0 0 auto; accent-color:var(--school-blue); }
 #collection-info{ color:var(--ink-soft); font-size:13px; margin:0; }
 #load-errors{ text-align:left; white-space:pre-line; padding:10px; background:var(--danger-bg); border:2px solid var(--danger); color:var(--danger-ink); border-radius:var(--radius-sm); }
 
@@ -197,6 +202,9 @@ canvas{
   touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
 }
 .controls span{ font-size:16px; vertical-align:middle; margin:0 10px; }
+/* Dritter Knopf nur im Landeanflug – schmaler als die Richtungsknöpfe. */
+.controls button.drop{ flex:.7; background:var(--blue-100); color:var(--school-blue); box-shadow:0 3px 0 var(--blue-900); }
+.controls button.drop:active{ background:#cfdcf4; box-shadow:0 1px 0 var(--blue-900); }
 .controls button:active,.controls button.held{ background:#ffbc59; transform:translateY(2px); box-shadow:0 1px 0 var(--orange-700); }
 
 footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom:2px; }
@@ -227,6 +235,10 @@ footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom
   h2{ font-size:20px; }
   .playfield{ margin:0 8px 8px; }
   .controls span{ font-size:14px; margin:0 4px; }
+  /* Drei Knöpfe passen nur nebeneinander, wenn der dritte auf sein Zeichen
+     schrumpft – die Vorlesehilfe kennt ihn weiter über aria-label. */
+  .controls button.drop{ flex:0 0 68px; }
+  .controls button.drop span, .controls button.drop::after{ display:none; }
 }
 
 .unlock-card{

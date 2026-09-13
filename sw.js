@@ -4,7 +4,7 @@
  * Ohne Netz kommt alles aus dem Speicher. */
 "use strict";
 
-const VERSION = "kronk-20260913e";
+const VERSION = "kronk-20260913f";
 const SHELL = [
   "./", "./index.html", "./style.css", "./spiel.js", "./aufgaben.js",
   "./manifest.json",
