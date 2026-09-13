@@ -79,23 +79,66 @@
   let consecutiveCorrect = 0;
   let currentThinking = 2;
 
+  // Der Spielstand liegt im Browser und kann beschädigt, veraltet oder
+  // gesperrt sein (privates Fenster, volle Quote). Ein kaputter Eintrag darf
+  // das Spiel nie blockieren: Im Zweifel gilt der Standardwert.
+  const MAX_FEHLER = 50;
+  function leseSpeicher(key) {
+    try { return localStorage.getItem(key); } catch (_) { return null; }
+  }
+  function leseJson(key) {
+    const raw = leseSpeicher(key);
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (_) { return null; }
+  }
+  function istTextliste(value) {
+    return Array.isArray(value) && value.every(v => typeof v === "string");
+  }
+
   function ladeSpielstand() {
-    const pts = localStorage.getItem('kronk_gesamtpunkte');
-    if (pts) gesamtPunkte = parseInt(pts);
-    const chars = localStorage.getItem('kronk_freigeschaltet');
-    if (chars) freigeschalteteKronks = JSON.parse(chars);
-    const aktiv = localStorage.getItem('kronk_aktiv');
-    if (aktiv) aktiverKronk = aktiv;
-    
-    const fehler = localStorage.getItem('kronk_fehler');
-    if (fehler) fehlerSpeicher = JSON.parse(fehler);
+    const punkte = Number(leseSpeicher('kronk_gesamtpunkte'));
+    gesamtPunkte = Number.isFinite(punkte) && punkte > 0 ? Math.floor(punkte) : 0;
+
+    const bekannt = kronkLevel.map(char => char.id);
+    const chars = leseJson('kronk_freigeschaltet');
+    freigeschalteteKronks = istTextliste(chars) ? chars.filter(id => bekannt.includes(id)) : [];
+    if (!freigeschalteteKronks.includes('kronk')) freigeschalteteKronks.unshift('kronk');
+
+    const aktiv = leseSpeicher('kronk_aktiv');
+    aktiverKronk = freigeschalteteKronks.includes(aktiv) ? aktiv : 'kronk';
+
+    const fehler = leseJson('kronk_fehler');
+    fehlerSpeicher = {};
+    if (fehler && typeof fehler === "object" && !Array.isArray(fehler)) {
+      for (const [id, liste] of Object.entries(fehler)) {
+        if (istTextliste(liste) && liste.length) fehlerSpeicher[id] = liste.slice(-MAX_FEHLER);
+      }
+    }
+  }
+
+  // Fragen, die es nicht mehr gibt (umformuliert, gelöscht, Sammlung
+  // entfernt), sonst wächst der Merkzettel mit jeder Änderung weiter.
+  function raeumeFehlerAuf() {
+    let geaendert = false;
+    for (const id of Object.keys(fehlerSpeicher)) {
+      const collection = collections.find(c => c.id === id);
+      const fragen = collection ? collection.data.fragen.map(q => q.frage) : [];
+      const bereinigt = fehlerSpeicher[id].filter(text => fragen.includes(text)).slice(-MAX_FEHLER);
+      if (bereinigt.length !== fehlerSpeicher[id].length) geaendert = true;
+      if (bereinigt.length) fehlerSpeicher[id] = bereinigt; else { delete fehlerSpeicher[id]; geaendert = true; }
+    }
+    if (geaendert) speichereSpielstand();
   }
 
   function speichereSpielstand() {
-    localStorage.setItem('kronk_gesamtpunkte', gesamtPunkte);
-    localStorage.setItem('kronk_freigeschaltet', JSON.stringify(freigeschalteteKronks));
-    localStorage.setItem('kronk_aktiv', aktiverKronk);
-    localStorage.setItem('kronk_fehler', JSON.stringify(fehlerSpeicher));
+    // Schlägt das Schreiben fehl, läuft das Spiel ohne gespeicherten Stand
+    // weiter – ein geworfener Fehler würde sonst mitten im Sprung landen.
+    try {
+      localStorage.setItem('kronk_gesamtpunkte', gesamtPunkte);
+      localStorage.setItem('kronk_freigeschaltet', JSON.stringify(freigeschalteteKronks));
+      localStorage.setItem('kronk_aktiv', aktiverKronk);
+      localStorage.setItem('kronk_fehler', JSON.stringify(fehlerSpeicher));
+    } catch (_) { /* privates Fenster oder Speicher voll */ }
   }
 
   function aktualisiereKronkMenue() {
@@ -532,6 +575,7 @@
           if (!fehlerSpeicher[selected.id]) fehlerSpeicher[selected.id] = [];
           if (!fehlerSpeicher[selected.id].includes(row.q.frage)) {
               fehlerSpeicher[selected.id].push(row.q.frage);
+              fehlerSpeicher[selected.id] = fehlerSpeicher[selected.id].slice(-MAX_FEHLER);
               speichereSpielstand();
           }
 
@@ -871,13 +915,14 @@
   document.addEventListener("visibilitychange", () => { if (document.hidden && mode === "playing") pause(); });
   
   $("kronk-select").addEventListener("change", async (e) => {
-    aktiverKronk = e.target.value;
+    const gewaehlt = e.target.value;
+    const geladen = await ladeKronkBilder(gewaehlt);
+    // Fehlt eine Bilddatei, bleibt der bisherige Kronk stehen, statt dass
+    // das Warten nie endet und Kronk unsichtbar wird.
+    if (!geladen) { e.target.value = aktiverKronk; $("status").textContent = "Dieser Kronk lässt sich gerade nicht laden."; return; }
+    aktiverKronk = gewaehlt;
+    Object.assign(images, geladen);
     speichereSpielstand();
-    await Promise.all(["normal", "jubel", "sprung"].map(name => new Promise((resolve) => {
-      const img = new Image(); 
-      img.onload = () => { images[name] = img; resolve(); };
-      img.src = `assets/${aktiverKronk}-${name}.png`;
-    })));
   });
 
   $("subject").addEventListener("change", updateGrades);
@@ -896,17 +941,29 @@
   }
   window.addEventListener("resize", resizeCanvas);
 
+  // Liefert die drei Bilder eines Kronks oder null, wenn eines fehlt.
+  async function ladeKronkBilder(id) {
+    try {
+      const geladen = await Promise.all(["normal", "jubel", "sprung"].map(name => new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve([name, img]);
+        img.onerror = () => reject(Error(`assets/${id}-${name}.png`));
+        img.src = `assets/${id}-${name}.png`;
+      })));
+      return Object.fromEntries(geladen);
+    } catch (_) { return null; }
+  }
+
   async function init() {
     try {
       await loadCollections();
       $("start").disabled = true;
       ladeSpielstand();
+      raeumeFehlerAuf();
       aktualisiereKronkMenue();
-      await Promise.all(["normal", "jubel", "sprung"].map(name => new Promise((resolve, reject) => {
-        const img = new Image(); img.onload = () => { images[name] = img; resolve(); };
-        img.onerror = () => reject(Error(`Kronk-Bild fehlt: assets/${aktiverKronk}-${name}.png`)); 
-        img.src = `assets/${aktiverKronk}-${name}.png`;
-      })));
+      const bilder = await ladeKronkBilder(aktiverKronk);
+      if (!bilder) throw Error(`Kronk-Bilder fehlen: assets/${aktiverKronk}-*.png`);
+      Object.assign(images, bilder);
       chooseTopic();
     } catch (e) { mode = "error"; showPanel("Dateien prüfen", e.message, "Bitte Dateien korrigieren"); $("start").disabled = true; }
     resizeCanvas(); requestAnimationFrame(frame);
