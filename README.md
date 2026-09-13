@@ -1,6 +1,6 @@
 # Kronk springt!
 
-Ein Lern-Jump-Spiel mit dem Schulmaskottchen Kronk. Reines HTML, CSS und JavaScript: kein Build-Schritt, Backend, Benutzerkonto, Tracking oder externe Schriftarten. Die drei Originalbilder in `assets/` werden unverändert verwendet.
+Ein Lern-Jump-Spiel mit dem Schulmaskottchen Kronk. Reines HTML, CSS und JavaScript: kein Build-Schritt, Backend, Benutzerkonto, Tracking oder externe Schriftarten. Die Kronk-Bilder in `assets/` sind unveränderte Motive des Auftraggebers, für die Anzeige im Spiel auf 460 Pixel Höhe herunterskaliert.
 
 **Spielen:** https://simfischer.github.io/Kronk-Jump-2.0/
 
@@ -8,13 +8,24 @@ Ein Lern-Jump-Spiel mit dem Schulmaskottchen Kronk. Reines HTML, CSS und JavaScr
 
 1. Fach, Klassenstufe und Thema auswählen. Die nachfolgenden Felder passen sich automatisch an. Es erscheinen nur Sammlungen, deren Dateien erfolgreich geladen und geprüft wurden.
 2. Denkpause wählen: **0, 1, 2, 4, 6, 8 oder 10 Sekunden**, Standard **2 Sekunden**. Bei 0 Sekunden fällt Kronk am Scheitel ohne Halt weiter; es erscheint kein Denkpausen-Countdown.
-3. Kronk springt automatisch. Links oder rechts gedrückt halten, alternativ die Pfeiltasten benutzen. Die seitliche Steuerung bleibt auch in der Denkpause aktiv. Der rote Fußmarker muss auf einer richtigen Plattform landen. Bei mehreren richtigen Antworten genügt eine beliebige richtige Plattform.
+3. Kronk springt automatisch. Steuern: die linke oder rechte **Hälfte des Spielfelds** gedrückt halten, die beiden Richtungstasten unten gedrückt halten, die Pfeiltasten ← → oder die **Ziffer der Antwortkarte** (1–4). Jede Karte trägt ihre Ziffer sichtbar auf der Landefläche. Die seitliche Steuerung bleibt auch in der Denkpause aktiv. Der rote Fußmarker muss auf einer richtigen Karte landen. Bei mehreren richtigen Antworten genügt eine beliebige richtige Karte.
 4. Jede richtige Landung gibt 100 Punkte und den nächsten Sprung. Falsche Plattformen brechen. Nach einem Fehler erscheinen alle richtigen Antworten und die Erklärung, falls vorhanden.
 5. Mit **Noch einmal spielen** dieselbe Sammlung neu beginnen. **Zur Themenauswahl** setzt die Runde zurück und öffnet die Auswahl. Das ist auch über die Pause möglich.
 
 Pause über den Knopf oder **P**. Beim Verlassen des Browserfensters bzw. Wechseln des Tabs pausiert das Spiel automatisch. Über **Weiterspielen** fortsetzen. Neustart und Themenauswahl löschen Punkte, Fortschritt, Plattformen, Eingaben und Denkpause der alten Runde.
 
-Die Frage steht in einer festen, kontrastreichen Box unterhalb des Spielfelds, direkt über der Steuerung. Sie wird nur einmal als scharfer HTML-Text angezeigt und bewegt sich nicht mit Kronk. Das Spielfeld nutzt die tatsächliche Display-Pixeldichte und passt sich bei Größenwechseln und Drehung proportional an. Plattformen und Antwortschrift sind größer. Frage und Plattformen wechseln gemeinsam. Sehr lange Fragen vergrößern den benötigten Platz; auf kleinen Displays kann die Seite dann scrollen, ohne den Text abzuschneiden.
+Die Frage steht in einer festen, kontrastreichen Box als scharfer HTML-Text und bewegt sich nicht mit Kronk. Im Hochformat sitzt sie unterhalb des Spielfelds, direkt über der Steuerung; im Querformat (iPad quer, Laptop, Beamer) rückt sie in eine eigene Spalte rechts neben das Spielfeld, sodass ohne Scrollen alles gleichzeitig sichtbar bleibt. Das Spielfeld nutzt die tatsächliche Display-Pixeldichte und passt sich bei Größenwechseln und Drehung proportional an. Frage und Antwortkarten wechseln gemeinsam.
+
+## Darstellung im Spielfeld
+
+- **Himmel statt Raster.** Der Hintergrund ist ein Farbverlauf mit zwei Wolkenebenen, die sich beim Steigen unterschiedlich schnell nach unten bewegen. Je weiter die Sammlung geschafft ist, desto tiefer wird das Blau oben. Das macht die Sprunghöhe sichtbar, die vorher als leere Fläche wirkte.
+- **Antwortkarten.** Jede Antwort ist eine weiße Karte mit blauer Landefläche oben. Auf der Landefläche steht die Ziffer der Karte; nach der Landung erscheint dort `RICHTIG` (grün) oder `FALSCH` (rot, die Karte kippt und bricht).
+- **Zielhilfe.** Solange Kronk fliegt, zeigt eine gestrichelte Linie senkrecht nach unten, ein oranger Rahmen um die angepeilte Karte und ein Landeschatten auf ihrer Landefläche, wo Kronk aufsetzen würde. In der Denkpause nennt die Statuszeile zusätzlich Feldnummer und Antworttext – auch für Vorlesehilfen.
+- **Denkpause.** Am Scheitelpunkt läuft ein oranger Ring um Kronk ab, daneben die verbleibenden Sekunden als Zahl.
+- **Höhenleiste.** Rechts zeigt eine Leiste mit einer Sprosse je Aufgabe und einem Ziel-Fähnchen, wie weit die Route geschafft ist. Geschaffte Reihen bleiben als schmaler oranger Routenbalken sichtbar.
+- **Serie.** Ab zwei richtigen Landungen hintereinander erscheint oben links eine Anzeige `Serie × n`.
+
+Sehr lange Fragen vergrößern den benötigten Platz; auf kleinen Displays kann die Seite dann scrollen, ohne den Text abzuschneiden.
 
 ## Vorhandene Sammlungen
 
@@ -88,7 +99,7 @@ Eine fehlende, ungültige oder falsch registrierte Sammlung erscheint mit Datein
 - `aufgaben.js`: zentrale Liste der Sammlungen.
 - `aufgaben/`: eine JavaScript-Datei je Sammlung. Dynamisches Laden über lokale Script-Tags funktioniert auch ohne Backend.
 - `spiel.js`: Laden, Schema-Prüfung, Steuerung, Physik, Kollisionen und Spielzustände.
-- `assets/`: unveränderte Originalbilder (Normal, Jubel, Sprung).
+- `assets/`: Kronk-Motive (Normal, Jubel, Sprung) je Charakter, auf Anzeigegröße skaliert – zusammen rund 0,8 MB statt vorher 31,6 MB.
 - `tests/spiel.test.cjs`: automatisierte Entwicklungstests mit Node.js, optional ausführbar über `node tests/spiel.test.cjs`. Zum Spielen wird Node.js nicht benötigt.
 
 GitHub Pages verwendet weiterhin die vorhandene Konfiguration. Alle Spielpfade sind relativ und funktionieren unter der Projektadresse `/Kronk-Jump-2.0/`. Auf dem Computer lässt sich `index.html` auch direkt öffnen; auf dem iPad den veröffentlichten Weblink verwenden, optional über Safari zum Home-Bildschirm hinzufügen. Kein Offline-/Service-Worker-Modus.
@@ -99,7 +110,7 @@ Die Physik rechnet mit festen Schritten von 1/120 Sekunde. `GRAVITY = 600`, `JUM
 
 Automatisiert geprüft: abhängige Auswahl und Inhalte, alle sieben Denkzeiten, 18 Querwechsel zwischen beiden Randpositionen und jeder Plattformmitte bei 2–4 Antworten ohne Denkpause, Tastatur- und Pointer-Ereignisse, Denkpause mit seitlicher Steuerung, manuelle und automatische Pause, richtige/falsche/verfehlte Landungen, Sieg, Neustart, Themenrückkehr sowie fehlende/fehlerhafte Aufgabendateien.
 
-Zusätzlich im Chrome-Browser mit iPad-ähnlichen Ansichten (768 × 1024 und 1024 × 768) geprüft. Das ersetzt keinen Praxistest auf einem echten iPad mit Safari und echten Mehrfinger-Touchgesten. Kein gespeicherter Lernstand oder Bestenliste; das Canvas-Spiel bietet keine vollständig gleichwertige Screenreader-Spielweise.
+Zusätzlich im Chromium-Browser bei 1440 × 900, 1280 × 720 sowie den iPad-ähnlichen Ansichten 768 × 1024 und 1024 × 768 geprüft; in allen vier Größen ist die Seite ohne Scrollen vollständig sichtbar. Das ersetzt keinen Praxistest auf einem echten iPad mit Safari und echten Mehrfinger-Touchgesten. Kein gespeicherter Lernstand oder Bestenliste; das Canvas-Spiel bietet keine vollständig gleichwertige Screenreader-Spielweise.
 
 ## Rechte
 

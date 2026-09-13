@@ -44,6 +44,7 @@ body{
   margin:0;
   padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
   min-height:100vh;
+  overscroll-behavior:none;
 }
 
 button,select{ font:inherit; }
@@ -60,7 +61,7 @@ button:focus-visible,select:focus-visible,canvas:focus-visible{
 }
 
 .game{
-  max-width:820px; margin:auto;
+  max-width:900px; margin:auto;
   display:flex; flex-direction:column; gap:10px;
   height:calc(100vh - 24px); height:calc(100dvh - 24px);
   min-height:650px;
@@ -110,28 +111,37 @@ h1 span{ font-weight:500; letter-spacing:0; color:var(--orange-ink); }
 }
 
 .question{
-  margin:12px 12px 0; padding:12px 16px;
+  margin:10px 12px 0; padding:12px 16px 14px;
   color:var(--ink);
-  background:var(--orange-050);
+  background:var(--paper);
   border:2px solid var(--school-blue);
-  border-top:5px solid var(--school-orange);
+  border-left:7px solid var(--school-orange);
   border-radius:var(--radius-md);
-  box-shadow:0 4px 0 rgba(41,63,119,.15);
+  box-shadow:0 4px 0 rgba(41,63,119,.12);
   flex-shrink:0; overflow-wrap:anywhere;
 }
-#progress{ font-size:12px; font-weight:750; color:var(--ink-soft); }
-h2{ font-size:24px; font-weight:800; letter-spacing:-.1px; line-height:1.25; margin:5px 0; }
+#progress{
+  display:inline-block; padding:3px 10px; border-radius:999px;
+  background:var(--orange-100); color:#7a4a00;
+  font-size:12px; font-weight:800; letter-spacing:.6px;
+}
+h2{ font-size:25px; font-weight:800; letter-spacing:-.1px; line-height:1.3; margin:8px 0 0; text-wrap:pretty; }
 
 .playfield{
   position:relative; flex:1; min-height:330px;
-  margin:0 12px 12px;
+  margin:12px 12px 0;
   border-radius:var(--radius-md);
   overflow:hidden;
+  background:linear-gradient(180deg,#dfeaf9 0%,#e9f1fc 50%,#fbfcff 100%);
   box-shadow:inset 0 0 0 1px var(--line);
+  transition:box-shadow .35s var(--ease);
 }
-canvas{ position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:contain; }
+canvas{
+  position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:contain;
+  touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
+}
 
-#status{ flex-shrink:0; font-size:13px; min-height:28px; padding:4px 12px 8px; margin:0; color:var(--ink); text-align:center; }
+#status{ flex-shrink:0; font-size:14px; font-weight:650; min-height:30px; padding:8px 12px 10px; margin:0; color:var(--ink-soft); text-align:center; overflow-wrap:anywhere; }
 
 .overlay{
   position:absolute; inset:0; z-index:2;
@@ -253,10 +263,10 @@ footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom
 .shake { animation: shake 0.4s ease-in-out; }
 
 @keyframes success-flash {
-  0% { background-color: rgba(46, 204, 113, 0.4); }
-  100% { background-color: #f0f4fa; }
+  0%   { box-shadow:inset 0 0 0 4px rgba(47,143,91,.85), 0 0 0 0 rgba(47,143,91,.35); }
+  100% { box-shadow:inset 0 0 0 1px var(--line), 0 0 0 14px rgba(47,143,91,0); }
 }
-.success-flash { animation: success-flash 0.4s ease-out; }
+.success-flash { animation: success-flash 0.55s ease-out; }
 
 @media(max-height:650px){
   .unlock-card{ padding:18px; }
@@ -316,3 +326,56 @@ footer{ text-align:center; color:var(--ink-soft); font-size:12px; padding-bottom
 @media(max-width:430px) {
   .feedback-card .feedback-progress { float:none; padding:8px 0 0; }
 }
+
+/* ================================================================
+   Querformat (iPad quer, Laptop, Beamer):
+   Spielfeld links groß, Aufgabe und Status rechts daneben.
+   So bleibt alles ohne Scrollen sichtbar und die Frage steht
+   auf Augenhöhe mit den Antwortkarten.
+   ================================================================ */
+@media (orientation:landscape) and (min-width:760px) and (max-height:900px){
+  body{ padding:8px max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); }
+  .game{ max-width:1280px; height:calc(100dvh - 16px); min-height:0; gap:8px; }
+
+  header{ padding:16px 18px 10px; }
+  header::before{ height:8px; background-size:20px 8px; }
+  h1{ font-size:21px; }
+  .meta{ font-size:13px; }
+
+  .stage{
+    display:grid; min-height:0;
+    grid-template-columns:minmax(0,1fr) minmax(280px,33%);
+    grid-template-rows:1fr auto auto 1fr;
+    column-gap:4px;
+  }
+  .playfield{ grid-column:1; grid-row:1 / span 4; margin:12px 6px 12px 12px; min-height:0; }
+  .question{ grid-column:2; grid-row:2; margin:0 12px 0 6px; }
+  #status{ grid-column:2; grid-row:3; text-align:left; padding:10px 12px 0 6px; }
+  h2{ font-size:23px; }
+
+  .controls button{ min-height:58px; }
+  footer{ font-size:11px; }
+  .card img{ display:none; }
+}
+
+/* Sehr flache Fenster: Kopfzeile und Fußzeile treten zurück. */
+@media (orientation:landscape) and (max-height:620px){
+  header{ padding:12px 14px 8px; }
+  h1{ font-size:18px; }
+  .controls button{ min-height:52px; font-size:20px; }
+  footer{ display:none; }
+}
+
+/* Große Bildschirme: mehr Spielfläche, ruhige Proportionen. */
+@media (min-width:1200px) and (min-height:900px){
+  .game{ max-width:1020px; }
+  h2{ font-size:27px; }
+}
+
+/* Tastaturhinweis auf den Richtungstasten. */
+.controls button::after{
+  content:attr(data-hint);
+  display:block; margin-top:2px;
+  font-size:11px; font-weight:700; letter-spacing:.4px; opacity:.72;
+}
+@media (max-height:620px){ .controls button::after{ display:none; } }

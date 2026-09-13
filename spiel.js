@@ -149,12 +149,12 @@
     questions = []; index = 0; score = 0; camera = 0; oldRows = []; row = null; player = null;
     hold = 0; apexUsed = false; failText = ""; celebration = 0; accumulator = 0; last = 0; facing = 1;
     particles = [];
-    clearInput(); $("score").textContent = `0 Punkte (Gesamt: ${gesamtPunkte})`;
+    clearInput(); $("score").textContent = `0 Punkte · Gesamt ${gesamtPunkte.toLocaleString("de-DE")}`;
     $("pause").disabled = true; $("pause").textContent = "Pause";
   }
   function chooseTopic() {
     resetRound(); mode = "ready";
-    showPanel("Hoch hinaus mit Kronk!", "Kronk springt von allein. Halte links oder rechts gedrückt und lande mit seinen Füßen auf der richtigen Antwort. Falsche Plattformen brechen weg!", "Los geht’s!", true);
+    showPanel("Hoch hinaus mit Kronk!", "Kronk springt von allein. Halte die linke oder rechte Hälfte des Spielfelds gedrückt – am Computer gehen auch ← → oder die Ziffer der Antwortkarte. Der rote Fußmarker muss auf der richtigen Karte landen; falsche Karten brechen weg.", "Los geht’s!", true);
     $("selection").hidden = false; $("choose-topic").hidden = true;
     $("question").textContent = "Bereit für den nächsten Sprung?";
     $("progress").textContent = "Mit Kronk nach oben";
@@ -220,7 +220,7 @@
   function makeRow(y, previousX = null) {
     const q = questions[index];
     const answers = shuffle(q.antworten);
-    const gap = 10, margin = 12, width = (W - margin * 2 - gap * (answers.length - 1)) / answers.length;
+    const gap = 12, margin = 26, width = (W - margin * 2 - gap * (answers.length - 1)) / answers.length;
     // After a correct landing, usually require a new horizontal position.
     // Keep a small random chance, so the previous lane is not always wrong.
     if (previousX !== null) {
@@ -257,12 +257,10 @@
   
   function setQuestion() {
     $("question").textContent = row.q.frage;
-    $("score").textContent = `${score} Punkte (Gesamt: ${gesamtPunkte})`;
+    $("score").textContent = `${score} Punkte · Gesamt ${gesamtPunkte.toLocaleString("de-DE")}`;
     $("progress").textContent = `Aufgabe ${index + 1} von ${questions.length}`;
     $("status").textContent = "Füße auf eine richtige Plattform!";
-    ctx.font = "600 22px system-ui";
-    const answerHeight = Math.max(...row.platforms.map(p => Math.max(52, textLines(p.text, p.width - 16).length * 26 + 18)));
-    renderHeight = Math.max(H, row.y - camera + 16 + answerHeight + 20);
+    renderHeight = Math.max(H, row.y - camera + 16 + rowHeight(row) + 24);
     resizeCanvas();
   }
   
@@ -379,6 +377,13 @@
     $("status").textContent = won ? "Alle Aufgaben geschafft!" : "Lernpause: Lösung ansehen und erneut üben.";
   }
 
+  // Sagt in Worten, worauf Kronk gerade zielt – auch für Vorlesehilfen.
+  function aimLabel() {
+    if (!row || !player) return "Kronk lässt sich weiter steuern";
+    const i = row.platforms.findIndex(p => player.x >= p.x && player.x <= p.x + p.width);
+    return i < 0 ? "Noch kein Feld unter Kronk" : `Ziel: Feld ${i + 1} · „${row.platforms[i].text}“`;
+  }
+
   function step(dt) {
     if (mode !== "playing" || $("unlock-dialog").open) return;
     
@@ -400,7 +405,7 @@
     
     if (hold > 0) {
       hold = Math.max(0, hold - dt);
-      $("status").textContent = `Denkpause · ${Math.ceil(hold)} s · Kronk lässt sich weiter steuern`;
+      $("status").textContent = `Denkpause · ${Math.ceil(hold)} s · ${aimLabel()}`;
       if (!hold) $("status").textContent = "Jetzt auf der richtigen Antwort landen!";
     } else {
       player.vy += GRAVITY * dt;
@@ -448,7 +453,8 @@
           void pf.offsetWidth;
           pf.classList.add("success-flash");
 
-          $("score").textContent = `${score} Punkte (Gesamt: ${gesamtPunkte})`;
+          $("score").textContent = `${score} Punkte · Gesamt ${gesamtPunkte.toLocaleString("de-DE")}`;
+          hit.solved = true;
           player.y = row.y; player.vy = -JUMP; hold = 0; apexUsed = false; celebration = .5;
           oldRows.push(row); oldRows = oldRows.slice(-1); index++;
           if (index === questions.length) { finish(true); return; }
@@ -477,6 +483,37 @@
     if (player.y - camera > H + 110) finish(false);
   }
   
+  /* ================================================================
+     Zeichnen: Höhenwelt, Antwortkarten, Zielhilfe, Denkpause
+     ================================================================ */
+  const SURFACE = 22;                                  // Höhe der Landefläche mit Ziffer
+  const LINE_H = 27, CARD_PAD_TOP = 12, CARD_PAD_BOTTOM = 14;
+  const ANSWER_FONT = '700 24px system-ui, -apple-system, "Segoe UI", sans-serif';
+  const UI_FONT = '750 15px system-ui, -apple-system, "Segoe UI", sans-serif';
+  const BLUE = "#293f77", BLUE_DARK = "#172b59", ORANGE = "#ff9900";
+  const GREEN = "#2f8f5b", GREEN_SOFT = "#eaf7ef", RED = "#d3392c", RED_SOFT = "#fdeeec";
+
+  // Farbverlauf mit Rückfallfarbe: in Testumgebungen ohne echten Canvas-Kontext
+  // liefert createLinearGradient nichts, dann wird einfach die letzte Farbe benutzt.
+  function vGradient(y0, y1, stops) {
+    try {
+      const g = ctx.createLinearGradient(0, y0, 0, y1);
+      for (const [pos, color] of stops) g.addColorStop(pos, color);
+      return g;
+    } catch (_) { return stops[stops.length - 1][1]; }
+  }
+
+  function roundPath(x, y, w, h, r) {
+    const rad = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath();
+    ctx.moveTo(x + rad, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rad);
+    ctx.arcTo(x + w, y + h, x, y + h, rad);
+    ctx.arcTo(x, y + h, x, y, rad);
+    ctx.arcTo(x, y, x + w, y, rad);
+    ctx.closePath();
+  }
+
   function textLines(text, maxWidth) {
     const lines = []; let line = "";
     for (const word of text.split(/\s+/)) {
@@ -492,56 +529,229 @@
     if (line) lines.push(line);
     return lines;
   }
-  function wrapped(text, x, y, maxWidth) {
-    const lines = textLines(text, maxWidth);
-    const height = Math.max(52, lines.length * 26 + 18);
-    ctx.fillStyle = "#ffffff"; ctx.fillRect(x - maxWidth / 2 - 8, y, maxWidth + 16, height);
-    ctx.fillStyle = "#293f77";
-    lines.forEach((s, i) => ctx.fillText(s, x, y + 32 + i * 26));
+
+  function cardHeight(p) {
+    ctx.font = ANSWER_FONT;
+    const lines = textLines(p.text, p.width - 26).length;
+    return SURFACE + CARD_PAD_TOP + lines * LINE_H + CARD_PAD_BOTTOM;
   }
-  
-  function drawRow(r, old = false) {
-    const y = r.y - camera;
-    if (y < -200 || y > H + 100) return;
-    ctx.globalAlpha = old ? .22 : 1;
-    for (const p of r.platforms) {
-      ctx.fillStyle = p.broken ? "#e94232" : "#293f77";
-      if (p.broken) {
-        ctx.save(); ctx.translate(p.x + p.width / 2, y + 15); ctx.rotate(.2); ctx.fillRect(-p.width / 2, 0, p.width * .45, 10); ctx.rotate(-.4); ctx.fillRect(0, 0, p.width * .45, 10); ctx.restore();
-      } else { ctx.fillRect(p.x, y, p.width, 14); }
-      ctx.textAlign = "center"; ctx.font = "600 22px system-ui";
-      if (!old) wrapped(p.text, p.x + p.width / 2, y + 16, p.width - 16);
+  function rowHeight(r) { return Math.max(...r.platforms.map(cardHeight)); }
+
+  /* ---------------- Hintergrund: Himmel, Wolken, Höhenleiste ---------------- */
+  const CLOUDS = [
+    { x: 96, y: 60, s: 1.00, d: .16 }, { x: 438, y: 150, s: .72, d: .16 },
+    { x: 262, y: 292, s: .58, d: .30 }, { x: 508, y: 386, s: .88, d: .30 },
+    { x: 58, y: 434, s: .66, d: .44 }, { x: 344, y: -26, s: .82, d: .44 }
+  ];
+  function cloudShape(x, y, s) {
+    ctx.beginPath();
+    ctx.arc(x, y, 24 * s, 0, Math.PI * 2);
+    ctx.arc(x + 30 * s, y - 13 * s, 31 * s, 0, Math.PI * 2);
+    ctx.arc(x + 64 * s, y + 1 * s, 22 * s, 0, Math.PI * 2);
+    ctx.fill();
+    roundPath(x - 22 * s, y + 2 * s, 108 * s, 22 * s, 11 * s);
+    ctx.fill();
+  }
+  function drawSky(height) {
+    const climb = questions.length ? Math.min(1, index / questions.length) : 0;
+    // Je höher Kronk kommt, desto tiefer und klarer wird der Himmel oben.
+    const top = climb < .34 ? "#dfeaf9" : climb < .67 ? "#cfe0f7" : "#bed4f4";
+    ctx.fillStyle = vGradient(0, height, [[0, top], [.5, "#e9f1fc"], [1, "#fbfcff"]]);
+    ctx.fillRect(0, 0, W, height);
+
+    const span = height + 260;
+    ctx.fillStyle = "rgba(255,255,255,.62)";
+    for (const c of CLOUDS) {
+      const y = ((c.y - camera * c.d) % span + span) % span - 130;
+      cloudShape(c.x, y, c.s);
     }
-    ctx.globalAlpha = 1;
+    drawRail(height);
   }
-  
+
+  // Höhenleiste am rechten Rand: Wie weit ist die Route geschafft?
+  function drawRail(height) {
+    if (!questions.length) return;
+    const x = W - 18, top = 54, bottom = height - 54, h = bottom - top;
+    if (h <= 20) return;
+    ctx.fillStyle = "rgba(41,63,119,.10)";
+    roundPath(x, top, 9, h, 5); ctx.fill();
+    const done = Math.min(index, questions.length) / questions.length;
+    if (done > 0) {
+      ctx.fillStyle = ORANGE;
+      roundPath(x, bottom - h * done, 9, h * done, 5); ctx.fill();
+    }
+    // Sprossen: eine je Aufgabe, gefüllt sobald geschafft
+    const steps = Math.min(questions.length, 24);
+    for (let i = 0; i < steps; i++) {
+      const cy = bottom - (h * (i + .5)) / steps;
+      ctx.fillStyle = i < index * steps / questions.length ? "#ffffff" : "rgba(41,63,119,.22)";
+      ctx.beginPath(); ctx.arc(x + 4.5, cy, 2.4, 0, Math.PI * 2); ctx.fill();
+    }
+    // Ziel-Fähnchen ganz oben
+    ctx.fillStyle = BLUE;
+    ctx.beginPath(); ctx.moveTo(x + 4, top - 6); ctx.lineTo(x + 4, top - 26);
+    ctx.lineTo(x + 22, top - 20); ctx.lineTo(x + 4, top - 14); ctx.fill();
+    ctx.fillRect(x + 2.5, top - 26, 3, 22);
+  }
+
+  /* ---------------- Antwortkarten ---------------- */
+  function drawPlatform(p, i, y) {
+    const h = cardHeight(p);
+    const fill = p.broken ? RED_SOFT : p.solved ? GREEN_SOFT : "#ffffff";
+    const edge = p.broken ? RED : p.solved ? GREEN : "#c6d4ea";
+    const bar = p.broken ? RED : p.solved ? GREEN : BLUE;
+
+    ctx.save();
+    if (p.broken) { ctx.translate(p.x + p.width / 2, y + h / 2); ctx.rotate(.05); ctx.translate(-(p.x + p.width / 2), -(y + h / 2)); }
+
+    ctx.fillStyle = "rgba(23,43,89,.13)";
+    roundPath(p.x + 1, y + 7, p.width, h, 15); ctx.fill();
+    ctx.fillStyle = fill; roundPath(p.x, y, p.width, h, 15); ctx.fill();
+
+    // Landefläche mit Ziffer – dieselbe Ziffer wie auf der Tastatur
+    ctx.save(); roundPath(p.x, y, p.width, h, 15); ctx.clip();
+    ctx.fillStyle = bar; ctx.fillRect(p.x, y, p.width, SURFACE);
+    ctx.fillStyle = "rgba(255,255,255,.22)"; ctx.fillRect(p.x, y, p.width, 3);
+    ctx.restore();
+
+    ctx.lineWidth = 2.5; ctx.strokeStyle = edge;
+    roundPath(p.x, y, p.width, h, 15); ctx.stroke();
+
+    ctx.fillStyle = "#ffffff"; ctx.font = '800 14px system-ui, sans-serif';
+    ctx.textAlign = "left"; ctx.fillText(String(i + 1), p.x + 12, y + 16);
+    if (p.solved || p.broken) {
+      ctx.textAlign = "right";
+      ctx.fillText(p.solved ? "RICHTIG" : "FALSCH", p.x + p.width - 12, y + 16);
+    }
+
+    ctx.font = ANSWER_FONT; ctx.textAlign = "center";
+    ctx.fillStyle = p.broken ? "#8d2a20" : p.solved ? "#1d6340" : BLUE;
+    textLines(p.text, p.width - 26).forEach((s, n) =>
+      ctx.fillText(s, p.x + p.width / 2, y + SURFACE + CARD_PAD_TOP + 20 + n * LINE_H));
+    ctx.restore();
+
+    // Bruchstücke der weggebrochenen Plattform
+    if (p.broken) {
+      ctx.save(); ctx.fillStyle = RED; ctx.globalAlpha = .8;
+      ctx.translate(p.x + p.width / 2, y + h + 14); ctx.rotate(.24);
+      ctx.fillRect(-p.width / 2, 0, p.width * .4, 9);
+      ctx.rotate(-.5); ctx.fillRect(6, 0, p.width * .4, 9);
+      ctx.restore();
+    }
+  }
+
+  // Geschaffte Reihen bleiben als schmaler Routenbalken sichtbar –
+  // in derselben orangen Farbe wie die Höhenleiste, damit er nicht mit
+  // einer Antwortmarkierung der aktuellen Aufgabe verwechselt wird.
+  function drawTrail(r) {
+    const y = r.y - camera;
+    if (y < -60 || y > H + 120) return;
+    ctx.save(); ctx.globalAlpha = .45; ctx.fillStyle = ORANGE;
+    for (const p of r.platforms) {
+      if (!p.richtig) continue;
+      roundPath(p.x + 6, y, p.width - 12, 8, 4); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawRow(r, old = false) {
+    if (old) { drawTrail(r); return; }
+    const y = r.y - camera;
+    if (y < -260 || y > H + 160) return;
+    r.platforms.forEach((p, i) => drawPlatform(p, i, y));
+  }
+
+  /* ---------------- Zielhilfe, Schatten, Denkpause ---------------- */
+  function targetPlatform() {
+    return row && row.platforms.find(p => player.x >= p.x && player.x <= p.x + p.width) || null;
+  }
+
+  function drawAim() {
+    if (mode !== "playing" || !row || !player || failText) return;
+    const rowY = row.y - camera, py = player.y - camera;
+    if (py > rowY - 4) return;
+    const target = targetPlatform();
+
+    ctx.save();
+    ctx.setLineDash([7, 9]); ctx.lineWidth = 3; ctx.strokeStyle = "rgba(255,153,0,.8)";
+    ctx.beginPath(); ctx.moveTo(player.x, py + 4); ctx.lineTo(player.x, rowY - 4); ctx.stroke();
+    ctx.restore();
+
+    if (!target) return;
+    // Landeschatten auf der Zielfläche – zeigt die Entfernung an
+    const near = Math.max(.18, Math.min(1, 1 - (rowY - py) / 380));
+    ctx.save(); ctx.globalAlpha = .22 + near * .25; ctx.fillStyle = BLUE_DARK;
+    ctx.beginPath(); ctx.ellipse(player.x, rowY + SURFACE / 2, 16 + near * 14, 4 + near * 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    ctx.save(); ctx.lineWidth = 4; ctx.strokeStyle = ORANGE;
+    roundPath(target.x - 4, rowY - 4, target.width + 8, cardHeight(target) + 8, 18); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawHold() {
+    if (!(hold > 0) || !player) return;
+    const cx = player.x, cy = player.y - camera - 48, r = 58;
+    const frac = currentThinking > 0 ? Math.max(0, Math.min(1, hold / currentThinking)) : 0;
+    ctx.save();
+    ctx.lineWidth = 7; ctx.lineCap = "round";
+    ctx.strokeStyle = "rgba(255,255,255,.85)";
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = ORANGE;
+    ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + frac * Math.PI * 2); ctx.stroke();
+    ctx.restore();
+
+    // Sekundenanzeige über dem Ring; am oberen Rand rutscht sie darunter.
+    const above = cy - r - 34, chipY = above >= 6 ? above : cy + r + 6;
+    ctx.save();
+    ctx.fillStyle = BLUE; roundPath(cx - 21, chipY, 42, 30, 15); ctx.fill();
+    ctx.fillStyle = "#ffffff"; ctx.font = '800 19px system-ui, sans-serif'; ctx.textAlign = "center";
+    ctx.fillText(String(Math.ceil(hold)), cx, chipY + 21);
+    ctx.restore();
+  }
+
+  // Serie: sichtbare Belohnung für mehrere richtige Antworten hintereinander
+  function drawStreak() {
+    if (mode !== "playing" || consecutiveCorrect < 2) return;
+    const text = `Serie × ${consecutiveCorrect}`;
+    ctx.save(); ctx.font = UI_FONT;
+    const w = ctx.measureText(text).width + 28;
+    ctx.fillStyle = ORANGE; roundPath(16, 16, w, 32, 16); ctx.fill();
+    ctx.fillStyle = BLUE; ctx.textAlign = "center"; ctx.fillText(text, 16 + w / 2, 37);
+    ctx.restore();
+  }
+
   function draw() {
     if (canvasDpr !== (window.devicePixelRatio || 1)) resizeCanvas();
     const height = renderHeight;
     ctx.clearRect(0, 0, W, height);
-    ctx.fillStyle = "#f0f4fa"; ctx.fillRect(0, 0, W, height);
-    ctx.strokeStyle = "#dce4f0"; ctx.lineWidth = 1;
-    for (let y = ((-camera * .3) % 60) - 60; y < height; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    drawSky(height);
     if (!player) return;
-    oldRows.forEach(r => drawRow(r, true)); drawRow(row);
-    
-    // Partikel zeichnen
+
+    oldRows.forEach(r => drawRow(r, true));
+    drawAim();
+    drawRow(row);
+
     particles.forEach(p => {
       ctx.fillStyle = p.color;
       ctx.globalAlpha = Math.max(0, p.life / 0.6);
-      ctx.fillRect(p.x, p.y - camera, p.size, p.size);
+      roundPath(p.x, p.y - camera, p.size, p.size, p.size / 3); ctx.fill();
     });
     ctx.globalAlpha = 1;
 
     const img = celebration > 0 || mode === "won" ? images.jubel : player.vy < 0 ? images.sprung : images.normal;
     if (img) {
-      const height = 95, width = height * img.naturalWidth / img.naturalHeight;
+      const h = 95, w = h * img.naturalWidth / img.naturalHeight;
       ctx.save(); ctx.translate(player.x, player.y - camera); ctx.scale(facing, 1);
-      ctx.drawImage(img, -width / 2, -height, width, height); ctx.restore();
-      ctx.fillStyle = "#e94232"; ctx.fillRect(player.x - 7, player.y - camera - 3, 14, 3);
+      ctx.drawImage(img, -w / 2, -h, w, h); ctx.restore();
+      // Fußmarker: zeigt genau die Stelle, die zählt
+      ctx.fillStyle = RED;
+      roundPath(player.x - 11, player.y - camera - 4, 22, 5, 2.5); ctx.fill();
     }
+    drawHold();
+    drawStreak();
   }
-  
+
   function frame(time) {
     const dt = Math.min((time - last) / 1000 || 0, .05); last = time;
     if (mode === "playing" && !$("unlock-dialog").open) { accumulator += dt; while (accumulator >= 1 / 120) { step(1 / 120); accumulator -= 1 / 120; } } else accumulator = 0;
@@ -556,6 +766,29 @@
     button.addEventListener("contextmenu", e => e.preventDefault());
   }
   
+  // Auf dem Spielfeld selbst steuern: linke oder rechte Hälfte gedrückt halten.
+  {
+    const field = document.querySelector(".playfield");
+    const markHeld = () => {
+      const dirs = [...pointers.values()];
+      $("left").classList.toggle("held", dirs.includes(-1));
+      $("right").classList.toggle("held", dirs.includes(1));
+    };
+    field.addEventListener("pointerdown", e => {
+      if (mode !== "playing") return;
+      e.preventDefault();
+      const bounds = field.getBoundingClientRect();
+      const direction = e.clientX - bounds.left < bounds.width / 2 ? -1 : 1;
+      try { field.setPointerCapture(e.pointerId); } catch (_) {}
+      pointers.set(e.pointerId, direction); markHeld();
+    });
+    const release = e => { pointers.delete(e.pointerId); markHeld(); };
+    field.addEventListener("pointerup", release);
+    field.addEventListener("pointercancel", release);
+    field.addEventListener("lostpointercapture", release);
+    field.addEventListener("contextmenu", e => e.preventDefault());
+  }
+
   window.addEventListener("keydown", e => {
     if ($("unlock-dialog").open || $("feedback-dialog").open || e.target.tagName === "SELECT") return;
     if (["ArrowLeft", "ArrowRight"].includes(e.key)) { e.preventDefault(); if (mode === "playing") keys.add(e.key); }

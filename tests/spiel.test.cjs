@@ -50,7 +50,7 @@ async function boot(extra = {}) {
 module.exports = (async () => {
   const {t,get,events,docEvents,context} = await boot();
   assert.equal(t.state.mode,'ready');
-  assert.deepEqual(get('subject').options.map(o=>o.value),['Deutsch','Religion']);
+  assert.deepEqual(get('subject').options.map(o=>o.value),['Deutsch','Mathematik','Religion']);
   assert.equal(t.state.thinking,2);
   get('grade').value='6'; t.updateTopics();
   assert.equal(get('topic').options.length,2);
@@ -58,7 +58,7 @@ module.exports = (async () => {
   assert.equal(t.state.questions.length,2);
   assert.match(get('question').textContent,/Subjekt|Prädikat/);
   t.chooseTopic(); get('subject').value='Religion'; t.updateGrades();
-  assert.deepEqual(get('grade').options.map(o=>o.value),['6']);
+  assert.deepEqual(get('grade').options.map(o=>o.value),['6','7']);
   assert.equal(get('topic').value,'religion-6-feste');
   t.start(); assert.equal(t.state.questions.length,3);
   t.chooseTopic();
@@ -150,7 +150,7 @@ module.exports = (async () => {
   const wrong=t.state.row.platforms.find(p=>!p.richtig); t.position(wrong.x+wrong.width/2,t.state.row.y-.5,100); t.step(1/120);
   assert.equal(wrong.broken,true);
   for(let i=0;i<600 && t.state.mode==='playing';i++) t.step(1/120);
-  assert.equal(t.state.mode,'lost'); assert.match(get('panel-text').textContent,/Richtig: Ja/);
+  assert.equal(t.state.mode,'lost'); assert.deepEqual(get('feedback-correct').options.map(o=>o.textContent),['Ja']);
   t.start(); assert.equal(t.state.score,0); assert.equal(t.state.index,0); assert.equal(t.state.oldRows.length,0); assert.equal(t.state.hold,0);
   // Verfehlen und vollständiger Sieg.
   t.position(300,t.state.row.y-.5,100); t.step(1/120);
@@ -165,7 +165,7 @@ module.exports = (async () => {
     if(code!==undefined) extra['aufgaben/'+file]=code;
     const b=await boot(extra);
     assert.equal(b.t.state.mode,'ready'); assert.match(b.get('load-errors').textContent,new RegExp(file.replace('.','\\.')));
-    assert.equal(b.get('subject').options.length,2); assert.equal(b.get('load-errors').hidden,false);
+    assert.equal(b.get('subject').options.length,3); assert.equal(b.get('load-errors').hidden,false);
   }
   console.log(`OK: Retina/Drehung/Zoom, Frage nur unten, lange Antworten, höherer Sprung mit mehr Flugzeit, Auswahl, Inhalte, 7 Denkzeiten, ${routes} Querwechsel ohne Denkpause, Tastatur/Pointer, Pause, Landungen, Neustart, Sieg und 3 Ladefehler.`);
 })();
