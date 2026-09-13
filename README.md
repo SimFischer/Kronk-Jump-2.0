@@ -20,8 +20,8 @@ Die Frage steht in einer festen, kontrastreichen Box als scharfer HTML-Text und 
 
 - **Himmel statt Raster.** Der Hintergrund ist ein Farbverlauf mit zwei Wolkenebenen, die sich beim Steigen unterschiedlich schnell nach unten bewegen. Je weiter die Sammlung geschafft ist, desto tiefer wird das Blau oben. Das macht die Sprunghöhe sichtbar, die vorher als leere Fläche wirkte.
 - **Antwortkarten.** Jede Antwort ist eine weiße Karte mit blauer Landefläche oben. Auf der Landefläche steht die Ziffer der Karte; nach der Landung erscheint dort `RICHTIG` (grün) oder `FALSCH` (rot, die Karte kippt und bricht).
-- **Zielhilfe.** Solange Kronk fliegt, zeigt eine gestrichelte Linie senkrecht nach unten, ein oranger Rahmen um die angepeilte Karte und ein Landeschatten auf ihrer Landefläche, wo Kronk aufsetzen würde. In der Denkpause nennt die Statuszeile zusätzlich Feldnummer und Antworttext – auch für Vorlesehilfen.
-- **Denkpause.** Am Scheitelpunkt läuft ein oranger Ring um Kronk ab, daneben die verbleibenden Sekunden als Zahl.
+- **Zielhilfe.** Solange Kronk fliegt, markieren ein oranger Rahmen um die angepeilte Karte und ein Landeschatten auf ihrer Landefläche, wo er aufsetzen würde. In der Denkpause nennt die Statuszeile zusätzlich Feldnummer und Antworttext – auch für Vorlesehilfen.
+- **Denkpause.** Die verbleibenden Sekunden stehen als Zahl direkt unter Kronk.
 - **Höhenleiste.** Rechts zeigt eine Leiste mit einer Sprosse je Aufgabe und einem Ziel-Fähnchen, wie weit die Route geschafft ist. Geschaffte Reihen bleiben als schmaler oranger Routenbalken sichtbar.
 - **Serie.** Ab zwei richtigen Landungen hintereinander erscheint oben links eine Anzeige `Serie × n`.
 

@@ -671,12 +671,6 @@
     const rowY = row.y - camera, py = player.y - camera;
     if (py > rowY - 4) return;
     const target = targetPlatform();
-
-    ctx.save();
-    ctx.setLineDash([7, 9]); ctx.lineWidth = 3; ctx.strokeStyle = "rgba(255,153,0,.8)";
-    ctx.beginPath(); ctx.moveTo(player.x, py + 4); ctx.lineTo(player.x, rowY - 4); ctx.stroke();
-    ctx.restore();
-
     if (!target) return;
     // Landeschatten auf der Zielfläche – zeigt die Entfernung an
     const near = Math.max(.18, Math.min(1, 1 - (rowY - py) / 380));
@@ -689,20 +683,10 @@
     ctx.restore();
   }
 
+  // Denkpause: nur die verbleibenden Sekunden über Kronk, ohne Ring.
   function drawHold() {
     if (!(hold > 0) || !player) return;
-    const cx = player.x, cy = player.y - camera - 48, r = 58;
-    const frac = currentThinking > 0 ? Math.max(0, Math.min(1, hold / currentThinking)) : 0;
-    ctx.save();
-    ctx.lineWidth = 7; ctx.lineCap = "round";
-    ctx.strokeStyle = "rgba(255,255,255,.85)";
-    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
-    ctx.strokeStyle = ORANGE;
-    ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + frac * Math.PI * 2); ctx.stroke();
-    ctx.restore();
-
-    // Sekundenanzeige über dem Ring; am oberen Rand rutscht sie darunter.
-    const above = cy - r - 34, chipY = above >= 6 ? above : cy + r + 6;
+    const cx = player.x, chipY = player.y - camera + 10;
     ctx.save();
     ctx.fillStyle = BLUE; roundPath(cx - 21, chipY, 42, 30, 15); ctx.fill();
     ctx.fillStyle = "#ffffff"; ctx.font = '800 19px system-ui, sans-serif'; ctx.textAlign = "center";
