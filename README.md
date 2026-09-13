@@ -12,6 +12,12 @@ Ein Lern-Jump-Spiel mit dem Schulmaskottchen Kronk. Reines HTML, CSS und JavaScr
 4. Jede richtige Landung gibt 100 Punkte und den nächsten Sprung. Falsche Plattformen brechen. Nach einem Fehler erscheinen alle richtigen Antworten und die Erklärung, falls vorhanden.
 5. Mit **Noch einmal spielen** dieselbe Sammlung neu beginnen. **Zur Themenauswahl** setzt die Runde zurück und öffnet die Auswahl. Das ist auch über die Pause möglich.
 
+## Ohne Adressleiste spielen
+
+Oben rechts sitzt ein **Vollbild**-Knopf (Tastatur: **F**), der Adressleiste, Tabs und Lesezeichen ausblendet. Er erscheint nur, wenn der Browser Vollbild wirklich beherrscht – am Laptop, auf Android und in Safari auf dem iPad. **Escape** oder ein zweiter Druck beenden das Vollbild wieder.
+
+Safari auf dem **iPhone** kennt kein Vollbild für Webseiten; dort ist der Knopf ausgeblendet. Der zuverlässige Weg auf allen Apple-Geräten ist stattdessen die Installation: Seite in Safari öffnen, **Teilen → Zum Home-Bildschirm**. Kronk startet dann als eigene App ohne jede Browserleiste, funktioniert offline und zeigt den Vollbild-Knopf gar nicht erst an, weil er dort überflüssig ist. Auf Android und am Rechner geht dasselbe über **Installieren** bzw. das Symbol in der Adressleiste.
+
 Pause über den Knopf oder **P**. Beim Verlassen des Browserfensters bzw. Wechseln des Tabs pausiert das Spiel automatisch. Über **Weiterspielen** fortsetzen. Neustart und Themenauswahl löschen Punkte, Fortschritt, Plattformen, Eingaben und Denkpause der alten Runde.
 
 Die Frage steht in einer festen, kontrastreichen Box als scharfer HTML-Text und bewegt sich nicht mit Kronk. Sie sitzt in jedem Format unterhalb des Spielfelds, direkt unter den Antwortkarten und über der Steuerung – der Blickweg von der Frage zu den Antworten bleibt damit kurz. Im Querformat (iPad quer, Laptop, Beamer) rücken Kopfzeile, Fragebox und Steuerung enger zusammen, sodass ohne Scrollen alles gleichzeitig sichtbar bleibt. Das Spielfeld nutzt die tatsächliche Display-Pixeldichte und passt sich bei Größenwechseln und Drehung proportional an. Zeichenfläche, CSS-Größe und Position rasten dabei auf ganze Gerätepixel ein, damit der Browser das fertige Bild nicht nachskalieren muss – sonst wirken Karten und Text je nach Fensterbreite verschwommen. Frage und Antwortkarten wechseln gemeinsam.

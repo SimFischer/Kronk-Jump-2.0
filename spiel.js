@@ -906,6 +906,7 @@
     if ($("unlock-dialog").open || $("feedback-dialog").open || e.target.tagName === "SELECT") return;
     if (["ArrowLeft", "ArrowRight"].includes(e.key)) { e.preventDefault(); if (mode === "playing") keys.add(e.key); }
     if (e.key.toLowerCase() === "p" && !e.repeat) pause();
+    if (e.key.toLowerCase() === "f" && !e.repeat) toggleVollbild();
     
     if (["1", "2", "3", "4"].includes(e.key)) aimAt(Number(e.key) - 1);
   });
@@ -924,6 +925,50 @@
     Object.assign(images, geladen);
     speichereSpielstand();
   });
+
+  /* ---------------- Vollbild ----------------
+   * Nimmt Adressleiste und Tabs aus dem Bild. Auf dem iPad kann Safari das;
+   * auf dem iPhone nicht – dort (und überall sonst) bleibt „Zum Startbildschirm
+   * hinzufügen“ der Weg zur randlosen Ansicht. Der Knopf zeigt sich nur, wenn
+   * der Browser wirklich mitmacht und die Seite nicht ohnehin als App läuft. */
+  const vollbildZiel = document.documentElement || null;
+  const kannVollbild = !!(vollbildZiel && (vollbildZiel.requestFullscreen || vollbildZiel.webkitRequestFullscreen));
+  const alsAppGestartet = typeof matchMedia === "function"
+    ? ["standalone", "fullscreen", "minimal-ui"].some(m => matchMedia(`(display-mode: ${m})`).matches)
+    : typeof navigator !== "undefined" && navigator.standalone === true;
+  const imVollbild = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+
+  function zeigeVollbildKnopf() {
+    const button = $("fullscreen");
+    if (!button) return;
+    button.hidden = !kannVollbild || alsAppGestartet;
+    const an = imVollbild();
+    button.textContent = an ? "Vollbild beenden" : "Vollbild";
+    attr(button, "aria-pressed", String(an));
+  }
+
+  async function toggleVollbild() {
+    if (!kannVollbild) return;
+    try {
+      if (imVollbild()) {
+        await (document.exitFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen());
+      } else {
+        await (vollbildZiel.requestFullscreen
+          ? vollbildZiel.requestFullscreen({ navigationUI: "hide" })
+          : vollbildZiel.webkitRequestFullscreen());
+      }
+    } catch (_) {
+      $("status").textContent = "Vollbild lässt sich hier nicht einschalten.";
+    }
+    zeigeVollbildKnopf();
+    resizeCanvas();
+  }
+
+  $("fullscreen").addEventListener("click", toggleVollbild);
+  for (const name of ["fullscreenchange", "webkitfullscreenchange"]) {
+    document.addEventListener(name, () => { zeigeVollbildKnopf(); resizeCanvas(); });
+  }
+  zeigeVollbildKnopf();
 
   $("subject").addEventListener("change", updateGrades);
   $("grade").addEventListener("change", updateTopics);

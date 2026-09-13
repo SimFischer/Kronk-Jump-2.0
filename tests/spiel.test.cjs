@@ -6,12 +6,13 @@ const vm = require('node:vm');
 const root = path.join(__dirname, '..');
 
 class Element {
-  constructor() { this.value = ''; this.hidden = false; this.disabled = false; this.textContent = ''; this.events = {}; this.options = []; this.classList = { add() {}, remove() {} }; }
+  constructor() { this.value = ''; this.hidden = false; this.disabled = false; this.textContent = ''; this.events = {}; this.options = []; this.classList = { add() {}, remove() {} }; this.style = {}; }
   addEventListener(name, fn) { this.events[name] = fn; }
   replaceChildren(...options) { this.options = options; this.value = options[0]?.value || ''; }
   add(option) { this.options.push(option); if (!this.value) this.value = option.value; }
   showModal() { this.open = true; } close() { this.open = false; }
   getBoundingClientRect() { return this.bounds || {width: 720, height: 648}; }
+  setAttribute(name, value) { (this.attributes ||= {})[name] = value; }
   focus() {} setPointerCapture() {} remove() {}
 }
 async function boot(extra = {}) {
@@ -20,11 +21,28 @@ async function boot(extra = {}) {
   get('thinking').value = '2';
   get('canvas').getContext = () => new Proxy({}, { get: (_, key) => key === 'measureText' ? text => ({width: text.length * 10}) : () => {} });
   const events = {}, docEvents = {};
-  const storage = new Map();
-  const context = vm.createContext({ localStorage: {getItem: key => storage.get(key) || null, setItem: (key,value) => storage.set(key,String(value))}, console, setTimeout, clearTimeout, requestAnimationFrame() {},
+  // Vollbild wird nur nachgebildet, wenn ein Test es anfordert – sonst kennt
+  // das Dokument kein documentElement und der Knopf muss verborgen bleiben.
+  const vollbild = extra.vollbild ? {aktiv:false, optionen:null, fehler:extra.vollbild.fehler,
+    element: { requestFullscreen(optionen) {
+      if (vollbild.fehler) return Promise.reject(Error('abgelehnt'));
+      vollbild.aktiv = true; vollbild.optionen = optionen; return Promise.resolve();
+    } } } : null;
+  const storage = extra.storage instanceof Map ? extra.storage : new Map(Object.entries(extra.storage || {}));
+  const localStorage = extra.storageDefekt
+    ? { getItem() { throw Error('gesperrt'); }, setItem() { throw Error('gesperrt'); } }
+    : { getItem: key => storage.has(key) ? storage.get(key) : null, setItem: (key,value) => storage.set(key,String(value)) };
+  const fehlendeBilder = extra.fehlendeBilder || [];
+  const context = vm.createContext({ localStorage, console, setTimeout, clearTimeout, requestAnimationFrame() {},
+    matchMedia: query => ({ matches: !!extra.displayMode && query.includes(`display-mode: ${extra.displayMode}`) }),
     Option: function(text, value) { this.text = text; this.value = value; },
-    Image: class { set src(value) { this.naturalWidth = 100; this.naturalHeight = 100; queueMicrotask(() => this.onload()); } },
-    document: { hidden: false, getElementById: get, querySelector: get, addEventListener(name,fn) { docEvents[name] = fn; }, createElement: () => new Element(), head: { append(script) {
+    Image: class { set src(value) { this.naturalWidth = 100; this.naturalHeight = 100;
+      queueMicrotask(() => fehlendeBilder.some(name => value.includes(name)) ? this.onerror() : this.onload()); } },
+    document: { hidden: false, getElementById: get, querySelector: get, addEventListener(name,fn) { docEvents[name] = fn; }, createElement: () => new Element(),
+      documentElement: vollbild ? vollbild.element : undefined,
+      get fullscreenElement() { return vollbild && vollbild.aktiv ? vollbild.element : null; },
+      exitFullscreen: vollbild ? () => { vollbild.aktiv = false; return Promise.resolve(); } : undefined,
+      head: { append(script) {
       queueMicrotask(() => { try {
         const code = extra[script.src] ?? fs.readFileSync(path.join(root, script.src), 'utf8');
         vm.runInContext(code, context); script.onload();
@@ -45,7 +63,7 @@ async function boot(extra = {}) {
   }; window.ready = init();`);
   vm.runInContext(source, context);
   await context.ready;
-  return {t:context.test, get, events, docEvents, context};
+  return {t:context.test, get, events, docEvents, context, storage, vollbild};
 }
 module.exports = (async () => {
   const {t,get,events,docEvents,context} = await boot();
@@ -89,9 +107,27 @@ module.exports = (async () => {
     for (const bounds of [{width:744,height:640},{width:820,height:350}]) {
       field.bounds = bounds; t.resizeCanvas();
       const width = Math.min(bounds.width, bounds.height * 600 / 540);
-      assert.equal(canvas.width, Math.round(width*dpr));
-      assert.equal(canvas.height, Math.round(width*540/600*dpr));
-      t.draw(); assert.equal(canvas.width, Math.round(width*dpr));
+      const expectedWidth = Math.round(width*dpr) - Math.round(width*dpr) % dpr;
+      const expectedHeight = Math.round(expectedWidth*540/600) - Math.round(expectedWidth*540/600) % dpr;
+      assert.equal(canvas.width, expectedWidth);
+      assert.equal(canvas.height, expectedHeight);
+      // Die eingepasste Fläche darf höchstens ein CSS-Pixel kleiner sein.
+      assert.ok(width - canvas.width/dpr < 1, `zu klein eingepasst: ${canvas.width/dpr} statt ${width}`);
+      t.draw(); assert.equal(canvas.width, expectedWidth);
+      // CSS-Größe und Zeichenfläche müssen exakt der Pixeldichte entsprechen,
+      // sonst skaliert der Browser nach und alles wirkt verschwommen.
+      const cssWidth = parseFloat(canvas.style.width), cssHeight = parseFloat(canvas.style.height);
+      assert.ok(Number.isInteger(cssWidth) && Number.isInteger(cssHeight), `krumme CSS-Größe: ${cssWidth}x${cssHeight}`);
+      assert.equal(cssWidth*dpr, canvas.width);
+      assert.equal(cssHeight*dpr, canvas.height);
+      // Die Zentrierung rastet auf ganze Gerätepixel ein statt auf halbe.
+      assert.equal(canvas.style.transform, 'none');
+      for (const side of ['left','top']) {
+        const value = parseFloat(canvas.style[side]);
+        assert.ok(Math.abs(value*dpr - Math.round(value*dpr)) < 1e-6, `${side} nicht auf Gerätepixel: ${value}`);
+      }
+      assert.ok(Math.abs(parseFloat(canvas.style.left)*2 + cssWidth - bounds.width) <= 1.001/dpr, 'waagerecht zentriert');
+      assert.ok(Math.abs(parseFloat(canvas.style.top)*2 + cssHeight - bounds.height) <= 1.001/dpr, 'senkrecht zentriert');
     }
   }
   assert.equal(t.constants.SPEED,480);
@@ -158,6 +194,87 @@ module.exports = (async () => {
   assert.equal(t.state.mode,'lost');
   t.fixture([q]); t.start(); const right=t.state.row.platforms.find(p=>p.richtig); t.position(right.x+right.width/2,t.state.row.y-.5,100); t.step(1/120);
   assert.equal(t.state.mode,'won'); assert.equal(t.state.score,100);
+  // Ein beschädigter oder gesperrter Spielstand darf das Spiel nie blockieren.
+  for (const kaputt of [
+    {kronk_fehler:'{kaputt'}, {kronk_fehler:'"text"'}, {kronk_gesamtpunkte:'abc'},
+    {kronk_gesamtpunkte:'-5'}, {kronk_freigeschaltet:'nichts'}, {kronk_freigeschaltet:'[1,2]'}
+  ]) {
+    const b = await boot({storage: kaputt});
+    assert.equal(b.t.state.mode, 'ready', `blockiert bei ${JSON.stringify(kaputt)}`);
+    assert.match(b.get('score').textContent, /Gesamt 0$/);
+    assert.deepEqual(b.get('kronk-select').options.map(o=>o.value), ['kronk']);
+  }
+  {
+    const b = await boot({storageDefekt: true});
+    assert.equal(b.t.state.mode, 'ready');
+    b.t.fixture([q]); b.get('thinking').value='0'; b.t.start();
+    const right = b.t.state.row.platforms.find(p=>p.richtig);
+    b.t.position(right.x+right.width/2, b.t.state.row.y-.5, 100); b.t.step(1/120);
+    assert.equal(b.t.state.mode, 'won', 'gesperrter Speicher darf den Sprung nicht abbrechen');
+  }
+  // Unbekannte Kronks und fremde Kennungen werden verworfen, nicht übernommen.
+  {
+    const b = await boot({storage: {
+      kronk_gesamtpunkte:'3000', kronk_freigeschaltet:'["kronk","kronk_gold","hack"]', kronk_aktiv:'hack',
+      kronk_fehler: JSON.stringify({'religion-6-feste':['Frage, die es nicht mehr gibt'], 'weg':['x']})
+    }});
+    assert.deepEqual(b.get('kronk-select').options.map(o=>o.value), ['kronk','kronk_gold']);
+    assert.equal(b.get('kronk-select').value, 'kronk');
+    assert.match(b.get('score').textContent, /Gesamt 3\.000$/);
+    // Verwaiste Merkzettel-Einträge werden beim Start aufgeräumt.
+    assert.equal(b.storage.get('kronk_fehler'), '{}');
+  }
+  // Fehlt ein Kronk-Bild, bleibt der bisherige stehen, statt ewig zu laden.
+  {
+    const b = await boot({fehlendeBilder:['kronk_gold'], storage:{kronk_gesamtpunkte:'3000', kronk_freigeschaltet:'["kronk","kronk_gold"]'}});
+    const auswahl = {value:'kronk_gold'};
+    await b.get('kronk-select').events.change({target: auswahl});
+    assert.equal(auswahl.value, 'kronk');
+    assert.match(b.get('status').textContent, /nicht laden/);
+  }
+  {
+    const b = await boot({fehlendeBilder:['kronk-normal']});
+    assert.equal(b.t.state.mode, 'error');
+    assert.match(b.get('panel-text').textContent, /Kronk-Bilder fehlen/);
+  }
+  // Vollbild: nur anbieten, wenn der Browser es kann.
+  assert.equal(get('fullscreen').hidden, true, 'ohne Unterstützung kein Knopf');
+  {
+    const b = await boot({vollbild:{}});
+    const button = b.get('fullscreen');
+    assert.equal(button.hidden, false);
+    assert.equal(button.textContent, 'Vollbild');
+    assert.equal(button.attributes['aria-pressed'], 'false');
+    await button.events.click();
+    assert.equal(b.vollbild.aktiv, true);
+    assert.equal(b.vollbild.optionen.navigationUI, 'hide');
+    assert.equal(button.textContent, 'Vollbild beenden');
+    assert.equal(button.attributes['aria-pressed'], 'true');
+    await button.events.click();
+    assert.equal(b.vollbild.aktiv, false);
+    assert.equal(button.textContent, 'Vollbild');
+    // Taste F schaltet ebenfalls, auch mitten im Spiel.
+    b.t.fixture([q]); b.get('thinking').value='0'; b.t.start();
+    await b.events.keydown({key:'f',target:{tagName:'CANVAS'},preventDefault(){},repeat:false});
+    assert.equal(b.vollbild.aktiv, true);
+    assert.equal(b.t.state.mode, 'playing', 'Vollbild pausiert das Spiel nicht');
+    // Das Spielfeld wird nach dem Wechsel neu vermessen.
+    b.get('.playfield').bounds = {width:500, height:450};
+    b.context.document.addEventListener; b.docEvents.fullscreenchange();
+    assert.equal(b.get('canvas').width, 500);
+  }
+  {
+    // Lehnt der Browser ab, bleibt das Spiel ruhig und sagt Bescheid.
+    const b = await boot({vollbild:{fehler:true}});
+    await b.get('fullscreen').events.click();
+    assert.equal(b.vollbild.aktiv, false);
+    assert.match(b.get('status').textContent, /nicht einschalten/);
+  }
+  // Als installierte App ist ohnehin keine Leiste im Bild.
+  {
+    const b = await boot({vollbild:{}, displayMode:'standalone'});
+    assert.equal(b.get('fullscreen').hidden, true);
+  }
   // Schema, fehlende Datei, Syntaxfehler und abweichende Kennung.
   for(const data of [null,{fragen:[]},{fragen:[null]},{fragen:[{...q,antworten:[null,null]}]},{fragen:[{...q,antworten:[{text:'Nein',richtig:false},{text:'Auch nein',richtig:false}]}]}]) assert.throws(()=>t.validate(data));
   for(const [file,code] of [['fehlt.js',undefined],['kaputt.js','(()'],['falsche-id.js','window.KRONK_SAMMLUNGEN.anders = {};']]) {
@@ -167,5 +284,5 @@ module.exports = (async () => {
     assert.equal(b.t.state.mode,'ready'); assert.match(b.get('load-errors').textContent,new RegExp(file.replace('.','\\.')));
     assert.equal(b.get('subject').options.length,3); assert.equal(b.get('load-errors').hidden,false);
   }
-  console.log(`OK: Retina/Drehung/Zoom, Frage nur unten, lange Antworten, höherer Sprung mit mehr Flugzeit, Auswahl, Inhalte, 7 Denkzeiten, ${routes} Querwechsel ohne Denkpause, Tastatur/Pointer, Pause, Landungen, Neustart, Sieg und 3 Ladefehler.`);
+  console.log(`OK: Retina/Drehung/Zoom, Frage nur unten, lange Antworten, höherer Sprung mit mehr Flugzeit, Auswahl, Inhalte, 7 Denkzeiten, ${routes} Querwechsel ohne Denkpause, Tastatur/Pointer, Pause, Landungen, Neustart, Sieg, Vollbild, beschädigter/gesperrter Spielstand, fehlende Kronk-Bilder und 3 Ladefehler.`);
 })();
