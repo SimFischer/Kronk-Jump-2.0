@@ -237,8 +237,8 @@
   }
 
   const ERKLAERUNG = {
-    sprung: "Kronk springt von allein. Halte die linke oder rechte Hälfte des Spielfelds gedrückt – am Computer gehen auch ← → oder die Ziffer der Antwortkarte. Der rote Fußmarker muss auf der richtigen Karte landen; falsche Karten brechen weg.",
-    landung: "Kronk schwebt über den Karten und wandert zur Seite, solange du hältst – am Computer mit ← → oder der Ziffer der Antwortkarte. Nach 10 Sekunden sinkt er von allein; mit ▼ geht es sofort runter. Die Zeit läuft mit und steht am Ende der Runde."
+    sprung: "Tippe direkt auf eine Antwortkarte: Kronk steuert sie automatisch an. Kronk springt von allein. Halte die linke oder rechte Hälfte des Spielfelds gedrückt – am Computer gehen auch ← → oder die Ziffer der Antwortkarte. Der rote Fußmarker muss auf der richtigen Karte landen; falsche Karten brechen weg.",
+    landung: "Tippe direkt auf eine Antwortkarte: Kronk wählt sie und landet dort (bei aktivierter Sofortlandung). Kronk schwebt über den Karten und wandert zur Seite, solange du hältst – am Computer mit ← → oder der Ziffer der Antwortkarte. Nach 10 Sekunden sinkt er von allein; mit ▼ geht es sofort runter. Die Zeit läuft mit und steht am Ende der Runde."
   };
 
   function gradeTitle(grade) { return String(grade) === "E" ? "E-Jahrgang" : `Klasse ${grade}`; }
@@ -986,7 +986,25 @@
       $("right").classList.toggle("held", dirs.includes(1));
     };
     field.addEventListener("pointerdown", e => {
-      if (mode !== "playing") return;
+      if (mode !== "playing" || !row || !player || failText || $("unlock-dialog").open || $("feedback-dialog").open) return;
+      if (e.button !== undefined && e.button !== 0) return;
+      // Die tatsächliche Zeichenfläche verwenden: Sie ist im Querformat
+      // oft schmaler als das Spielfeld und berücksichtigt die Pixeldichte.
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        const x = (e.clientX - rect.left) * W / rect.width;
+        const y = (e.clientY - rect.top) * renderHeight / rect.height;
+        const cardY = row.y - camera;
+        const hit = row.platforms.findIndex(p => !p.broken &&
+          x >= p.x && x <= p.x + p.width && y >= cardY && y <= cardY + cardHeight(row, p));
+        if (hit !== -1) {
+          e.preventDefault();
+          clearInput();
+          aimAt(hit);
+          starteSinkflug();
+          return;
+        }
+      }
       e.preventDefault();
       const bounds = field.getBoundingClientRect();
       const direction = e.clientX - bounds.left < bounds.width / 2 ? -1 : 1;
