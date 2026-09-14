@@ -6,7 +6,7 @@
   const W = 600, H = 540, GRAVITY = 600, JUMP = 700, SPEED = 480;
   // Landeanflug: Kronk schwebt HOVER Pixel über der Reihe, sinkt nach
   // SINK_TIME Sekunden (oder auf Knopfdruck) mit SINK_SPEED nach unten.
-  const SINK_TIME = 10, SINK_SPEED = 1000, HOVER = 210;
+  const SINK_TIME = 10, SINK_SPEED = 850, HOVER = 210;
   const ROW_Y = 410, START_Y = 515, GAP = START_Y - ROW_Y;
   let canvasDpr = 0, renderHeight = H;
   
