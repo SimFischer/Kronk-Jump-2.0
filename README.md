@@ -51,6 +51,10 @@ Sehr lange Fragen vergrößern den benötigten Platz; auf kleinen Displays kann 
 | Deutsch | 6 | Satzglieder (Beispiel) | `aufgaben/deutsch-6-satzglieder.js` |
 | Deutsch | E | Aufklärung – 20 Fragen | `aufgaben/deutsch-e-aufklaerung.js` |
 | Religion | 6 | Christliche Feste (Beispiel) | `aufgaben/religion-6-feste.js` |
+| Religion | 7 | Die Urgemeinde – 18 Fragen | `aufgaben/religion-7-urgemeinde.js` |
+| Religion | 7 | Gespräch am Brunnen und Stephanus – 22 Fragen | `aufgaben/religion-7-brunnen-stephanus.js` |
+| Religion | 7 | Christenverfolgung – 32 Fragen | `aufgaben/religion-7-christenverfolgung.js` |
+| Religion | 7 | Die konstantinische Wende – 28 Fragen | `aufgaben/religion-7-konstantinische-wende.js` |
 
 Die als Beispiele gekennzeichneten Sammlungen sind kurze Demonstrationen, keine vollständigen Unterrichtsreihen.
 
