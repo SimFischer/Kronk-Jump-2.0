@@ -1,63 +1,64 @@
 // Religion, Klasse 7: Die Urgemeinde.
-// Arbeitsblätter "Die Urgemeinde" (Apg 2,36-47) und "Ein Gespräch am Brunnen".
-// Verständnisfragen: Es geht um Zusammenhänge und Gründe, nicht um
-// Detailwissen aus dem Text (Zahlen, Namen, Formulierungen).
-// Antworten bewusst kurz - sie müssen auf die Antwortkarten im Spiel passen.
+// Verständnisfragen zu den großen Linien des Themas: Wer gehörte dazu,
+// wie lebte die Gemeinde, warum wuchs sie, warum stieß sie auf Ablehnung.
+// Kein Detailwissen aus einzelnen Textstellen (Zahlen, Namen, Zitate).
+// Wichtig: Die Fragen werden gemischt. Jede Frage muss deshalb für sich
+// verständlich sein - keine Rückbezüge wie "diese", "dabei", "trotzdem".
 window.KRONK_SAMMLUNGEN["religion-7-urgemeinde"] = {
   mischen: true,
   fragen: [
-    { frage: "Was meint das Wort Urgemeinde?", antworten: [
+    { frage: "Was ist mit der Urgemeinde gemeint?", antworten: [
       { text: "Die erste Christengemeinde", richtig: true },
-      { text: "Eine Gemeinde im Mittelalter", richtig: false, warum: "Die Urgemeinde entstand rund 1.000 Jahre früher, direkt nach Jesu Tod." },
-      { text: "Ein Dorf in Israel heute", richtig: false }
+      { text: "Eine Gemeinde im Mittelalter", richtig: false, warum: "Die Urgemeinde entstand rund 1.000 Jahre früher, kurz nach Jesu Tod." },
+      { text: "Die Kirche in Rom heute", richtig: false }
     ], erklaerung: "Gemeint ist die allererste Gemeinschaft von Christen, kurz nach Ostern in Jerusalem." },
 
-    { frage: "Warum war Taufe mehr als ein Ritual?", antworten: [
-      { text: "Sie bedeutete einen Neuanfang", richtig: true },
-      { text: "Sie machte reich", richtig: false },
-      { text: "Sie ersetzte die Arbeit", richtig: false }
-    ], erklaerung: "Wer sich taufen ließ, wollte sein Leben ändern - das meint Umkehr." },
+    { frage: "Was bedeutete die Taufe für die ersten Christen?", antworten: [
+      { text: "Einen Neuanfang im Leben", richtig: true },
+      { text: "Eine Aufnahmegebühr", richtig: false },
+      { text: "Eine Pflicht des Staates", richtig: false, warum: "Der römische Staat hatte mit der Taufe nichts zu tun." }
+    ], erklaerung: "Wer sich taufen ließ, wollte sein Leben ändern. Genau das meint das Wort Umkehr." },
 
-    { frage: "Was war neu am Zugang zur Gemeinde?", antworten: [
-      { text: "Jeder konnte sich entscheiden", richtig: true },
-      { text: "Nur Priester durften hinein", richtig: false },
-      { text: "Man musste hineingeboren sein", richtig: false, warum: "Genau das war anders: Nicht Herkunft, sondern eigene Entscheidung zählte." }
-    ], erklaerung: "Herkunft, Stand und Geschlecht spielten keine Rolle - entscheidend war der Glaube." },
+    { frage: "Wer konnte zur Urgemeinde gehören?", antworten: [
+      { text: "Jeder, der sich dafür entschied", richtig: true },
+      { text: "Nur Priester und Gelehrte", richtig: false },
+      { text: "Nur wer hineingeboren wurde", richtig: false, warum: "Genau das war neu: Nicht die Herkunft entschied, sondern der eigene Entschluss." }
+    ], erklaerung: "Herkunft, Besitz und Geschlecht spielten keine Rolle - entscheidend war der Glaube." },
 
-    { frage: "Warum teilten die Christen ihren Besitz?", antworten: [
-      { text: "Niemand sollte Not leiden", richtig: true },
+    { frage: "Warum teilten die ersten Christen ihren Besitz?", antworten: [
+      { text: "Damit niemand Not litt", richtig: true },
       { text: "Um Steuern zu sparen", richtig: false },
-      { text: "Weil der Kaiser es befahl", richtig: false, warum: "Der Staat hatte damit nichts zu tun, es war eine freiwillige Entscheidung." }
+      { text: "Weil der Kaiser es befahl", richtig: false, warum: "Es war eine freiwillige Entscheidung der Gemeinde, kein Gesetz." }
     ], erklaerung: "Das Teilen war gelebte Nächstenliebe: Wer etwas brauchte, bekam es aus der Gemeinschaft." },
 
-    { frage: "Was zeigt die Gütergemeinschaft über den Glauben?", antworten: [
+    { frage: "Was zeigt das Teilen des Besitzes über den Glauben der ersten Christen?", antworten: [
       { text: "Glaube zeigt sich im Handeln", richtig: true },
       { text: "Glaube ist reine Privatsache", richtig: false },
-      { text: "Besitz ist immer Sünde", richtig: false, warum: "Besitz wurde nicht verteufelt, sondern geteilt." }
+      { text: "Besitz gilt als Sünde", richtig: false, warum: "Besitz wurde nicht verurteilt, sondern geteilt." }
     ], erklaerung: "Was die Christen glaubten, sollte man an ihrem Alltag erkennen können." },
 
-    { frage: "Warum war das gemeinsame Mahl so wichtig?", antworten: [
-      { text: "Es schuf Gemeinschaft", richtig: true },
-      { text: "Es war besonders günstig", richtig: false },
-      { text: "Es war römische Pflicht", richtig: false }
+    { frage: "Warum war das gemeinsame Mahl für die ersten Christen wichtig?", antworten: [
+      { text: "Es stiftete Gemeinschaft", richtig: true },
+      { text: "Es war billiger als allein zu essen", richtig: false },
+      { text: "Es war eine römische Vorschrift", richtig: false }
     ], erklaerung: "Beim Essen erinnerten sie sich an Jesus und erlebten sich zugleich als eine Familie." },
 
-    { frage: "Warum traf man sich in Privathäusern?", antworten: [
+    { frage: "Warum traf sich die Urgemeinde in Privathäusern?", antworten: [
       { text: "Es gab noch keine Kirchen", richtig: true },
-      { text: "Häuser waren größer", richtig: false },
-      { text: "Draußen war es verboten", richtig: false }
-    ], erklaerung: "Kirchengebäude entstanden erst später. Die Gemeinde traf sich dort, wo Platz war." },
+      { text: "Häuser boten mehr Platz", richtig: false },
+      { text: "Treffen im Freien waren verboten", richtig: false }
+    ], erklaerung: "Kirchengebäude entstanden erst viel später. Die Gemeinde traf sich dort, wo Platz war." },
 
-    { frage: "Was hielt diese Menschen zusammen?", antworten: [
+    { frage: "Was hielt die Menschen in der Urgemeinde zusammen?", antworten: [
       { text: "Der gemeinsame Glaube", richtig: true },
       { text: "Die gleiche Familie", richtig: false },
       { text: "Der gleiche Beruf", richtig: false }
     ], erklaerung: "Sie kamen aus ganz verschiedenen Schichten - verbunden hat sie allein ihr Glaube." },
 
-    { frage: "Warum wuchs die Gemeinde so schnell?", antworten: [
-      { text: "Ihr Leben überzeugte andere", richtig: true },
-      { text: "Sie zahlten Eintrittsgeld", richtig: false },
-      { text: "Sie zwangen die Leute", richtig: false, warum: "Niemand wurde gezwungen, die Menschen kamen freiwillig." }
+    { frage: "Warum wuchs die Urgemeinde schnell?", antworten: [
+      { text: "Ihre Lebensweise überzeugte", richtig: true },
+      { text: "Sie zahlte neuen Mitgliedern Geld", richtig: false },
+      { text: "Sie zwang Menschen zum Beitritt", richtig: false, warum: "Niemand wurde gezwungen - die Menschen kamen freiwillig." }
     ], erklaerung: "Zusammenhalt, Teilen und Freude machten die Gemeinde für andere anziehend." },
 
     { frage: "Für wen galt die christliche Botschaft?", antworten: [
@@ -66,70 +67,64 @@ window.KRONK_SAMMLUNGEN["religion-7-urgemeinde"] = {
       { text: "Nur für Reiche", richtig: false }
     ], erklaerung: "Arme und Reiche, Frauen und Männer, Juden und Nichtjuden - alle waren eingeladen." },
 
-    { frage: "Warum war die Taufe von Nichtjuden ein Streitpunkt?", antworten: [
+    { frage: "Warum war es in der frühen Kirche umstritten, auch Nichtjuden zu taufen?", antworten: [
       { text: "Das Christentum kam aus dem Judentum", richtig: true },
       { text: "Nichtjuden konnten nicht lesen", richtig: false },
-      { text: "Rom hatte es verboten", richtig: false }
-    ], erklaerung: "Viele fanden: Wer dazugehören will, muss erst Jude werden. Die Gemeinde entschied sich anders." },
+      { text: "Rom hatte es ausdrücklich verboten", richtig: false }
+    ], erklaerung: "Viele meinten: Wer dazugehören will, muss erst Jude werden. Die Gemeinde entschied sich anders." },
 
-    { frage: "Woran erkannten Außenstehende die Christen?", antworten: [
+    { frage: "Woran erkannte man die ersten Christen im Alltag?", antworten: [
       { text: "Am Umgang miteinander", richtig: true },
       { text: "An besonderer Kleidung", richtig: false },
       { text: "An einer eigenen Sprache", richtig: false }
     ], erklaerung: "Auffällig war nicht ihr Aussehen, sondern wie sie miteinander umgingen." },
 
-    { frage: "Warum entstanden Gerüchte über die Christen?", antworten: [
-      { text: "Ihre Feiern blieben unter sich", richtig: true },
-      { text: "Sie erzählten Lügen", richtig: false },
+    { frage: "Warum entstanden Gerüchte über die ersten Christen?", antworten: [
+      { text: "Ihre Feiern waren nicht öffentlich", richtig: true },
+      { text: "Sie erzählten selbst Lügen", richtig: false },
       { text: "Sie konnten nicht schreiben", richtig: false }
     ], erklaerung: "Was man nicht kennt, macht Angst. Aus Unwissen wurden schnell wilde Geschichten." },
 
-    { frage: "Wie kam das Gerücht vom Menschenfleisch zustande?", antworten: [
-      { text: "Bilder des Abendmahls falsch verstanden", richtig: true },
-      { text: "Christen jagten nachts", richtig: false },
-      { text: "Römer erfanden es aus Spaß", richtig: false }
-    ], erklaerung: "Von Leib und Blut Christi zu sprechen, verstanden Außenstehende wörtlich." },
+    { frage: "Warum lehnten viele Juden die Botschaft der Christen ab?", antworten: [
+      { text: "Für sie war nur Gott göttlich", richtig: true },
+      { text: "Die Christen zahlten keine Steuern", richtig: false },
+      { text: "Die Christen sprachen kein Hebräisch", richtig: false }
+    ], erklaerung: "Einen Menschen als Gottes Sohn zu verehren, galt vielen als Gotteslästerung." },
 
-    { frage: "Warum war der Glaube an einen Gekreuzigten anstößig?", antworten: [
-      { text: "Das Kreuz war Verbrecherstrafe", richtig: true },
-      { text: "Jesus war Ausländer", richtig: false },
-      { text: "Kreuze waren verboten", richtig: false }
-    ], erklaerung: "Einen Hingerichteten als Gott zu verehren, wirkte auf viele völlig absurd." },
+    { frage: "Warum war es für viele anstößig, einen Gekreuzigten als Gott zu verehren?", antworten: [
+      { text: "Das Kreuz war eine Verbrecherstrafe", richtig: true },
+      { text: "Jesus war ein Ausländer", richtig: false },
+      { text: "Kreuze waren in Rom verboten", richtig: false }
+    ], erklaerung: "Am Kreuz starben Schwerverbrecher. Darin einen Gott zu sehen, wirkte auf viele absurd." },
 
-    { frage: "Was warfen Juden wie Marta den Christen vor?", antworten: [
-      { text: "Gotteslästerung", richtig: true },
-      { text: "Steuerbetrug", richtig: false },
-      { text: "Fahnenflucht", richtig: false }
-    ], erklaerung: "Für sie gab es nur einen Gott - einen Menschen göttlich zu nennen, war undenkbar." },
-
-    { frage: "Warum fühlten sich viele von den Christen bedroht?", antworten: [
-      { text: "Sie stellten Gewohntes infrage", richtig: true },
-      { text: "Sie waren bewaffnet", richtig: false },
-      { text: "Sie waren in der Mehrheit", richtig: false, warum: "Die Christen waren eine kleine Minderheit." }
+    { frage: "Warum fühlten sich viele Menschen im Römischen Reich von den Christen bedroht?", antworten: [
+      { text: "Die Christen stellten Gewohntes infrage", richtig: true },
+      { text: "Die Christen waren bewaffnet", richtig: false },
+      { text: "Die Christen waren in der Mehrheit", richtig: false, warum: "Die Christen waren lange nur eine kleine Minderheit." }
     ], erklaerung: "Neue Überzeugungen rütteln an dem, was für alle selbstverständlich war." },
 
-    { frage: "Warum wurde aus Gerede am Brunnen eine Anzeige?", antworten: [
-      { text: "Misstrauen wurde zur Empörung", richtig: true },
-      { text: "Der Hohe Rat rief dazu auf", richtig: false },
-      { text: "Es gab eine Belohnung", richtig: false }
-    ], erklaerung: "Gerüchte können gefährlich werden: Aus Reden wird schnell Handeln gegen andere." },
+    { frage: "Wie konnten Gerüchte für die ersten Christen gefährlich werden?", antworten: [
+      { text: "Aus Gerede wurden Anzeigen", richtig: true },
+      { text: "Aus Gerede wurden Gesetze", richtig: false },
+      { text: "Gerüchte blieben folgenlos", richtig: false }
+    ], erklaerung: "Wer angezeigt wurde, musste vor Gericht. So wurde aus Misstrauen echte Verfolgung." },
 
-    { frage: "Was gab den Christen Hoffnung?", antworten: [
+    { frage: "Was gab den ersten Christen Hoffnung?", antworten: [
       { text: "Leben über den Tod hinaus", richtig: true },
       { text: "Reichtum auf Erden", richtig: false },
-      { text: "Der Sieg über Rom", richtig: false }
+      { text: "Ein Sieg über Rom", richtig: false }
     ], erklaerung: "Die Botschaft von der Auferstehung nahm dem Tod seinen Schrecken." },
 
-    { frage: "Was macht die Urgemeinde bis heute zum Vorbild?", antworten: [
-      { text: "Teilen und Zusammenhalt", richtig: true },
-      { text: "Ihre große Macht", richtig: false },
-      { text: "Ihre schönen Gebäude", richtig: false, warum: "Gebäude hatte sie gar nicht - sie traf sich in Wohnhäusern." }
-    ], erklaerung: "Gemeinden berufen sich bis heute auf dieses Bild: füreinander da sein, niemanden zurücklassen." },
+    { frage: "Warum gilt die Urgemeinde bis heute als Vorbild?", antworten: [
+      { text: "Wegen Teilen und Zusammenhalt", richtig: true },
+      { text: "Wegen ihrer großen Macht", richtig: false },
+      { text: "Wegen ihrer prächtigen Kirchen", richtig: false, warum: "Kirchengebäude hatte sie gar nicht - sie traf sich in Wohnhäusern." }
+    ], erklaerung: "Gemeinden berufen sich bis heute darauf: füreinander da sein, niemanden zurücklassen." },
 
-    { frage: "Was ist an diesem Bild der Urgemeinde kritisch zu sehen?", antworten: [
-      { text: "Es ist ein Idealbild", richtig: true },
-      { text: "Es ist frei erfunden", richtig: false },
-      { text: "Es stammt von Römern", richtig: false }
+    { frage: "Wie ist die Schilderung der Urgemeinde in der Bibel zu verstehen?", antworten: [
+      { text: "Als Idealbild", richtig: true },
+      { text: "Als reine Erfindung", richtig: false },
+      { text: "Als Bericht eines Römers", richtig: false }
     ], erklaerung: "Der Text zeigt, wie Gemeinde sein soll. Der Alltag war sicher auch damals schwieriger." }
   ]
 };
