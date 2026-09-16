@@ -10,8 +10,6 @@ window.KRONK_KATALOG = [
   { id: "mathe-5-kleines-1x1", fach: "Mathematik", klasse: 5, thema: "Das kleine 1x1", datei: "aufgaben/mathe-5-kleines-1x1.js" },
   { id: "religion-6-feste", fach: "Religion", klasse: 6, thema: "Christliche Feste", datei: "aufgaben/religion-6-feste.js", beispiel: true },
   { id: "religion-7-urgemeinde", fach: "Religion", klasse: 7, thema: "Die Urgemeinde", datei: "aufgaben/religion-7-urgemeinde.js" },
-  { id: "religion-7-brunnen-stephanus", fach: "Religion", klasse: 7, thema: "Gespräch am Brunnen und Stephanus", datei: "aufgaben/religion-7-brunnen-stephanus.js" },
-  { id: "religion-7-christenverfolgung", fach: "Religion", klasse: 7, thema: "Christenverfolgung", datei: "aufgaben/religion-7-christenverfolgung.js" },
-  { id: "religion-7-konstantinische-wende", fach: "Religion", klasse: 7, thema: "Die konstantinische Wende", datei: "aufgaben/religion-7-konstantinische-wende.js" }
+  { id: "religion-7-verfolgung-wende", fach: "Religion", klasse: 7, thema: "Christenverfolgung und konstantinische Wende", datei: "aufgaben/religion-7-verfolgung-wende.js" }
 ];
 

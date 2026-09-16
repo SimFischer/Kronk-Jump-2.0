@@ -1,4 +1,5 @@
-// Religion, Klasse 7: Arbeitsblatt "Die Urgemeinde" (Apg 2,36-47).
+// Religion, Klasse 7: Die Urgemeinde.
+// Arbeitsblätter "Die Urgemeinde" (Apg 2,36-47) und "Ein Gespräch am Brunnen".
 // Kurze Fragen, kurze Antworten - passend zu den Antwortkarten im Spiel.
 window.KRONK_SAMMLUNGEN["religion-7-urgemeinde"] = {
   mischen: true,
@@ -10,8 +11,8 @@ window.KRONK_SAMMLUNGEN["religion-7-urgemeinde"] = {
     ], erklaerung: "Der Text stammt aus der Apostelgeschichte, Kapitel 2, Verse 36-47." },
     { frage: "Wer hält die Rede an die Zuhörer?", antworten: [
       { text: "Petrus", richtig: true },
-      { text: "Stephanus", richtig: false, warum: "Stephanus tritt erst später auf, in Apg 6 und 7." },
-      { text: "Paulus", richtig: false, warum: "Paulus wird erst nach der Steinigung des Stephanus Christ." }
+      { text: "Johannes", richtig: false, warum: "Johannes steht zwar dabei, gesprochen hat aber Petrus." },
+      { text: "Paulus", richtig: false, warum: "Paulus wird erst später Christ und gehört hier noch nicht dazu." }
     ], erklaerung: "Petrus antwortet den Zuhörern zusammen mit den anderen Aposteln." },
     { frage: "Was fragen die Zuhörer die Apostel?", antworten: [
       { text: "Was sollen wir tun?", richtig: true },
@@ -92,6 +93,51 @@ window.KRONK_SAMMLUNGEN["religion-7-urgemeinde"] = {
       { text: "Jubelnde Freude", richtig: true },
       { text: "Stille Trauer", richtig: false },
       { text: "Angst und Sorge", richtig: false }
-    ], erklaerung: "Sie aßen gemeinsam, mit jubelnder Freude und reinem Herzen." }
+    ], erklaerung: "Sie aßen gemeinsam, mit jubelnder Freude und reinem Herzen." },
+    { frage: "Warum war der Brunnen so wichtig?", antworten: [
+      { text: "Treffpunkt für Neuigkeiten", richtig: true },
+      { text: "Gerichtsort der Stadt", richtig: false },
+      { text: "Eingang zum Tempel", richtig: false }
+    ], erklaerung: "Vor dem fließenden Wasser war der Brunnen der wichtigste Treffpunkt: Dort tauschte man Neuigkeiten aus." },
+    { frage: "Über wen reden Marta und Chaja zuerst?", antworten: [
+      { text: "Hauptmann Kornelius", richtig: true },
+      { text: "Kaiser Nero", richtig: false },
+      { text: "Petrus", richtig: false }
+    ], erklaerung: "Kornelius hat sich der Christussekte angeschlossen und wurde getauft." },
+    { frage: "Was ist an Kornelius für Marta und Chaja anstößig?", antworten: [
+      { text: "Er ist ein Heide", richtig: true },
+      { text: "Er ist Sklave", richtig: false },
+      { text: "Er ist Priester", richtig: false }
+    ], erklaerung: "Der? Aber der ist doch ein Heide! - Dass auch Nichtjuden getauft werden, empört die beiden." },
+    { frage: "Welches Gerücht über die Christen nennt Marta?", antworten: [
+      { text: "Sie essen Menschenfleisch", richtig: true },
+      { text: "Sie stehlen Wasser", richtig: false },
+      { text: "Sie verbrennen Bücher", richtig: false }
+    ], erklaerung: "Marta fragt, ob es stimme, dass die Christen Menschenfleisch essen." },
+    { frage: "Woher kommt das Gerücht vom Menschenfleisch?", antworten: [
+      { text: "Vom Abendmahl", richtig: true },
+      { text: "Von der Taufe", richtig: false, warum: "Die Taufe ist ein Ritual mit Wasser - damit hat das Gerücht nichts zu tun." },
+      { text: "Von der Fußwaschung", richtig: false }
+    ], erklaerung: "Die Christen teilen Leib und Blut Christi. Außenstehende verstehen das wörtlich falsch." },
+    { frage: "Was werfen die Frauen den Christen im Blick auf Jesus vor?", antworten: [
+      { text: "Gotteslästerung", richtig: true },
+      { text: "Steuerbetrug", richtig: false },
+      { text: "Diebstahl", richtig: false }
+    ], erklaerung: "Die Christen beten einen am Kreuz hingerichteten Menschen als Gott an. Für Marta ist nur Jahwe Gott." },
+    { frage: "Was stört Marta und Chaja an Jesu Tod?", antworten: [
+      { text: "Tod als Schwerverbrecher", richtig: true },
+      { text: "Tod im Krieg", richtig: false },
+      { text: "Tod im Gefängnis", richtig: false }
+    ], erklaerung: "Chaja würde sich schämen, wenn ein Bekannter als Schwerverbrecher am Kreuz enden würde." },
+    { frage: "Wen zieht die neue Lehre laut Chaja besonders an?", antworten: [
+      { text: "Junge Leute", richtig: true },
+      { text: "Nur alte Männer", richtig: false },
+      { text: "Nur Soldaten", richtig: false }
+    ], erklaerung: "Gerade junge Leute fallen auf die klugen Redner der Gemeinde herein, meint Chaja." },
+    { frage: "Was beschließen Marta und Chaja am Ende?", antworten: [
+      { text: "Zum Hohen Rat zu gehen", richtig: true },
+      { text: "Selbst Christinnen zu werden", richtig: false },
+      { text: "Die Stadt zu verlassen", richtig: false }
+    ], erklaerung: "Komm, wir gehen jetzt gleich zum Hohen Rat. Aus dem Gerede am Brunnen wird eine Anzeige." }
   ]
 };
