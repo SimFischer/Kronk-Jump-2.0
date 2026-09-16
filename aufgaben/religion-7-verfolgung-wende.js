@@ -1,160 +1,179 @@
 // Religion, Klasse 7: Christenverfolgung und konstantinische Wende.
-// Gruppenarbeit zur Christenverfolgung (Gruende - Rolle von Staat und
-// Buergern - Art der Verfolgung), M5 zur Schlacht 312 und M6 zur frohen
-// Botschaft. Bewusst einfach gehalten: keine Jahreszahlen und Namen, die
-// nicht im Auswertungsbogen standen.
+// Gruppenarbeit zur Christenverfolgung (Gründe – Rolle von Staat und
+// Bürgern – Art der Verfolgung), M5 zur Schlacht 312 und M6 zur frohen
+// Botschaft.
+// Verständnisfragen: Es geht um Ursachen, Zusammenhänge und Folgen,
+// nicht um Jahreszahlen und Namen. Antworten kurz – sie müssen auf die
+// Antwortkarten im Spiel passen.
 window.KRONK_SAMMLUNGEN["religion-7-verfolgung-wende"] = {
   mischen: true,
   fragen: [
-    { frage: "Aus welcher Religion kam das Christentum?", antworten: [
-      { text: "Aus dem Judentum", richtig: true },
-      { text: "Aus dem Islam", richtig: false, warum: "Den Islam gab es damals noch gar nicht." },
-      { text: "Aus der römischen Religion", richtig: false }
-    ], erklaerung: "Das Christentum entstand aus dem Judentum. Viele Römer hielten es für eine jüdische Sekte." },
-    { frage: "Warum waren die Christen vielen Römern verdächtig?", antworten: [
+    { frage: "Warum hielten viele Römer das Christentum zuerst für harmlos?", antworten: [
+      { text: "Es galt als jüdische Sekte", richtig: true },
+      { text: "Es hatte keine Anhänger", richtig: false },
+      { text: "Der Kaiser war Christ", richtig: false, warum: "Einen christlichen Kaiser gab es erst rund 300 Jahre später." }
+    ], erklaerung: "Das Christentum kam aus dem Judentum. Erst als es sich ausbreitete, fiel es auf." },
+
+    { frage: "Warum wurden die Christen den Römern verdächtig?", antworten: [
       { text: "Sie verehrten die Götter nicht", richtig: true },
       { text: "Sie sprachen kein Latein", richtig: false },
-      { text: "Sie zahlten keine Steuern", richtig: false, warum: "Steuern waren nicht das Problem - der Streit ging um die Götter." }
-    ], erklaerung: "Christinnen und Christen wollten sich am Glauben an andere Götter nicht beteiligen." },
-    { frage: "Wofür machte man die Christen bei Hungersnöten verantwortlich?", antworten: [
-      { text: "Für den Zorn der Götter", richtig: true },
-      { text: "Für schlechtes Wetter", richtig: false },
-      { text: "Für zu wenig Soldaten", richtig: false }
-    ], erklaerung: "Weil sie nicht opferten, sollten sie den Zorn der Götter auf das Reich gezogen haben." },
-    { frage: "Wer bekam die Schuld am Brand von Rom?", antworten: [
-      { text: "Die Christen", richtig: true },
-      { text: "Die Soldaten", richtig: false },
-      { text: "Die Juden", richtig: false }
-    ], erklaerung: "Nach dem großen Brand im Jahr 64 wurden die Christen beschuldigt." },
-    { frage: "Welcher Kaiser beschuldigte die Christen nach dem Brand?", antworten: [
-      { text: "Nero", richtig: true },
-      { text: "Konstantin", richtig: false, warum: "Konstantin lebte viel später und förderte die Christen sogar." },
-      { text: "Diokletian", richtig: false, warum: "Diokletian verfolgte die Christen erst rund 240 Jahre später." }
-    ], erklaerung: "Kaiser Nero gab den Christen die Schuld am Brand von Rom." },
+      { text: "Sie zahlten keine Steuern", richtig: false, warum: "Steuern zahlten sie. Der Streit ging um die Götter." }
+    ], erklaerung: "Wer nicht opferte, stellte sich außerhalb dessen, was für alle selbstverständlich war." },
+
+    { frage: "Warum war das Opfer für die Götter für Rom so wichtig?", antworten: [
+      { text: "Es sollte das Reich schützen", richtig: true },
+      { text: "Es brachte dem Kaiser Geld", richtig: false },
+      { text: "Es war reine Gewohnheit", richtig: false }
+    ], erklaerung: "Man glaubte: Nur wenn die Götter zufrieden sind, geht es dem Reich gut." },
+
+    { frage: "Was bedeutete die Weigerung zu opfern in römischen Augen?", antworten: [
+      { text: "Untreue gegenüber dem Staat", richtig: true },
+      { text: "Eine private Marotte", richtig: false },
+      { text: "Einen religiösen Fehler", richtig: false, warum: "Es ging nicht nur um Religion – Opfer waren zugleich ein Treuebeweis." }
+    ], erklaerung: "Religion und Staat gehörten zusammen. Wer nicht mitmachte, galt als Gefahr für alle." },
+
+    { frage: "Warum bekamen die Christen bei Katastrophen die Schuld?", antworten: [
+      { text: "Sie sollten die Götter erzürnt haben", richtig: true },
+      { text: "Sie lebten in den Katakomben", richtig: false },
+      { text: "Sie besaßen die Getreidelager", richtig: false }
+    ], erklaerung: "Hungersnot oder Brand erklärte man sich als Strafe der Götter – und suchte Schuldige." },
+
+    { frage: "Warum eignete sich eine kleine Gruppe gut als Sündenbock?", antworten: [
+      { text: "Sie war fremd und wehrlos", richtig: true },
+      { text: "Sie war sehr mächtig", richtig: false },
+      { text: "Sie war gut bewaffnet", richtig: false }
+    ], erklaerung: "Minderheiten, die man kaum kennt, bekommen leicht die Schuld für das, was schiefgeht." },
+
     { frage: "Von wem gingen die frühen Verfolgungen vor allem aus?", antworten: [
       { text: "Von der Bevölkerung", richtig: true },
-      { text: "Vom Kaiser", richtig: false, warum: "In den ersten beiden Jahrhunderten verfolgte der Staat noch nicht gezielt." },
-      { text: "Von den Nachbarvölkern", richtig: false }
-    ], erklaerung: "In den ersten beiden Jahrhunderten gingen die Verfolgungen eher von den Bürgerinnen und Bürgern aus." },
-    { frage: "Wie erfuhr der Staat anfangs von Christen?", antworten: [
-      { text: "Durch Anzeigen", richtig: true },
-      { text: "Durch Volkszählungen", richtig: false },
-      { text: "Durch Spione", richtig: false }
-    ], erklaerung: "Die Herrscher reagierten auf Anzeigen aus der Bevölkerung. Gesucht wurde nicht." },
-    { frage: "Suchte der Staat anfangs gezielt nach Christen?", antworten: [
-      { text: "Nein", richtig: true },
-      { text: "Ja, in jedem Haus", richtig: false, warum: "Erst später verfolgte der Staat gezielt - anfangs nur nach einer Anzeige." },
-      { text: "Ja, mit Listen", richtig: false }
-    ], erklaerung: "Nach ihnen fahnden soll man nicht - so lautete die Anweisung des Kaisers." },
-    { frage: "Wie konnte ein angeklagter Christ wieder freikommen?", antworten: [
-      { text: "Er opferte den Göttern", richtig: true },
-      { text: "Er zahlte Geld", richtig: false },
-      { text: "Gar nicht", richtig: false }
-    ], erklaerung: "Wer den römischen Göttern opferte und seinem Glauben abschwor, wurde freigelassen." },
-    { frage: "Wer verfolgte die Christen im 3. und 4. Jahrhundert?", antworten: [
-      { text: "Der Staat", richtig: true },
-      { text: "Nur einzelne Nachbarn", richtig: false, warum: "Das war vorher so. Jetzt gab es Gesetze gegen die Christen." },
-      { text: "Niemand mehr", richtig: false }
-    ], erklaerung: "Jetzt erließen die Kaiser Gesetze: Der Staat verfolgte die Christen gezielt." },
-    { frage: "Was mussten ab dem 3. Jahrhundert alle im Reich tun?", antworten: [
-      { text: "Den Göttern opfern", richtig: true },
-      { text: "In den Krieg ziehen", richtig: false },
-      { text: "Nach Rom reisen", richtig: false }
-    ], erklaerung: "Ein Gesetz verpflichtete alle zu Opfern für die Götter. Wer nicht opferte, wurde bestraft." },
-    { frage: "Unter welchem Kaiser war die Verfolgung am härtesten?", antworten: [
-      { text: "Diokletian", richtig: true },
-      { text: "Konstantin", richtig: false, warum: "Konstantin ließ Kirchen bauen, statt sie zu zerstören." },
-      { text: "Nero", richtig: false, warum: "Neros Verfolgung blieb auf die Stadt Rom beschränkt." }
-    ], erklaerung: "Zu Beginn des 4. Jahrhunderts, ab dem Jahr 303, erreichte die Verfolgung ihren Höhepunkt." },
-    { frage: "Wie endeten die staatlichen Verfolgungen?", antworten: [
-      { text: "Ein Kaiser erlaubte den Glauben", richtig: true },
-      { text: "Die Christen flohen aus Rom", richtig: false },
-      { text: "Das Reich ging unter", richtig: false }
-    ], erklaerung: "Kurz vor seinem Tod erließ Kaiser Galerius 311 ein Gesetz, das die christliche Religion nicht mehr verbot." },
-    { frage: "Was geschah mit den Verfolgten unter Nero?", antworten: [
-      { text: "Sie wurden getötet", richtig: true },
-      { text: "Sie wurden verbannt", richtig: false },
-      { text: "Sie mussten zahlen", richtig: false }
-    ], erklaerung: "Viele wurden verfolgt, gefoltert und umgebracht." },
-    { frage: "Wie grausam ging man bei den Verfolgungen vor?", antworten: [
-      { text: "Tieren vorgeworfen", richtig: true },
-      { text: "Ins Gefängnis gesperrt", richtig: false },
-      { text: "Zur Arbeit gezwungen", richtig: false }
-    ], erklaerung: "Viele Verfolgte wurden den Tieren zum Fraß vorgeworfen oder bei lebendigem Leib verbrannt." },
-    { frage: "Was geschah mit Kirchen und christlichen Schriften?", antworten: [
-      { text: "Sie wurden verbrannt", richtig: true },
-      { text: "Sie wurden verkauft", richtig: false },
-      { text: "Sie blieben unberührt", richtig: false }
-    ], erklaerung: "Kirchen wurden angezündet, Gottesdienste verboten, christliche Schriften verbrannt." },
-    { frage: "Was geschah mit reichen Christen?", antworten: [
-      { text: "Sie wurden enteignet", richtig: true },
-      { text: "Sie wurden Kaiser", richtig: false },
-      { text: "Sie durften bleiben", richtig: false }
-    ], erklaerung: "Adlige und reiche Christinnen und Christen verloren ihren Besitz." },
-    { frage: "Wer war Konstantins Rivale?", antworten: [
-      { text: "Maxentius", richtig: true },
-      { text: "Diokletian", richtig: false },
-      { text: "Nero", richtig: false }
-    ], erklaerung: "Maxentius war ebenfalls römischer Kaiser und verfolgte dieselben Pläne." },
-    { frage: "In welchem Jahr fand die entscheidende Schlacht statt?", antworten: [
-      { text: "312", richtig: true },
-      { text: "313", richtig: false, warum: "313 ist das Jahr der Mailänder Vereinbarung, ein Jahr nach der Schlacht." },
-      { text: "303", richtig: false }
-    ], erklaerung: "Die Geschichte spielt in der Nacht des 27. Oktober 312 vor den Toren Roms." },
-    { frage: "Was ließ Konstantin im Morgengrauen tun?", antworten: [
-      { text: "Ein Zeichen auf die Schilde", richtig: true },
-      { text: "Die Soldaten taufen", richtig: false, warum: "Getauft wurde niemand - er malte nur das Zeichen auf die Schilde." },
-      { text: "Einen Altar bauen", richtig: false }
-    ], erklaerung: "Er malte das Zeichen des Christengottes auf die Schilde seiner Soldaten." },
-    { frage: "Wie ging die Schlacht aus?", antworten: [
-      { text: "Konstantin siegte", richtig: true },
-      { text: "Maxentius siegte", richtig: false },
-      { text: "Unentschieden", richtig: false }
-    ], erklaerung: "Konstantin gewann und wurde neuer Kaiser von Rom." },
-    { frage: "Wie nennt man Konstantins Hinwendung zum Christentum?", antworten: [
-      { text: "Konstantinische Wende", richtig: true },
-      { text: "Völkerwanderung", richtig: false },
-      { text: "Reformation", richtig: false }
-    ], erklaerung: "Die Hinwendung Konstantins zum Christentum heißt Konstantinische Wende." },
-    { frage: "Was tat Konstantin nach dem Sieg für die Christen?", antworten: [
-      { text: "Kirchen bauen lassen", richtig: true },
-      { text: "Gottesdienste verbieten", richtig: false },
-      { text: "Schriften verbrennen", richtig: false }
-    ], erklaerung: "Er ließ Kirchen bauen und gab den Gemeinden ihren beschlagnahmten Besitz zurück." },
-    { frage: "In welchem Jahr wurde die Mailänder Vereinbarung getroffen?", antworten: [
-      { text: "313", richtig: true },
-      { text: "312", richtig: false, warum: "312 war die Schlacht, die Vereinbarung kam ein Jahr später." },
-      { text: "393", richtig: false, warum: "393 wurde das Christentum Staatsreligion." }
-    ], erklaerung: "313 wurde das Christentum als erlaubte Religion bestätigt." },
-    { frage: "Wann ließ sich Konstantin taufen?", antworten: [
-      { text: "Kurz vor seinem Tod", richtig: true },
-      { text: "Direkt nach der Schlacht", richtig: false },
-      { text: "Als Kind", richtig: false }
-    ], erklaerung: "Erst kurz vor seinem Tod ließ er sich taufen - damit war er der erste christliche Kaiser." },
-    { frage: "Worin zeigt sich laut Jesus die Liebe zu Gott?", antworten: [
-      { text: "In der Nächstenliebe", richtig: true },
-      { text: "In reichen Opfern", richtig: false },
-      { text: "In langen Gebeten", richtig: false }
-    ], erklaerung: "Die Liebe zu Gott zeigt sich vor allem in der Liebe zum Nächsten und zu den Schwachen." },
-    { frage: "Was verkündeten Jesu Anhänger nach seiner Hinrichtung?", antworten: [
-      { text: "Seine Auferstehung", richtig: true },
-      { text: "Seine Flucht", richtig: false },
-      { text: "Seine Rückkehr nach Nazareth", richtig: false }
-    ], erklaerung: "Drei Tage später verkündeten sie, er sei von den Toten auferweckt worden." },
-    { frage: "Was ist die Frohe Botschaft?", antworten: [
-      { text: "Ewiges Leben nach dem Tod", richtig: true },
-      { text: "Reichtum auf Erden", richtig: false },
-      { text: "Sieg über Rom", richtig: false }
-    ], erklaerung: "Das Versprechen auf ein ewiges, glückliches Leben nach dem Tod gab den Menschen Hoffnung." },
-    { frage: "Was ist ein Martyrium?", antworten: [
-      { text: "Leiden für den Glauben", richtig: true },
-      { text: "Ein Gottesdienst", richtig: false },
-      { text: "Eine Taufe", richtig: false }
-    ], erklaerung: "Menschen, die für ihren Glauben leiden und sterben, nennt man Märtyrer." },
-    { frage: "Was änderte sich für die Christen durch Konstantin?", antworten: [
+      { text: "Vom Kaiser persönlich", richtig: false, warum: "Anfangs verfolgte der Staat noch nicht gezielt – er reagierte nur." },
+      { text: "Von Nachbarvölkern", richtig: false }
+    ], erklaerung: "Am Anfang waren es Nachbarn und Bekannte, die Christen anzeigten." },
+
+    { frage: "Was zeigt die Anweisung, nicht nach Christen zu fahnden?", antworten: [
+      { text: "Der Staat sah keine große Gefahr", richtig: true },
+      { text: "Der Staat war zu schwach", richtig: false },
+      { text: "Der Staat schützte die Christen", richtig: false, warum: "Geschützt wurden sie nicht – wer angezeigt wurde, kam vor Gericht." }
+    ], erklaerung: "Solange Christen unauffällig blieben, ließ man sie in Ruhe. Erst die Anzeige machte den Fall." },
+
+    { frage: "Was änderte sich bei den Verfolgungen im 3. Jahrhundert?", antworten: [
+      { text: "Der Staat verfolgte gezielt", richtig: true },
+      { text: "Die Verfolgungen hörten auf", richtig: false },
+      { text: "Nur noch Nachbarn zeigten an", richtig: false, warum: "Das war vorher so. Jetzt gab es Gesetze gegen die Christen." }
+    ], erklaerung: "Aus einzelnen Anzeigen wurde eine reichsweite Verfolgung per Gesetz." },
+
+    { frage: "Warum konnte ein Angeklagter durch ein Opfer freikommen?", antworten: [
+      { text: "Das Opfer galt als Treuebeweis", richtig: true },
+      { text: "Es war ein Bußgeld", richtig: false },
+      { text: "Es war eine Taufe", richtig: false }
+    ], erklaerung: "Rom wollte keine Toten, sondern Gehorsam. Wer opferte, hatte sich untergeordnet." },
+
+    { frage: "Warum blieben viele Christen trotzdem standhaft?", antworten: [
+      { text: "Der Glaube war wichtiger als das Leben", richtig: true },
+      { text: "Sie hofften auf Geld", richtig: false },
+      { text: "Sie durften nicht fliehen", richtig: false }
+    ], erklaerung: "Für sie hätte das Opfer bedeutet, ihren Glauben zu verraten." },
+
+    { frage: "Was ist ein Märtyrer?", antworten: [
+      { text: "Wer für den Glauben stirbt", richtig: true },
+      { text: "Ein Gemeindeleiter", richtig: false },
+      { text: "Ein getaufter Soldat", richtig: false }
+    ], erklaerung: "Märtyrer wurden zu Vorbildern: Ihr Glaube war stärker als die Angst." },
+
+    { frage: "Warum schadeten die Verfolgungen dem Christentum weniger als gedacht?", antworten: [
+      { text: "Die Standhaftigkeit beeindruckte", richtig: true },
+      { text: "Niemand bemerkte sie", richtig: false },
+      { text: "Rom entschuldigte sich", richtig: false }
+    ], erklaerung: "Viele fragten sich: Was ist das für ein Glaube, für den Menschen sterben?" },
+
+    { frage: "Warum ging der Staat auch gegen Kirchen und Schriften vor?", antworten: [
+      { text: "Er wollte die Religion auslöschen", richtig: true },
+      { text: "Er brauchte das Baumaterial", richtig: false },
+      { text: "Er wollte Platz für Tempel", richtig: false }
+    ], erklaerung: "Nicht nur Menschen, auch alles, was den Glauben weitergibt, sollte verschwinden." },
+
+    { frage: "Was gab den Christen in der Verfolgung Hoffnung?", antworten: [
+      { text: "Das Versprechen ewigen Lebens", richtig: true },
+      { text: "Die Aussicht auf Reichtum", richtig: false },
+      { text: "Ein Sieg über Rom", richtig: false }
+    ], erklaerung: "Die Frohe Botschaft nahm dem Tod seinen Schrecken – das machte sie belastbar." },
+
+    { frage: "Was heißt konstantinische Wende?", antworten: [
       { text: "Von verfolgt zu gefördert", richtig: true },
       { text: "Von gefördert zu verboten", richtig: false },
       { text: "Von erlaubt zu verfolgt", richtig: false }
-    ], erklaerung: "Aus einer verfolgten Religion wurde eine vom Kaiser besonders geförderte Religion." }
+    ], erklaerung: "Innerhalb weniger Jahre kehrte sich die Lage der Christen ins Gegenteil um." },
+
+    { frage: "Warum spricht man von einer Wende und nicht von einem Schritt?", antworten: [
+      { text: "Die Lage kehrte sich um", richtig: true },
+      { text: "Es ging sehr langsam", richtig: false },
+      { text: "Es betraf nur Rom", richtig: false }
+    ], erklaerung: "Aus der bedrohten Minderheit wurde die vom Kaiser bevorzugte Religion." },
+
+    { frage: "Was wurde 313 in Mailand vereinbart?", antworten: [
+      { text: "Freie Religionsausübung", richtig: true },
+      { text: "Christentum als Staatsreligion", richtig: false, warum: "Staatsreligion wurde es erst Jahrzehnte später." },
+      { text: "Verbot aller alten Kulte", richtig: false, warum: "Die alten Kulte blieben zunächst erlaubt." }
+    ], erklaerung: "Zunächst galt: Jeder darf glauben, was er will – auch die Christen." },
+
+    { frage: "Warum war das für die Christen ein großer Unterschied?", antworten: [
+      { text: "Der Glaube war nicht mehr strafbar", richtig: true },
+      { text: "Alle mussten Christen werden", richtig: false },
+      { text: "Sie bekamen Ämter im Heer", richtig: false }
+    ], erklaerung: "Zum ersten Mal konnten sie offen leben, ohne Anzeige und Prozess fürchten zu müssen." },
+
+    { frage: "Welchen politischen Nutzen hatte Konstantins Unterstützung?", antworten: [
+      { text: "Sie stärkte die Einheit des Reiches", richtig: true },
+      { text: "Sie sparte Steuern", richtig: false },
+      { text: "Sie beendete alle Kriege", richtig: false }
+    ], erklaerung: "Eine wachsende, gut organisierte Religion konnte das Reich zusammenhalten." },
+
+    { frage: "Was spricht dafür, dass Konstantin auch politisch dachte?", antworten: [
+      { text: "Er ließ sich erst spät taufen", richtig: true },
+      { text: "Er zerstörte alle Tempel", richtig: false },
+      { text: "Er verbot das Opfern", richtig: false }
+    ], erklaerung: "Er förderte die Kirche früh, wurde selbst aber erst kurz vor seinem Tod getauft." },
+
+    { frage: "Warum ist Konstantins Vision historisch unsicher?", antworten: [
+      { text: "Sie wurde erst später berichtet", richtig: true },
+      { text: "Sie steht in der Bibel", richtig: false },
+      { text: "Konstantin bestritt sie", richtig: false }
+    ], erklaerung: "Christliche Autoren erzählen davon lange nach der Schlacht. Was geschah, weiß niemand sicher." },
+
+    { frage: "Was gewann die Kirche durch die Nähe zum Kaiser?", antworten: [
+      { text: "Besitz, Bauten und Einfluss", richtig: true },
+      { text: "Mehr Märtyrer", richtig: false },
+      { text: "Weniger Mitglieder", richtig: false }
+    ], erklaerung: "Sie erhielt Besitz zurück, bekam Geschenke und durfte große Kirchen bauen." },
+
+    { frage: "Welche Gefahr brachte diese Nähe zur Macht mit sich?", antworten: [
+      { text: "Abhängigkeit von der Politik", richtig: true },
+      { text: "Verlust aller Schriften", richtig: false },
+      { text: "Rückkehr der Verfolgung", richtig: false }
+    ], erklaerung: "Wer vom Kaiser gefördert wird, kann ihm schlecht widersprechen." },
+
+    { frage: "Wie veränderte sich die Rolle der Christen insgesamt?", antworten: [
+      { text: "Von Minderheit zur Mehrheit", richtig: true },
+      { text: "Von Mehrheit zur Minderheit", richtig: false },
+      { text: "Sie blieb unverändert", richtig: false }
+    ], erklaerung: "Aus einer verfolgten Gruppe wurde nach und nach die Religion des ganzen Reiches." },
+
+    { frage: "Was konnte dabei verloren gehen?", antworten: [
+      { text: "Die Entschiedenheit des Anfangs", richtig: true },
+      { text: "Die Bibel", richtig: false },
+      { text: "Die Taufe", richtig: false }
+    ], erklaerung: "Christ zu sein kostete nun nichts mehr – manche wurden es aus Gewohnheit oder Vorteil." },
+
+    { frage: "Was unterscheidet die Urgemeinde von der Kirche nach 313?", antworten: [
+      { text: "Arme Gemeinschaft statt mächtige Kirche", richtig: true },
+      { text: "Beten statt Glauben", richtig: false },
+      { text: "Frauen statt Männer", richtig: false }
+    ], erklaerung: "Aus kleinen Hausgemeinden wurde eine Kirche mit Prachtbauten und Einfluss." },
+
+    { frage: "Was lässt sich aus der Geschichte der Verfolgungen lernen?", antworten: [
+      { text: "Minderheiten brauchen Schutz", richtig: true },
+      { text: "Mehrheiten haben immer recht", richtig: false },
+      { text: "Religion gehört verboten", richtig: false }
+    ], erklaerung: "Wo eine Gruppe pauschal beschuldigt wird, wird es für sie schnell gefährlich." }
   ]
 };

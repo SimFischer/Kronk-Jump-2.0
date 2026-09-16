@@ -1,143 +1,135 @@
 // Religion, Klasse 7: Die Urgemeinde.
 // Arbeitsblätter "Die Urgemeinde" (Apg 2,36-47) und "Ein Gespräch am Brunnen".
-// Kurze Fragen, kurze Antworten - passend zu den Antwortkarten im Spiel.
+// Verständnisfragen: Es geht um Zusammenhänge und Gründe, nicht um
+// Detailwissen aus dem Text (Zahlen, Namen, Formulierungen).
+// Antworten bewusst kurz - sie müssen auf die Antwortkarten im Spiel passen.
 window.KRONK_SAMMLUNGEN["religion-7-urgemeinde"] = {
   mischen: true,
   fragen: [
-    { frage: "In welchem Bibelbuch steht der Text über die Urgemeinde?", antworten: [
-      { text: "Apostelgeschichte", richtig: true },
-      { text: "Buch Exodus", richtig: false, warum: "Exodus steht im Alten Testament und erzählt vom Auszug aus Ägypten." },
-      { text: "Offenbarung", richtig: false, warum: "Die Offenbarung ist das letzte Buch der Bibel und handelt von der Endzeit." }
-    ], erklaerung: "Der Text stammt aus der Apostelgeschichte, Kapitel 2, Verse 36-47." },
-    { frage: "Wer hält die Rede an die Zuhörer?", antworten: [
-      { text: "Petrus", richtig: true },
-      { text: "Johannes", richtig: false, warum: "Johannes steht zwar dabei, gesprochen hat aber Petrus." },
-      { text: "Paulus", richtig: false, warum: "Paulus wird erst später Christ und gehört hier noch nicht dazu." }
-    ], erklaerung: "Petrus antwortet den Zuhörern zusammen mit den anderen Aposteln." },
-    { frage: "Was fragen die Zuhörer die Apostel?", antworten: [
-      { text: "Was sollen wir tun?", richtig: true },
-      { text: "Wer bezahlt uns?", richtig: false },
-      { text: "Wann kommt der Kaiser?", richtig: false }
-    ], erklaerung: "Die Rede trifft sie mitten ins Herz, darum fragen sie: Brüder, was sollen wir tun?" },
-    { frage: "Wozu ruft Petrus auf?", antworten: [
-      { text: "Umkehr und Taufe", richtig: true },
-      { text: "Opfer für die Götter", richtig: false, warum: "Opfer für die römischen Götter verlangte später der Staat, nicht Petrus." },
-      { text: "Auswanderung", richtig: false }
-    ], erklaerung: "Kehrt um und lasst euch taufen auf Jesus Christus." },
-    { frage: "Wie wird man Mitglied der Urgemeinde?", antworten: [
-      { text: "Durch die Taufe", richtig: true },
-      { text: "Durch Geburt", richtig: false, warum: "Man wird nicht hineingeboren: Die Menschen entscheiden sich selbst." },
-      { text: "Durch Geld", richtig: false, warum: "Besitz wird in der Gemeinde geteilt, nicht als Eintritt bezahlt." }
-    ], erklaerung: "Wer die Botschaft annimmt, lässt sich taufen und gehört dazu." },
-    { frage: "Was schenkt Gott den Getauften laut Petrus?", antworten: [
-      { text: "Den Heiligen Geist", richtig: true },
-      { text: "Ein Amt in Rom", richtig: false },
-      { text: "Land und Vieh", richtig: false }
-    ], erklaerung: "Gott vergibt die Schuld und schenkt den Heiligen Geist." },
-    { frage: "Für wen gilt Gottes Versprechen?", antworten: [
-      { text: "Für jeden und jede", richtig: true },
-      { text: "Nur für Priester", richtig: false },
-      { text: "Nur für Männer", richtig: false, warum: "Petrus sagt ausdrücklich: jeder und jede im Volk." }
-    ], erklaerung: "Das Versprechen gilt den Zuhörern, ihren Kindern und allen, die noch fern sind." },
-    { frage: "Wie viele Menschen kommen an diesem Tag dazu?", antworten: [
-      { text: "Etwa 3.000", richtig: true },
-      { text: "Etwa 300", richtig: false },
-      { text: "Etwa 30", richtig: false }
-    ], erklaerung: "Etwa dreitausend Menschen wurden an diesem Tag zur Gemeinde hinzugefügt." },
-    { frage: "Von wem lässt sich die Gemeinde unterweisen?", antworten: [
-      { text: "Von den Aposteln", richtig: true },
-      { text: "Von den Hohen Priestern", richtig: false },
-      { text: "Von römischen Beamten", richtig: false }
-    ], erklaerung: "Sie ließen sich von den Aposteln unterweisen." },
-    { frage: "Welche vier Dinge prägen das Gemeindeleben?", antworten: [
-      { text: "Lehre, Liebe, Mahl, Gebet", richtig: true },
-      { text: "Handel, Militär, Steuern", richtig: false },
-      { text: "Opfer, Orakel, Tempelbau", richtig: false }
-    ], erklaerung: "Unterweisung, gegenseitige Liebe, das Mahl des Herrn und das gemeinsame Gebet." },
-    { frage: "Was tut die Gemeinde mit ihrem Besitz?", antworten: [
-      { text: "Sie tut ihn zusammen", richtig: true },
-      { text: "Jeder behält alles", richtig: false, warum: "Im Text bilden alle Gläubigen eine enge Gemeinschaft und legen ihren Besitz zusammen." },
-      { text: "Sie gibt ihn dem Kaiser", richtig: false }
-    ], erklaerung: "Alle, die zum Glauben gekommen waren, taten ihren ganzen Besitz zusammen." },
-    { frage: "Wer bekommt den Erlös aus den Verkäufen?", antworten: [
-      { text: "Die Bedürftigen", richtig: true },
-      { text: "Die Apostel allein", richtig: false },
-      { text: "Der Tempel", richtig: false }
-    ], erklaerung: "Grundstücke und Wertgegenstände wurden verkauft, der Erlös an Bedürftige verteilt." },
-    { frage: "Wie nennt man dieses Teilen von Besitz?", antworten: [
-      { text: "Gütergemeinschaft", richtig: true },
-      { text: "Kirchensteuer", richtig: false, warum: "Die Kirchensteuer ist eine moderne staatliche Abgabe." },
-      { text: "Zehnter", richtig: false, warum: "Der Zehnte ist eine feste Abgabe von einem Zehntel, nicht das Teilen des ganzen Besitzes." }
-    ], erklaerung: "Das gemeinsame Teilen des Eigentums heißt Gütergemeinschaft." },
-    { frage: "Wo trifft sich die Gemeinde täglich?", antworten: [
-      { text: "Im Tempel", richtig: true },
-      { text: "Im Amphitheater", richtig: false },
-      { text: "In den Katakomben", richtig: false, warum: "Katakomben werden erst in der Zeit der Verfolgungen in Rom wichtig." }
-    ], erklaerung: "Tag für Tag versammelten sie sich einmütig im Tempel." },
-    { frage: "Wo feiern sie das Mahl des Herrn?", antworten: [
-      { text: "In ihren Häusern", richtig: true },
-      { text: "Auf dem Marktplatz", richtig: false },
-      { text: "In der Synagoge", richtig: false }
-    ], erklaerung: "In ihren Häusern hielten sie das Mahl des Herrn und aßen gemeinsam." },
-    { frage: "Wie wirkt die Gemeinde auf das Volk?", antworten: [
-      { text: "Sie wird geachtet", richtig: true },
-      { text: "Sie wird ausgelacht", richtig: false },
-      { text: "Sie wird vertrieben", richtig: false }
-    ], erklaerung: "Sie priesen Gott und wurden vom ganzen Volk geachtet." },
-    { frage: "Wie entwickelt sich die Zahl der Mitglieder?", antworten: [
-      { text: "Sie wächst täglich", richtig: true },
-      { text: "Sie bleibt gleich", richtig: false },
-      { text: "Sie sinkt", richtig: false }
-    ], erklaerung: "Der Herr führte ihnen jeden Tag weitere Menschen zu." },
-    { frage: "Welche Stimmung beschreibt der Text beim Mahl?", antworten: [
-      { text: "Jubelnde Freude", richtig: true },
-      { text: "Stille Trauer", richtig: false },
-      { text: "Angst und Sorge", richtig: false }
-    ], erklaerung: "Sie aßen gemeinsam, mit jubelnder Freude und reinem Herzen." },
-    { frage: "Warum war der Brunnen so wichtig?", antworten: [
-      { text: "Treffpunkt für Neuigkeiten", richtig: true },
-      { text: "Gerichtsort der Stadt", richtig: false },
-      { text: "Eingang zum Tempel", richtig: false }
-    ], erklaerung: "Vor dem fließenden Wasser war der Brunnen der wichtigste Treffpunkt: Dort tauschte man Neuigkeiten aus." },
-    { frage: "Über wen reden Marta und Chaja zuerst?", antworten: [
-      { text: "Hauptmann Kornelius", richtig: true },
-      { text: "Kaiser Nero", richtig: false },
-      { text: "Petrus", richtig: false }
-    ], erklaerung: "Kornelius hat sich der Christussekte angeschlossen und wurde getauft." },
-    { frage: "Was ist an Kornelius für Marta und Chaja anstößig?", antworten: [
-      { text: "Er ist ein Heide", richtig: true },
-      { text: "Er ist Sklave", richtig: false },
-      { text: "Er ist Priester", richtig: false }
-    ], erklaerung: "Der? Aber der ist doch ein Heide! - Dass auch Nichtjuden getauft werden, empört die beiden." },
-    { frage: "Welches Gerücht über die Christen nennt Marta?", antworten: [
-      { text: "Sie essen Menschenfleisch", richtig: true },
-      { text: "Sie stehlen Wasser", richtig: false },
-      { text: "Sie verbrennen Bücher", richtig: false }
-    ], erklaerung: "Marta fragt, ob es stimme, dass die Christen Menschenfleisch essen." },
-    { frage: "Woher kommt das Gerücht vom Menschenfleisch?", antworten: [
-      { text: "Vom Abendmahl", richtig: true },
-      { text: "Von der Taufe", richtig: false, warum: "Die Taufe ist ein Ritual mit Wasser - damit hat das Gerücht nichts zu tun." },
-      { text: "Von der Fußwaschung", richtig: false }
-    ], erklaerung: "Die Christen teilen Leib und Blut Christi. Außenstehende verstehen das wörtlich falsch." },
-    { frage: "Was werfen die Frauen den Christen im Blick auf Jesus vor?", antworten: [
+    { frage: "Was meint das Wort Urgemeinde?", antworten: [
+      { text: "Die erste Christengemeinde", richtig: true },
+      { text: "Eine Gemeinde im Mittelalter", richtig: false, warum: "Die Urgemeinde entstand rund 1.000 Jahre früher, direkt nach Jesu Tod." },
+      { text: "Ein Dorf in Israel heute", richtig: false }
+    ], erklaerung: "Gemeint ist die allererste Gemeinschaft von Christen, kurz nach Ostern in Jerusalem." },
+
+    { frage: "Warum war Taufe mehr als ein Ritual?", antworten: [
+      { text: "Sie bedeutete einen Neuanfang", richtig: true },
+      { text: "Sie machte reich", richtig: false },
+      { text: "Sie ersetzte die Arbeit", richtig: false }
+    ], erklaerung: "Wer sich taufen ließ, wollte sein Leben ändern - das meint Umkehr." },
+
+    { frage: "Was war neu am Zugang zur Gemeinde?", antworten: [
+      { text: "Jeder konnte sich entscheiden", richtig: true },
+      { text: "Nur Priester durften hinein", richtig: false },
+      { text: "Man musste hineingeboren sein", richtig: false, warum: "Genau das war anders: Nicht Herkunft, sondern eigene Entscheidung zählte." }
+    ], erklaerung: "Herkunft, Stand und Geschlecht spielten keine Rolle - entscheidend war der Glaube." },
+
+    { frage: "Warum teilten die Christen ihren Besitz?", antworten: [
+      { text: "Niemand sollte Not leiden", richtig: true },
+      { text: "Um Steuern zu sparen", richtig: false },
+      { text: "Weil der Kaiser es befahl", richtig: false, warum: "Der Staat hatte damit nichts zu tun, es war eine freiwillige Entscheidung." }
+    ], erklaerung: "Das Teilen war gelebte Nächstenliebe: Wer etwas brauchte, bekam es aus der Gemeinschaft." },
+
+    { frage: "Was zeigt die Gütergemeinschaft über den Glauben?", antworten: [
+      { text: "Glaube zeigt sich im Handeln", richtig: true },
+      { text: "Glaube ist reine Privatsache", richtig: false },
+      { text: "Besitz ist immer Sünde", richtig: false, warum: "Besitz wurde nicht verteufelt, sondern geteilt." }
+    ], erklaerung: "Was die Christen glaubten, sollte man an ihrem Alltag erkennen können." },
+
+    { frage: "Warum war das gemeinsame Mahl so wichtig?", antworten: [
+      { text: "Es schuf Gemeinschaft", richtig: true },
+      { text: "Es war besonders günstig", richtig: false },
+      { text: "Es war römische Pflicht", richtig: false }
+    ], erklaerung: "Beim Essen erinnerten sie sich an Jesus und erlebten sich zugleich als eine Familie." },
+
+    { frage: "Warum traf man sich in Privathäusern?", antworten: [
+      { text: "Es gab noch keine Kirchen", richtig: true },
+      { text: "Häuser waren größer", richtig: false },
+      { text: "Draußen war es verboten", richtig: false }
+    ], erklaerung: "Kirchengebäude entstanden erst später. Die Gemeinde traf sich dort, wo Platz war." },
+
+    { frage: "Was hielt diese Menschen zusammen?", antworten: [
+      { text: "Der gemeinsame Glaube", richtig: true },
+      { text: "Die gleiche Familie", richtig: false },
+      { text: "Der gleiche Beruf", richtig: false }
+    ], erklaerung: "Sie kamen aus ganz verschiedenen Schichten - verbunden hat sie allein ihr Glaube." },
+
+    { frage: "Warum wuchs die Gemeinde so schnell?", antworten: [
+      { text: "Ihr Leben überzeugte andere", richtig: true },
+      { text: "Sie zahlten Eintrittsgeld", richtig: false },
+      { text: "Sie zwangen die Leute", richtig: false, warum: "Niemand wurde gezwungen, die Menschen kamen freiwillig." }
+    ], erklaerung: "Zusammenhalt, Teilen und Freude machten die Gemeinde für andere anziehend." },
+
+    { frage: "Für wen galt die christliche Botschaft?", antworten: [
+      { text: "Für alle Menschen", richtig: true },
+      { text: "Nur für Männer", richtig: false },
+      { text: "Nur für Reiche", richtig: false }
+    ], erklaerung: "Arme und Reiche, Frauen und Männer, Juden und Nichtjuden - alle waren eingeladen." },
+
+    { frage: "Warum war die Taufe von Nichtjuden ein Streitpunkt?", antworten: [
+      { text: "Das Christentum kam aus dem Judentum", richtig: true },
+      { text: "Nichtjuden konnten nicht lesen", richtig: false },
+      { text: "Rom hatte es verboten", richtig: false }
+    ], erklaerung: "Viele fanden: Wer dazugehören will, muss erst Jude werden. Die Gemeinde entschied sich anders." },
+
+    { frage: "Woran erkannten Außenstehende die Christen?", antworten: [
+      { text: "Am Umgang miteinander", richtig: true },
+      { text: "An besonderer Kleidung", richtig: false },
+      { text: "An einer eigenen Sprache", richtig: false }
+    ], erklaerung: "Auffällig war nicht ihr Aussehen, sondern wie sie miteinander umgingen." },
+
+    { frage: "Warum entstanden Gerüchte über die Christen?", antworten: [
+      { text: "Ihre Feiern blieben unter sich", richtig: true },
+      { text: "Sie erzählten Lügen", richtig: false },
+      { text: "Sie konnten nicht schreiben", richtig: false }
+    ], erklaerung: "Was man nicht kennt, macht Angst. Aus Unwissen wurden schnell wilde Geschichten." },
+
+    { frage: "Wie kam das Gerücht vom Menschenfleisch zustande?", antworten: [
+      { text: "Bilder des Abendmahls falsch verstanden", richtig: true },
+      { text: "Christen jagten nachts", richtig: false },
+      { text: "Römer erfanden es aus Spaß", richtig: false }
+    ], erklaerung: "Von Leib und Blut Christi zu sprechen, verstanden Außenstehende wörtlich." },
+
+    { frage: "Warum war der Glaube an einen Gekreuzigten anstößig?", antworten: [
+      { text: "Das Kreuz war Verbrecherstrafe", richtig: true },
+      { text: "Jesus war Ausländer", richtig: false },
+      { text: "Kreuze waren verboten", richtig: false }
+    ], erklaerung: "Einen Hingerichteten als Gott zu verehren, wirkte auf viele völlig absurd." },
+
+    { frage: "Was warfen Juden wie Marta den Christen vor?", antworten: [
       { text: "Gotteslästerung", richtig: true },
       { text: "Steuerbetrug", richtig: false },
-      { text: "Diebstahl", richtig: false }
-    ], erklaerung: "Die Christen beten einen am Kreuz hingerichteten Menschen als Gott an. Für Marta ist nur Jahwe Gott." },
-    { frage: "Was stört Marta und Chaja an Jesu Tod?", antworten: [
-      { text: "Tod als Schwerverbrecher", richtig: true },
-      { text: "Tod im Krieg", richtig: false },
-      { text: "Tod im Gefängnis", richtig: false }
-    ], erklaerung: "Chaja würde sich schämen, wenn ein Bekannter als Schwerverbrecher am Kreuz enden würde." },
-    { frage: "Wen zieht die neue Lehre laut Chaja besonders an?", antworten: [
-      { text: "Junge Leute", richtig: true },
-      { text: "Nur alte Männer", richtig: false },
-      { text: "Nur Soldaten", richtig: false }
-    ], erklaerung: "Gerade junge Leute fallen auf die klugen Redner der Gemeinde herein, meint Chaja." },
-    { frage: "Was beschließen Marta und Chaja am Ende?", antworten: [
-      { text: "Zum Hohen Rat zu gehen", richtig: true },
-      { text: "Selbst Christinnen zu werden", richtig: false },
-      { text: "Die Stadt zu verlassen", richtig: false }
-    ], erklaerung: "Komm, wir gehen jetzt gleich zum Hohen Rat. Aus dem Gerede am Brunnen wird eine Anzeige." }
+      { text: "Fahnenflucht", richtig: false }
+    ], erklaerung: "Für sie gab es nur einen Gott - einen Menschen göttlich zu nennen, war undenkbar." },
+
+    { frage: "Warum fühlten sich viele von den Christen bedroht?", antworten: [
+      { text: "Sie stellten Gewohntes infrage", richtig: true },
+      { text: "Sie waren bewaffnet", richtig: false },
+      { text: "Sie waren in der Mehrheit", richtig: false, warum: "Die Christen waren eine kleine Minderheit." }
+    ], erklaerung: "Neue Überzeugungen rütteln an dem, was für alle selbstverständlich war." },
+
+    { frage: "Warum wurde aus Gerede am Brunnen eine Anzeige?", antworten: [
+      { text: "Misstrauen wurde zur Empörung", richtig: true },
+      { text: "Der Hohe Rat rief dazu auf", richtig: false },
+      { text: "Es gab eine Belohnung", richtig: false }
+    ], erklaerung: "Gerüchte können gefährlich werden: Aus Reden wird schnell Handeln gegen andere." },
+
+    { frage: "Was gab den Christen Hoffnung?", antworten: [
+      { text: "Leben über den Tod hinaus", richtig: true },
+      { text: "Reichtum auf Erden", richtig: false },
+      { text: "Der Sieg über Rom", richtig: false }
+    ], erklaerung: "Die Botschaft von der Auferstehung nahm dem Tod seinen Schrecken." },
+
+    { frage: "Was macht die Urgemeinde bis heute zum Vorbild?", antworten: [
+      { text: "Teilen und Zusammenhalt", richtig: true },
+      { text: "Ihre große Macht", richtig: false },
+      { text: "Ihre schönen Gebäude", richtig: false, warum: "Gebäude hatte sie gar nicht - sie traf sich in Wohnhäusern." }
+    ], erklaerung: "Gemeinden berufen sich bis heute auf dieses Bild: füreinander da sein, niemanden zurücklassen." },
+
+    { frage: "Was ist an diesem Bild der Urgemeinde kritisch zu sehen?", antworten: [
+      { text: "Es ist ein Idealbild", richtig: true },
+      { text: "Es ist frei erfunden", richtig: false },
+      { text: "Es stammt von Römern", richtig: false }
+    ], erklaerung: "Der Text zeigt, wie Gemeinde sein soll. Der Alltag war sicher auch damals schwieriger." }
   ]
 };
